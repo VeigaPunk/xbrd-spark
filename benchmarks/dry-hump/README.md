@@ -1,0 +1,81 @@
+# dry-hump — Sekhmet 64-concurrent Titanium benchmark example
+
+**Name:** dry-hump  
+**Substrate:** Sekhmet (`xbrd-spark`) on **Codex Titanium**  
+**Shape:** 8 domain swarms × 8 sparks = **64 concurrent** Titanium runs  
+**Fire model:** barrier (`READY` → simultaneous `FIRE`) then wall-clock to all `DONE`
+
+## Headline result (recorded live)
+
+| Metric | Value |
+|--------|------:|
+| Wall clock (FIRE → all DONE) | **26.034 s** |
+| Total sparks | **64** |
+| Status | **64 ok / 0 fail** |
+| Per-spark duration | min 3.7s · max 16.4s · avg 9.7s |
+| Model | `gpt-5.3-codex-spark` |
+| Dispatcher | `codex-titanium` via `sekhmet swarm --direct -j 8` |
+
+Serial lower bound at avg duration: ~10+ minutes. Observed wall **~26s** ⇒ real concurrency.
+
+## Domains (8 labrats)
+
+| Domain | Theme |
+|--------|--------|
+| `religion` | faith vs reason, divine command, sacred vs civil law |
+| `sex` | adult consent / fidelity / sex-work ethics (adults only) |
+| `drugs` | decrim, harm reduction, opioids policy dilemmas |
+| `politics` | power, whistleblowing, civil disobedience |
+| `money` | greed, inheritance, disaster pricing |
+| `violence` | self-defense, just war, proportionality (philosophy only) |
+| `ai` | displacement, deepfakes, weapons, identity |
+| `charlie-kirk` | campus / free-speech / culture-war style dilemmas |
+
+Each domain has:
+
+- `domains/<name>/tasks.txt` — 8 questions (one per line)
+- `domains/<name>/results.ndjson` — compact per-spark outcomes
+- `domains/<name>/timing.txt` — domain swarm start/end/exit
+
+## Reproduce
+
+### Dry-run smoke (no Titanium, free)
+
+```bash
+ROOT=$(mktemp -d)
+for d in religion sex drugs politics money violence ai charlie-kirk; do
+  sekhmet swarm --dry-run -j 8 \
+    --tasks-file benchmarks/dry-hump/domains/$d/tasks.txt \
+    --root "$ROOT/$d" >/dev/null &
+done
+wait
+echo "dry-hump dry-run complete under $ROOT"
+```
+
+### Live Titanium (costs API; needs auth)
+
+```bash
+export CODEX_BIN=$(command -v codex-titanium || command -v codex)
+export PATH="$HOME/.cargo/bin:$PATH"
+BASE=$(mktemp -d)
+START=$(date +%s.%N)
+for d in religion sex drugs politics money violence ai charlie-kirk; do
+  mkdir -p "$BASE/$d"
+  sekhmet swarm --direct -j 8 --timeout 180 \
+    --tasks-file benchmarks/dry-hump/domains/$d/tasks.txt \
+    --root "$BASE/$d" \
+    > "$BASE/$d/ndjson.out" 2> "$BASE/$d/stderr.log" &
+done
+wait
+END=$(date +%s.%N)
+awk -v s="$START" -v e="$END" 'BEGIN{printf "wall_seconds=%.3f\n", e-s}'
+```
+
+Hard cap: Sekhmet swarm `--jobs` max **64**. This example uses **8×8** parallel processes for organizational isolation by domain; host concurrency peaks near **64** Titanium children.
+
+## Notes
+
+- Live namespaces under `/tmp` are **not** checked in (hundreds of MB of codex homes).
+- Questions are moral/policy dilemmas for load-gen + qualitative stress, not product advice.
+- Recorded run: 2026-08-01T22:40:38Z → 22:41:04Z UTC.
+

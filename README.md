@@ -170,3 +170,14 @@ The `--scope` path re-uses the exact exclude list and rsync pattern from `script
 ---
 
 *Keep moves that improve any axis and harm none. Let the frontier walk itself.*
+
+## Benchmark example: dry-hump
+
+64-concurrent Titanium moral-dilemma stress (8 domains × 8 sparks):
+
+See [`benchmarks/dry-hump/`](benchmarks/dry-hump/) — recorded **64/64 ok in ~26s** wall clock.
+
+```bash
+./benchmarks/dry-hump/run-dry.sh    # free dry-run smoke
+./benchmarks/dry-hump/run-live.sh   # live Codex Titanium (API cost)
+```

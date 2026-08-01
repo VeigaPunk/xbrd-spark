@@ -1,8 +1,9 @@
-//! xbrd-spark — pure L3 execution substrate for codex-spark under xbrd.
+//! xbrd-spark / sekhmet — pure L3 swarm dispatch substrate for codex-spark under xbreed.
 //!
 //! Isolation without git worktrees. Unique spark-id → namespaced ephemeral dir.
 //! Double-work is allowed; higher orchestrator (distiller/judge) collects + dedups.
-//! Any CLI or delegated agent (labrat, mutation-tester, executor) can invoke.
+//! Always available: any CLI or agent can call `run` or `swarm` (up to 64 concurrent).
+//! Rust only — no Python.
 
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
@@ -11,16 +12,21 @@ use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::io::{self, Read};
+use std::io::{self, BufRead, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::{Arc, Mutex};
+use std::thread;
 use std::time::Instant;
 use uuid::Uuid;
 
+/// Hard ceiling for concurrent swarm runners (always-available L3 pool size).
+pub const MAX_SWARM_CONCURRENCY: usize = 64;
+
 #[derive(Parser, Debug)]
 #[command(
-    name = "xbrd-spark",
-    about = "Pure L3 codex-spark worker surface (no worktrees, double-work OK)"
+    name = "sekhmet",
+    about = "Sekhmet — always-available swarm dispatch substrate (xbreed L3). Up to 64 concurrent runners."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -101,6 +107,63 @@ enum Commands {
         #[arg(long, env = "XBRD_SPARK_ROOT")]
         root: Option<PathBuf>,
     },
+
+    /// Run many tasks with a bounded pool of concurrent runners (max 64).
+    ///
+    /// Always-available swarm wrap: one process owns a pool of workers; each
+    /// task is an isolated spark namespace (same as `run`). Emits one NDJSON
+    /// CollectRecord per completed task (order is completion order).
+    Swarm {
+        /// Task source: file path, or `-` for stdin. Lines = tasks; lines
+        /// starting with `{` are JSON objects with `task` (+ optional `scope`, `id`).
+        #[arg(long = "tasks-file", short = 'f')]
+        tasks_file: Option<PathBuf>,
+
+        /// Number of concurrent runners (1..=64). Default 16. Env: XBRD_SPARK_JOBS.
+        #[arg(long, short = 'j', default_value_t = 16, env = "XBRD_SPARK_JOBS")]
+        jobs: usize,
+
+        /// Optional shared scope directory rsync'd into each spark workspace.
+        #[arg(long)]
+        scope: Option<PathBuf>,
+
+        /// Read-only: force codex with `--sandbox read-only`.
+        #[arg(long, default_value_t = false)]
+        ro: bool,
+
+        /// Timeout seconds per spark (0 = no timeout).
+        #[arg(long, default_value_t = 120)]
+        timeout: u64,
+
+        /// Prefer direct `codex` over `xask --spark`.
+        #[arg(long, default_value_t = false)]
+        direct: bool,
+
+        #[arg(long, env = "XBRD_SPARK_ROOT")]
+        root: Option<PathBuf>,
+
+        /// Delete each namespace after its run.
+        #[arg(long = "no-keep", action = clap::ArgAction::SetTrue)]
+        no_keep: bool,
+
+        /// Dry-run each task (no xask/codex).
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
+
+        /// Fail the process if any spark fails/times out (default: still emit NDJSON, exit 1 if any failed).
+        #[arg(long, default_value_t = false)]
+        fail_fast: bool,
+    },
+}
+
+/// One unit of swarm work (parsed from tasks-file line or JSON object).
+#[derive(Debug, Clone, Deserialize)]
+struct SwarmTask {
+    task: String,
+    #[serde(default)]
+    scope: Option<String>,
+    #[serde(default)]
+    id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -141,6 +204,14 @@ struct CollectRecord {
     result_path: String,
     artifacts: Vec<String>,
     provenance: Meta,
+}
+
+/// Serialize NDJSON emit only (never hold this lock across Titanium spawn).
+fn emit_ndjson(record: &CollectRecord) -> Result<()> {
+    static EMIT: Mutex<()> = Mutex::new(());
+    let _g = EMIT.lock().unwrap_or_else(|e| e.into_inner());
+    println!("{}", serde_json::to_string(record)?);
+    Ok(())
 }
 
 fn default_root() -> PathBuf {
@@ -367,8 +438,33 @@ fn resolve_task(task: Option<String>, task_file: Option<PathBuf>) -> Result<Stri
     Ok(buf)
 }
 
+/// Default model for Titanium spark runs (override with `XBRD_SPARK_MODEL`).
+fn spark_model() -> String {
+    env::var("XBRD_SPARK_MODEL").unwrap_or_else(|_| "gpt-5.3-codex-spark".into())
+}
+
+/// Resolve Codex Titanium binary: `CODEX_BIN` → `codex-titanium` → `codex`.
+fn resolve_codex_bin() -> Result<PathBuf> {
+    if let Ok(p) = env::var("CODEX_BIN") {
+        let pb = PathBuf::from(&p);
+        if pb.is_file() {
+            return Ok(pb);
+        }
+        if let Ok(w) = which::which(p.as_str()) {
+            return Ok(w);
+        }
+        bail!("CODEX_BIN not found or not a file: {p}");
+    }
+    if let Ok(p) = which::which("codex-titanium") {
+        return Ok(p);
+    }
+    which::which("codex").with_context(|| {
+        "codex-titanium/codex not found on PATH (install Codex Titanium or set CODEX_BIN)"
+    })
+}
+
 fn find_dispatcher(direct: bool, ro: bool) -> Result<(String, Vec<String>)> {
-    // Prefer pure direct codex for L3 substrate (single source of flags).
+    // Prefer pure Titanium codex for L3 substrate (single source of flags).
     // xask is optional convenience for migration / loadout continuity.
     // --ro forces codex so `--sandbox read-only` is actually applied (xask has no sandbox flags).
     if !direct && !ro {
@@ -384,21 +480,22 @@ fn find_dispatcher(direct: bool, ro: bool) -> Result<(String, Vec<String>)> {
     } else {
         "danger-full-access"
     };
-    let p = which::which("codex").with_context(|| {
+    let p = resolve_codex_bin().with_context(|| {
         if ro {
-            "codex not found on PATH (--ro forces codex sandbox; xask skipped)"
+            "codex-titanium/codex not found on PATH (--ro forces titanium sandbox; xask skipped)"
         } else if direct {
-            "codex not found on PATH (--direct)"
+            "codex-titanium/codex not found on PATH (--direct)"
         } else {
-            "neither xask nor codex found on PATH"
+            "neither xask nor codex-titanium/codex found on PATH"
         }
     })?;
+    let model = spark_model();
     Ok((
         p.to_string_lossy().into_owned(),
         vec![
             "exec".into(),
             "-m".into(),
-            "gpt-5.3-codex-spark".into(),
+            model,
             "-c".into(),
             "model_reasoning_effort=low".into(),
             "--ephemeral".into(),
@@ -411,6 +508,152 @@ fn find_dispatcher(direct: bool, ro: bool) -> Result<(String, Vec<String>)> {
             "approval_policy=never".into(),
         ],
     ))
+}
+
+/// Load swarm tasks from a path (`-` = stdin). Blank / `#` lines skipped.
+/// Lines starting with `{` are JSON: `{"task":"...","scope":"?","id":"?"}`.
+fn load_swarm_tasks(path: Option<&Path>) -> Result<Vec<SwarmTask>> {
+    let reader: Box<dyn BufRead> = match path {
+        None => Box::new(io::BufReader::new(io::stdin())),
+        Some(p) if p.as_os_str() == "-" => Box::new(io::BufReader::new(io::stdin())),
+        Some(p) => Box::new(io::BufReader::new(
+            fs::File::open(p).with_context(|| format!("open tasks file {}", p.display()))?,
+        )),
+    };
+    let mut out = Vec::new();
+    for (i, line) in reader.lines().enumerate() {
+        let line = line.with_context(|| format!("read tasks line {}", i + 1))?;
+        let t = line.trim();
+        if t.is_empty() || t.starts_with('#') {
+            continue;
+        }
+        if t.starts_with('{') {
+            let st: SwarmTask = serde_json::from_str(t)
+                .with_context(|| format!("parse JSON task on line {}", i + 1))?;
+            if st.task.trim().is_empty() {
+                bail!("empty task field on line {}", i + 1);
+            }
+            out.push(st);
+        } else {
+            out.push(SwarmTask {
+                task: t.to_string(),
+                scope: None,
+                id: None,
+            });
+        }
+    }
+    if out.is_empty() {
+        bail!("no tasks loaded (empty tasks-file / stdin)");
+    }
+    Ok(out)
+}
+
+/// Bounded concurrent swarm: up to [`MAX_SWARM_CONCURRENCY`] runners.
+/// Each task is an isolated spark (same as `run`). NDJSON records print on completion.
+fn run_swarm(
+    tasks: Vec<SwarmTask>,
+    jobs: usize,
+    shared_scope: Option<PathBuf>,
+    ro: bool,
+    timeout: u64,
+    direct: bool,
+    root: PathBuf,
+    keep: bool,
+    dry_run: bool,
+    fail_fast: bool,
+) -> Result<i32> {
+    let jobs = jobs.clamp(1, MAX_SWARM_CONCURRENCY);
+    fs::create_dir_all(&root)?;
+
+    let (tx, rx) = std::sync::mpsc::channel::<SwarmTask>();
+    let rx = Arc::new(Mutex::new(rx));
+    let fail_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
+
+    let mut handles = Vec::with_capacity(jobs);
+    for _ in 0..jobs {
+        let rx = Arc::clone(&rx);
+        let fail_count = Arc::clone(&fail_count);
+        let stop = Arc::clone(&stop);
+        let root = root.clone();
+        let shared_scope = shared_scope.clone();
+        handles.push(thread::spawn(move || {
+            loop {
+                if stop.load(std::sync::atomic::Ordering::Relaxed) {
+                    break;
+                }
+                let job = {
+                    let guard = match rx.lock() {
+                        Ok(g) => g,
+                        Err(_) => break,
+                    };
+                    guard.recv()
+                };
+                let Ok(job) = job else { break };
+                if stop.load(std::sync::atomic::Ordering::Relaxed) {
+                    break;
+                }
+                let id = job
+                    .id
+                    .clone()
+                    .filter(|s| !s.is_empty())
+                    .unwrap_or_else(|| format!("sp-{}", Uuid::new_v4()));
+                let scope_owned = job
+                    .scope
+                    .as_ref()
+                    .map(PathBuf::from)
+                    .or_else(|| shared_scope.clone());
+                // Run Titanium/codex concurrently; NDJSON emit is locked only inside emit_ndjson.
+                match run_spark(
+                    &id,
+                    &job.task,
+                    scope_owned.as_deref(),
+                    ro,
+                    timeout,
+                    direct,
+                    &root,
+                    keep,
+                    dry_run,
+                ) {
+                    Ok(0) => {}
+                    Ok(_code) => {
+                        fail_count.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        if fail_fast {
+                            stop.store(true, std::sync::atomic::Ordering::Relaxed);
+                            break;
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("sekhmet swarm error id={id}: {e:#}");
+                        fail_count.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        if fail_fast {
+                            stop.store(true, std::sync::atomic::Ordering::Relaxed);
+                            break;
+                        }
+                    }
+                }
+            }
+        }));
+    }
+
+    for t in tasks {
+        if stop.load(std::sync::atomic::Ordering::Relaxed) {
+            break;
+        }
+        tx.send(t).context("swarm queue closed")?;
+    }
+    drop(tx);
+
+    for h in handles {
+        let _ = h.join();
+    }
+
+    let failed = fail_count.load(std::sync::atomic::Ordering::Relaxed);
+    if failed > 0 {
+        Ok(1)
+    } else {
+        Ok(0)
+    }
 }
 
 /// Outcome of a timed dispatcher run.
@@ -692,7 +935,7 @@ fn run_spark(
             started_at: chrono::Utc::now().to_rfc3339(),
             finished_at: None,
             duration_ms: None,
-            model: "gpt-5.3-codex-spark".into(),
+            model: spark_model(),
             cmdline: vec!["dry-run".into()],
             status: "running".into(),
             exit_code: None,
@@ -709,7 +952,7 @@ fn run_spark(
         write_meta_atomic(&base, &meta)?;
 
         let (_, record) = finalize_result(&base, &mut meta, "ok", "dry-run", "", Some(0), 0)?;
-        println!("{}", serde_json::to_string(&record)?);
+        emit_ndjson(&record)?;
 
         if !keep {
             let _ = fs::remove_dir_all(&base);
@@ -733,7 +976,7 @@ fn run_spark(
         started_at: chrono::Utc::now().to_rfc3339(),
         finished_at: None,
         duration_ms: None,
-        model: "gpt-5.3-codex-spark".into(),
+        model: spark_model(),
         cmdline: if dispatcher.is_ok() {
             std::iter::once(bin.clone())
                 .chain(args.iter().cloned())
@@ -766,7 +1009,7 @@ fn run_spark(
             Some(1),
             0,
         )?;
-        println!("{}", serde_json::to_string(&record)?);
+        emit_ndjson(&record)?;
         if !keep {
             let _ = fs::remove_dir_all(&base);
         }
@@ -803,7 +1046,7 @@ fn run_spark(
                 Some(1),
                 duration_ms,
             )?;
-            println!("{}", serde_json::to_string(&record)?);
+            emit_ndjson(&record)?;
             if !keep {
                 let _ = fs::remove_dir_all(&base);
             }
@@ -844,7 +1087,7 @@ fn run_spark(
         exit,
         duration_ms,
     )?;
-    println!("{}", serde_json::to_string(&record)?);
+    emit_ndjson(&record)?;
 
     if !keep {
         let _ = fs::remove_dir_all(&base);
@@ -861,7 +1104,7 @@ fn collect(ids: &[String], root: &Path) -> Result<()> {
         bail!("no spark ids provided");
     }
     for record in collect_records(ids, root)? {
-        println!("{}", serde_json::to_string(&record)?);
+        emit_ndjson(&record)?;
     }
     Ok(())
 }
@@ -1000,6 +1243,41 @@ fn main() -> Result<()> {
         Commands::Status { id, root } => {
             let root = root.unwrap_or_else(default_root);
             status(&id, &root)?;
+        }
+        Commands::Swarm {
+            tasks_file,
+            jobs,
+            scope,
+            ro,
+            timeout,
+            direct,
+            root,
+            no_keep,
+            dry_run,
+            fail_fast,
+        } => {
+            if jobs > MAX_SWARM_CONCURRENCY {
+                eprintln!(
+                    "sekhmet: --jobs {jobs} exceeds max {MAX_SWARM_CONCURRENCY}; clamping"
+                );
+            }
+            let root = root.unwrap_or_else(default_root);
+            let tasks = load_swarm_tasks(tasks_file.as_deref())?;
+            let code = run_swarm(
+                tasks,
+                jobs,
+                scope,
+                ro,
+                timeout,
+                direct,
+                root,
+                !no_keep,
+                dry_run,
+                fail_fast,
+            )?;
+            if code != 0 {
+                std::process::exit(code);
+            }
         }
     }
     Ok(())
@@ -1685,5 +1963,88 @@ mod tests {
         // same content → same artifact name for meta and result
         assert_eq!(hash_file(&base.join("meta.json")).unwrap(), h_file);
         assert_eq!(content_hash("ok", "a", "b"), content_hash("ok", "a", "b"));
+    }
+
+    #[test]
+    fn max_swarm_concurrency_is_64() {
+        assert_eq!(MAX_SWARM_CONCURRENCY, 64);
+    }
+
+    #[test]
+    fn load_swarm_tasks_plain_and_jsonl() {
+        let tmp = TempDir::new().unwrap();
+        let f = tmp.path().join("tasks.txt");
+        fs::write(
+            &f,
+            "# comment\n\ntask-one\n{\"task\":\"task-two\",\"id\":\"sp-fixed-two\"}\n",
+        )
+        .unwrap();
+        let tasks = load_swarm_tasks(Some(&f)).unwrap();
+        assert_eq!(tasks.len(), 2);
+        assert_eq!(tasks[0].task, "task-one");
+        assert_eq!(tasks[1].task, "task-two");
+        assert_eq!(tasks[1].id.as_deref(), Some("sp-fixed-two"));
+    }
+
+    #[test]
+    fn swarm_dry_run_pool_completes() {
+        let tmp = TempDir::new().unwrap();
+        let root = tmp.path().join("root");
+        let tasks: Vec<SwarmTask> = (0..8)
+            .map(|i| SwarmTask {
+                task: format!("swarm-task-{i}"),
+                scope: None,
+                id: None,
+            })
+            .collect();
+        let code = run_swarm(
+            tasks,
+            4, // concurrent workers
+            None,
+            false,
+            30,
+            true,
+            root.clone(),
+            true,
+            true, // dry_run
+            false,
+        )
+        .unwrap();
+        assert_eq!(code, 0);
+        let n = fs::read_dir(&root).unwrap().count();
+        assert_eq!(n, 8, "expected 8 namespaces under swarm root");
+    }
+
+    #[test]
+    fn resolve_codex_bin_honors_codex_bin_env() {
+        let tmp = TempDir::new().unwrap();
+        let fake = tmp.path().join("fake-codex");
+        fs::write(&fake, b"#!/bin/sh\nexit 0\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&fake, fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        let prev = env::var_os("CODEX_BIN");
+        env::set_var("CODEX_BIN", &fake);
+        let got = resolve_codex_bin().unwrap();
+        assert_eq!(got, fake);
+        match prev {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
+    }
+
+    #[test]
+    fn find_dispatcher_resolves_titanium_when_available() {
+        if which::which("codex-titanium").is_err() && which::which("codex").is_err() {
+            return;
+        }
+        let (bin, args) = find_dispatcher(true, false).unwrap();
+        assert!(
+            bin.contains("codex"),
+            "expected codex/titanium path, got {bin}"
+        );
+        assert!(args.windows(2).any(|w| w[0] == "-m" && w[1].contains("codex")));
     }
 }

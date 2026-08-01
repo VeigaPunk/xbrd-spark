@@ -1,13 +1,18 @@
 [package]
 name = "xbrd-spark"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-description = "Pure L3 worker surface for xbrd: namespaced ephemeral codex-spark execution without worktrees. Double-work tolerant; higher layers distill."
+description = "Sekhmet — always-available swarm dispatch substrate (xbreed L3). Pure L3 namespaced codex-spark; up to 64 concurrent runners. Rust only."
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/VeigaPunk/xbrd-spark"
 
 [[bin]]
 name = "xbrd-spark"
+path = "src/main.rs"
+
+# Marketplace / always-on alias — same binary surface as xbrd-spark
+[[bin]]
+name = "sekhmet"
 path = "src/main.rs"
 
 [dependencies]

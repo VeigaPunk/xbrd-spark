@@ -3,11 +3,14 @@
 **Always-available swarm dispatch substrate** — layer 3 of xbreed.
 
 Marketplace name: **`sekhmet`** ([ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)).  
-Binary crate: **`xbrd-spark`** (Rust only — no Python).
+Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Python).
 
-Routes executions through **codex-spark** (GPT-5.3-Codex-Spark) with:
+Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) with model **`gpt-5.3-codex-spark`** (override via `XBRD_SPARK_MODEL`). Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
+
+Routes executions through **codex-spark on Titanium** with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
+- **Up to 64 concurrent runners** — `sekhmet swarm -j N` (hard cap 64)
 - **No git worktrees** — namespaced ephemeral dirs only
 - **Double-work tolerance** — concurrent identical tasks are fine; higher layer (distiller / the-judge) dedups by content hash + provenance
 - **Any-CLI invocable** — labrat, mutation-tester, executor, or plain bash can call it
@@ -64,8 +67,14 @@ xbrd-spark run --dry-run --task "probe" --root /tmp/xbrd-spark-smoke
 # With FS context for mutation / labrat that need files
 xbrd-spark run --scope . --task "mutate the boundary check in src/lib.rs and run tests"
 
-# Prefer direct codex (skip xask loadout) for absolute min latency
+# Prefer direct Codex Titanium (skip xask loadout) for absolute min latency
 xbrd-spark run --direct --task "..."
+# or the always-on alias:
+sekhmet run --direct --task "..."
+
+# Swarm: up to 64 concurrent Titanium runners (NDJSON per completion)
+printf 'task A\ntask B\ntask C\n' | sekhmet swarm --direct -j 16 --tasks-file - --root "$(mktemp -d)"
+# tasks file: one prompt per line, or JSONL {"task":"...","id":"sp-...","scope":"/path"}
 
 # Deterministic id from task+scope hash (stable; collision risk under concurrent same task)
 xbrd-spark run --deterministic --task "..."

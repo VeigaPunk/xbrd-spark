@@ -2142,4 +2142,52 @@ mod tests {
         assert!(extract_usage_tokens("hello", "world").is_none());
     }
 
+    #[test]
+    fn finalize_records_usage_tokens_in_meta_and_result() {
+        let tmp = TempDir::new().unwrap();
+        let base = tmp.path().join("sp-tokentest01");
+        ensure_dirs(&base).unwrap();
+        let mut meta = Meta {
+            spark_id: "sp-tokentest01".into(),
+            started_at: chrono::Utc::now().to_rfc3339(),
+            finished_at: None,
+            duration_ms: None,
+            model: "test".into(),
+            cmdline: vec!["test".into()],
+            status: "running".into(),
+            exit_code: None,
+            content_hash: None,
+            task_hash: hash_str("t"),
+            invoker: "test".into(),
+            scope: None,
+            ro: false,
+            timeout_secs: 0,
+            direct: true,
+            dry_run: false,
+            root: base.display().to_string(),
+            usage_tokens: None,
+        };
+        let (_, rec) = finalize_result(
+            &base,
+            &mut meta,
+            "ok",
+            "done",
+            "tokens used\n  2,048\n",
+            Some(0),
+            12,
+        )
+        .unwrap();
+        assert_eq!(rec.usage_tokens, Some(2048));
+        assert_eq!(meta.usage_tokens, Some(2048));
+        let meta_disk: Meta =
+            serde_json::from_str(&fs::read_to_string(base.join("meta.json")).unwrap()).unwrap();
+        assert_eq!(meta_disk.usage_tokens, Some(2048));
+        let res: ResultJson =
+            serde_json::from_str(&fs::read_to_string(base.join("out/result.json")).unwrap())
+                .unwrap();
+        assert_eq!(res.usage_tokens, Some(2048));
+    }
+
+
+
 }

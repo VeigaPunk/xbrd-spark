@@ -1,0 +1,5 @@
+# Live token smoke (local evidence, 2026-08-01)
+# sekhmet run --direct --no-keep --timeout 90 --task 'Reply with exactly one word: pong'
+status=ok
+usage_tokens=2793
+# Confirms extract_usage_tokens + NDJSON field under Titanium logs.

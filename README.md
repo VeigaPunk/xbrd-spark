@@ -102,6 +102,7 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 - **`--ro`**: **forces the codex dispatcher** with `--sandbox read-only` (skips xask so sandbox is actually enforced). Without `--ro`, prefers xask when present, else codex with `danger-full-access`. Recorded in `meta.ro`.
 - **`--scope`**: must be a directory; rsync snapshot into `workspace/` even on `--dry-run` (when rsync is available). Non-directory paths fail setup and roll back the namespace.
 - **Provenance**: `meta` also records `direct`, `dry_run`, and `timeout_secs` for every run.
+- **`usage_tokens`**: best-effort parse from dispatcher stdout/stderr (`tokens used`, `total_tokens`, …) written into `meta.json`, `out/result.json`, and NDJSON when present.
 - **Spawn/dispatcher errors**: after namespace + initial meta exist, failures finalize with status `error`, emit NDJSON, and exit non-zero (record still present for distill).
 
 ## Open residuals

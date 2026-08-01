@@ -47,3 +47,5 @@ target/release/sekhmet --help
 ```
 
 CI: `.github/workflows/ci.yml` runs check / test / clippy / release --help on push to main.
+
+Optional live smoke: `XBRD_SPARK_LIVE=1 cargo test --test live_smoke -- --ignored --nocapture`

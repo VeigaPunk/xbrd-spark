@@ -1,3 +1,7 @@
+# e2e model-questions campaign REPORT
+
+12 OpenCode models: each generates 64 moral-dilemma questions, then Sekhmet runs Titanium swarm.
+
 # e2e model-questions leaderboard
 
 OpenCode generates 64 questions → Sekhmet Titanium swarm answers them.
@@ -25,3 +29,9 @@ OpenCode generates 64 questions → Sekhmet Titanium swarm answers them.
 | `e2e06_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 25.547 | 63 | 0 | 0 | 193452 |
 
 _Regenerate: `./gen-leaderboard.sh`_
+
+## Campaign notes
+
+- e2e06 nemotron: 63 questions after gen retry (incomplete ok count).
+- Requires current sekhmet for usage_tokens (cargo install --path . --force).
+- Primary dry-hump fixed packs remain under telemetry-12x/; this campaign is gen→answer.

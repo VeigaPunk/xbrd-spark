@@ -1,0 +1,14 @@
+{
+  "model": "openai/gpt-5.6-sol-fast",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 44.997,
+  "sessions": [
+    "ses_04056c66cffeATQMPINgdoB1QT"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 8491.0,
+  "tokens_input": 5620.0,
+  "tokens_output": 1273.0,
+  "tokens_reasoning": 62.0,
+  "cost": 0.0
+}

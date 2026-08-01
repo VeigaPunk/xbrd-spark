@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e12_openai_gpt-5_6-sol-fast",
+  "model": "openai/gpt-5.6-sol-fast",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "Should a doctor honor an adult patient\u2019s religious refusal of lifesaving blood even when grieving relatives strongly object?",
+    "Should clergy disclose a private confession indicating serious future harm when secrecy is central to their religious office?",
+    "Should a public school accommodate daily student prayer if doing so appears to privilege one faith tradition?"
+  ],
+  "e2e_wall_seconds": 70.745,
+  "gen_wall_seconds": 44.997,
+  "swarm_wall_seconds": 25.721,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 205539,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2472,
+  "sekhmet_tokens_max": 3716,
+  "sekhmet_tokens_avg": 3211.5,
+  "opencode_gen": {
+    "model": "openai/gpt-5.6-sol-fast",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 44.997,
+    "sessions": [
+      "ses_04056c66cffeATQMPINgdoB1QT"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 8491.0,
+    "tokens_input": 5620.0,
+    "tokens_output": 1273.0,
+    "tokens_reasoning": 62.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e12_openai_gpt-5_6-sol-fast-o8jwOw",
+  "e2e_start_iso": "2026-08-01T23:29:25+00:00"
+}

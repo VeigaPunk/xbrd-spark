@@ -1,0 +1,14 @@
+{
+  "model": "openai/gpt-5.5-fast",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 26.936,
+  "sessions": [
+    "ses_0405846e9ffeBx4SJrJJLjSnjl"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 8424.0,
+  "tokens_input": 1522.0,
+  "tokens_output": 1220.0,
+  "tokens_reasoning": 50.0,
+  "cost": 0.0
+}

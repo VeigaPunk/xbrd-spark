@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e10_openai_gpt-5_5-fast",
+  "model": "openai/gpt-5.5-fast",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "Should a hospital chaplain comfort a dying patient with beliefs the chaplain privately considers false, if truth might intensify suffering?",
+    "Is it moral for parents to raise a child inside a strict religion while deliberately limiting exposure to competing worldviews?",
+    "Should a government protect sacred religious symbols from desecration if doing so restricts peaceful political expression by minorities?"
+  ],
+  "e2e_wall_seconds": 49.787,
+  "gen_wall_seconds": 26.936,
+  "swarm_wall_seconds": 22.824,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 205727,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2438,
+  "sekhmet_tokens_max": 3511,
+  "sekhmet_tokens_avg": 3214.5,
+  "opencode_gen": {
+    "model": "openai/gpt-5.5-fast",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 26.936,
+    "sessions": [
+      "ses_0405846e9ffeBx4SJrJJLjSnjl"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 8424.0,
+    "tokens_input": 1522.0,
+    "tokens_output": 1220.0,
+    "tokens_reasoning": 50.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e10_openai_gpt-5_5-fast-eaNw56",
+  "e2e_start_iso": "2026-08-01T23:27:47+00:00"
+}

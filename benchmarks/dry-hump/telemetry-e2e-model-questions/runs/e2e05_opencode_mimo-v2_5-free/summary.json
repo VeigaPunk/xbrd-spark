@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e05_opencode_mimo-v2_5-free",
+  "model": "opencode/mimo-v2.5-free",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "Would you kill one person to save five?",
+    "Is it ever acceptable to break a promise?",
+    "Should you report a friend's crime if it could destroy their life?"
+  ],
+  "e2e_wall_seconds": 40.181,
+  "gen_wall_seconds": 7.406,
+  "swarm_wall_seconds": 17.796,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 198302,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2327,
+  "sekhmet_tokens_max": 3388,
+  "sekhmet_tokens_avg": 3098.5,
+  "opencode_gen": {
+    "model": "opencode/mimo-v2.5-free",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 7.406,
+    "sessions": [
+      "ses_0405d3680ffevKakO7Rt2qCWo1"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 9695.0,
+    "tokens_input": 7185.0,
+    "tokens_output": 35.0,
+    "tokens_reasoning": 427.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e05_opencode_mimo-v2_5-free-AtbrlY",
+  "e2e_start_iso": "2026-08-01T23:22:23+00:00"
+}

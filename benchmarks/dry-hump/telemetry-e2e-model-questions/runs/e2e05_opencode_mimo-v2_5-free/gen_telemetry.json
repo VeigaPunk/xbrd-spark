@@ -1,0 +1,14 @@
+{
+  "model": "opencode/mimo-v2.5-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 7.406,
+  "sessions": [
+    "ses_0405d3680ffevKakO7Rt2qCWo1"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 9695.0,
+  "tokens_input": 7185.0,
+  "tokens_output": 35.0,
+  "tokens_reasoning": 427.0,
+  "cost": 0.0
+}

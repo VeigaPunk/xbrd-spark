@@ -1,4 +1,16 @@
-e2e01_opencode_big-pickle/ndjson.qa.out 130696 FAIL
-e2e02_opencode_deepseek-v4-flash-free/ndjson.qa.out 134071 FAIL
-e2e03_opencode_laguna-s-2_1-free/ndjson.qa.out 125070 FAIL
-e2e04_opencode_ling-3_0-flash-free/ndjson.qa.out 129954 FAIL
+e2e01_opencode_big-pickle bytes=130696 url=https://litter.catbox.moe/y6mo36.out
+paste-out: backend=litterbox bytes=130696 name=ndjson.qa.out
+e2e02_opencode_deepseek-v4-flash-free bytes=134071 url=https://litter.catbox.moe/firblh.out
+paste-out: backend=litterbox bytes=134071 name=ndjson.qa.out
+e2e03_opencode_laguna-s-2_1-free bytes=125070 url=https://litter.catbox.moe/wqu3kb.out
+paste-out: backend=litterbox bytes=125070 name=ndjson.qa.out
+e2e04_opencode_ling-3_0-flash-free bytes=132006 url=https://litter.catbox.moe/1aity3.out
+paste-out: backend=litterbox bytes=132006 name=ndjson.qa.out
+e2e05_opencode_mimo-v2_5-free bytes=125226 url=https://litter.catbox.moe/s36qcl.out
+paste-out: backend=litterbox bytes=125226 name=ndjson.qa.out
+e2e06_opencode_nemotron-3-ultra-free bytes=125026 url=https://litter.catbox.moe/6xqjty.out
+paste-out: backend=litterbox bytes=125026 name=ndjson.qa.out
+e2e07_opencode_north-mini-code-free bytes=130268 url=https://litter.catbox.moe/aj7tis.out
+paste-out: backend=litterbox bytes=130268 name=ndjson.qa.out
+e2e08_openai_gpt-5_3-codex-spark bytes=129820 url=https://litter.catbox.moe/owz5w3.out
+paste-out: backend=litterbox bytes=129820 name=ndjson.qa.out

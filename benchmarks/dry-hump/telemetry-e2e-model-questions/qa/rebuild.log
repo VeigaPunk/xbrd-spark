@@ -12,3 +12,7 @@ swarm_ec=1 wall=21.328
 ===== 6/12 e2e06_opencode_nemotron-3-ultra-free questions=63 root=/tmp/sekhmet-qa-rebuild-e2e06_opencode_nemotron-3-ultra-free-kfq7l7 =====
 swarm_ec=1 wall=21.154
 ===== 7/12 e2e07_opencode_north-mini-code-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e07_opencode_north-mini-code-free-UgnDqS =====
+swarm_ec=1 wall=24.081
+===== 8/12 e2e08_openai_gpt-5_3-codex-spark questions=64 root=/tmp/sekhmet-qa-rebuild-e2e08_openai_gpt-5_3-codex-spark-vFY4iE =====
+swarm_ec=1 wall=24.607
+===== 9/12 e2e09_openai_gpt-5_4-mini-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e09_openai_gpt-5_4-mini-fast-s3ADBg =====

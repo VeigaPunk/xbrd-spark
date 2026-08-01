@@ -6,3 +6,7 @@
 # Local copyrighted / out-of-tree payloads (never ship)
 benchmarks/poor-things-cc/
 benchmarks/**/payload-private/
+
+# Large QA rebuild dumps (paste URLs in qa/PASTE_URLS.txt)
+**/ndjson.qa.out
+**/swarm.qa.stderr.log

@@ -114,3 +114,4 @@ esac
 
 printf '%s\n' "$URL"
 echo "paste-out: backend=$USED bytes=$BYTES name=$NAME" >&2
+exit 0

@@ -1,0 +1,14 @@
+{
+  "model": "opencode/deepseek-v4-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 31.106,
+  "sessions": [
+    "ses_0406dd1d6ffeo891V4DTX7XKWq"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 28980.0,
+  "tokens_input": 7251.0,
+  "tokens_output": 225.0,
+  "tokens_reasoning": 0.0,
+  "cost": 0.0
+}

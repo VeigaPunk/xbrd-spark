@@ -1,6 +1,6 @@
 {
   "campaign": "dry-hump-12x-opencode-models",
-  "runs": 12,
+  "runs": 14,
   "rows": [
     {
       "run_id": "r01_opencode_big-pickle",
@@ -12,6 +12,19 @@
       "sekhmet_tokens": 215835,
       "opencode_wall_s": 29.866,
       "opencode_tokens": 18531.0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r02b_opencode_deepseek-v4-flash-free",
+      "model": "opencode/deepseek-v4-flash-free",
+      "sekhmet_wall_s": 23.819,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 31.106,
+      "opencode_tokens": 28980.0,
       "opencode_cost": 0.0,
       "opencode_exit": 0
     },
@@ -40,6 +53,19 @@
       "opencode_tokens": 39911.0,
       "opencode_cost": 0.0,
       "opencode_exit": 0
+    },
+    {
+      "run_id": "r04b_opencode_ling-3_0-flash-free",
+      "model": "opencode/ling-3.0-flash-free",
+      "sekhmet_wall_s": 22.170,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": null,
+      "opencode_tokens": null,
+      "opencode_cost": null,
+      "opencode_exit": null
     },
     {
       "run_id": "r04_opencode_ling-3_0-flash-free",
@@ -160,10 +186,10 @@
     }
   ],
   "totals": {
-    "sekhmet_ok": 512,
+    "sekhmet_ok": 640,
     "sekhmet_tokens": 846928,
-    "opencode_tokens": 474315,
+    "opencode_tokens": 503295,
     "opencode_cost": 0,
-    "sekhmet_wall_sum": 173.23399999999998
+    "sekhmet_wall_sum": 219.22299999999998
   }
 }

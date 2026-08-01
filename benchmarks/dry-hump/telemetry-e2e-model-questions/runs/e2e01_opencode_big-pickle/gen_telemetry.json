@@ -1,0 +1,14 @@
+{
+  "model": "opencode/big-pickle",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 50.784,
+  "sessions": [
+    "ses_040609c5fffeh4o0Ly4DJSVu1z"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 13799.0,
+  "tokens_input": 9088.0,
+  "tokens_output": 2068.0,
+  "tokens_reasoning": 2643.0,
+  "cost": 0.0
+}

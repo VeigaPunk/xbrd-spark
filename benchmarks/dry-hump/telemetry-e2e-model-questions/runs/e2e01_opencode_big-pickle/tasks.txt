@@ -1,0 +1,64 @@
+If a deeply religious person has a child whose life-saving treatment conflicts with their faith's teachings, should the state override parental consent to save the child?
+A hospital chaplain must decide whether to pray with a dying patient who requests prayers, knowing the chaplain personally finds the patient's beliefs offensive — what should the chaplain do?
+A religious school receives public funding but refuses to teach evolution, so should the government keep funding it in the name of religious freedom or cut funding to protect science education?
+If a religion's scripture commands followers to shun an ex-member whose child is dying, is the community morally obligated to break that rule to offer comfort?
+A judge whose religion condemns same-sex marriage must rule on a marriage equality case — should the judge recuse herself or set her beliefs aside and rule on the law?
+Should a government allow a minority religion to conduct animal sacrifice in public parks when neighbors find the practice abhorrent but the ritual is central to the faith?
+An elderly believer refuses a blood transfusion on religious grounds and will die without it — should doctors respect the refusal or administer care to preserve life?
+A religious charity refuses to hire openly gay employees while receiving public funds, so is it right to revoke its funding even if that closes a soup kitchen feeding hundreds?
+A married person develops deep romantic feelings for a colleague and finds a mutual attraction — is it more moral to stay faithful and suppress the feelings, or be honest about the feelings with the spouse?
+If two consenting adults in a committed relationship decide to open the relationship with strict rules, is one of them morally wrong if secret feelings develop for a third person?
+A person in an unhappy relationship chooses to stay for the sake of their children while pursuing a secret affair — is the secrecy itself a greater moral wrong than leaving the family would be?
+Should a sex worker's clients be criminally punished when selling sex is legalized but buying it remains illegal, or does that law unfairly punish only one side of a consensual transaction?
+An adult discovers that a close friend's new romantic partner is married to someone else; should the adult tell the friend about the deception or respect the friend's privacy and stay silent?
+Is it morally acceptable for a person to end a long-term relationship through a text message if direct conversation would be more painful and drawn out for both parties?
+A young adult begins a sexual relationship with a partner who is much older and financially dependent on them — is the power imbalance alone enough to make the relationship unethical?
+Two friends agree to a casual arrangement, but one develops feelings and keeps the arrangement going while hiding the feelings to avoid losing the friendship — is that dishonest?
+Should a country legalize and tax all currently-illegal drugs if the revenue could fully fund public healthcare, or does that incentive corrupt the health policy's moral foundation?
+A police officer who knows a neighbor grows small amounts of marijuana for chronic pain must decide whether to enforce a strict drug law — is enforcing the letter of the law the right choice?
+If an overdose-reversal drug is available but requires a prescription, should an addict's friend steal it to save the addict's life from an overdose emergency?
+A pharmaceutical company prices a lifesaving addiction-treatment drug out of reach for most addicts, so should the government break the patent to produce affordable generics even if it harms the company?
+Is it more moral for a government to treat drug addiction as a public health matter, decriminalizing possession, or as a criminal matter to deter casual use?
+A healthcare provider must choose between reporting a patient's illegal drug use to authorities, as law requires, or protecting the patient's trust and their treatment outcomes by staying silent?
+If a city funds harm-reduction centers like safe injection sites but that attracts users to a residential neighborhood, is it right to keep the centers where the need is greatest?
+A country facing an addiction crisis legalizes performance-enhancing drugs for athletes to fund treatment — is that a defensible trade-off or a betrayal of fair competition values?
+A politician must decide whether to support a policy that clearly helps the poor but will predictably get her primary opponent elected — should she prioritize the policy or her electoral viability?
+Should a democratically elected leader ignore an unpopular court ruling they believe is legally wrong, if obeying it will cause immediate public harm?
+A voter's chosen candidate commits a scandal that doesn't change any policy position — is the voter morally obligated to withdraw support or can they judge only policy?
+Should a journalist publish a leaked government document that reveals corruption but also endangers an intelligence officer's life, balancing truth against the harm it causes?
+A protest organizer plans a peaceful march that will certainly be met with violent police response, hurting marchers — is it moral to hold the march anyway for the cause?
+If a mayor can reduce homelessness by forcibly relocating homeless people to a distant shelter, is the forcible relocation justified by the improved conditions for everyone else?
+A lawmaker faces a vote that would end child poverty but also enrich his own party's major donors — is it morally acceptable for him to vote against it to preserve his campaign funding?
+Is a citizen morally required to pay taxes to a government whose wars they find unjust, or is conscientious nonpayment a legitimate form of political protest?
+An employee discovers that their company's accounting practices are fraudulent but reporting it will cost every coworker their jobs — is whistleblowing still the right choice?
+A wealthy person can fund one of two charities: one that saves many lives abroad cheaply or one that saves few lives at home expensively — which is the more moral use of the money?
+If a person inherits money gained through their ancestor's clearly immoral business practices, are they morally obligated to donate that inheritance or can they keep it guilt-free?
+A shopkeeper sells an overpriced item to an elderly customer who doesn't know the market price — is the profit moral, or does the information imbalance make it exploitation?
+Should a worker accept a highly paid job at a company whose products harm public health, donating part of the salary to health causes, or refuse the job entirely on principle?
+A friend in genuine financial crisis asks for a large loan you can easily afford, but you know the money will likely never be repaid — is refusing the loan the morally right choice?
+An investor earns a fortune from shorting a failing company, profiting from thousands of resulting layoffs — is that profit morally defensible or should speculation have limits?
+If a lottery winner discovers the winning ticket was sold by mistake to them instead of another customer, are they morally required to return the prize money?
+Is it morally permissible to kill one healthy person to harvest organs that would save five dying patients, if the one is guaranteed a painless death?
+A soldier ordered to commit an act they believe is a war crime must choose between following orders and facing court-martial or refusing and facing imprisonment — which is morally right?
+Should a hostage negotiator lie to a terrorist to end a standoff peacefully, when the lie will break the family's trust once the truth comes out later?
+If a community can prevent a foreseeable massacre by preemptively attacking a known threat that has not yet acted, is that preemptive violence morally justified?
+A person witnessing a public beating must choose between intervening physically and risking injury or calling police and risking the victim's death in the delay — which duty wins?
+Is it more moral to forgive a violent offender who genuinely reformed after decades in prison, or does forgiveness dishonor the victim who never received justice?
+A parent must choose between defending their child from a violent attacker with lethal force or disarming them nonlethally while risking the attacker escalating — what should the parent choose?
+If a trolley-problem scenario involves a person who consented to be sacrificed to save others, does that consent make throwing the switch morally permissible where it otherwise would not be?
+If an autonomous vehicle must choose between crashing into a pedestrian or swerving into a barrier and killing its passenger, who should its algorithm be designed to prioritize?
+An AI hiring system reliably predicts job success but systematically rejects qualified candidates from a certain background — should a company use it if the outcome is efficient?
+Should an AI system ever be allowed to lie to a user, for instance to shield a child from upsetting content, or is any deception by a machine ethically unacceptable?
+If a medical AI makes a mistake that harms a patient, is the blame on the developers, the hospital that deployed it, or the doctor who relied on it?
+Should society allow AI systems to make irreversible decisions, like denying an insurance claim or parole, when a human could always be required to review them?
+A person who outsources all their moral decisions to a well-calibrated AI — is that person still morally responsible for the choices the AI makes on their behalf?
+If an AI assistant discovers a user is planning suicide, should the AI break its privacy promise and report the user to authorities or respect the confidentiality?
+Is it morally right to deploy AI surveillance that prevents crime but also tracks innocent citizens' every movement, when the crime prevention benefit is real and measurable?
+A university professor assigns a text containing a racial slur to teach about historical oppression — is that assignment defensible academic work or a moral failure toward affected students?
+Should a campus newspaper publish an opinion piece it strongly disagrees with, when publishing normalizes a view the community finds harmful?
+A student organization refuses to host a speaker with controversial views, citing safety concerns — is prioritizing the community's psychological safety over free speech morally right?
+If a university's speech code protects marginalized students but effectively silences conservative speakers, is the speech code morally acceptable in exchange for inclusivity?
+An academic receives a prestigious award funded by an industry whose practices conflict with the academic's research findings — is accepting the award a moral conflict of interest?
+Should a professor be forced to use a student's preferred pronouns if doing so conflicts with the professor's deeply held religious beliefs, or is accommodation a reasonable requirement?
+A student films a public confrontation between classmates and posts it online, causing one participant to face severe harassment — is the filming or the posting the greater moral wrong?
+If a campus speaker is disinvited because of credible threats from off-campus groups, is yielding to the threats a morally acceptable decision or an abdication of the university's principles?

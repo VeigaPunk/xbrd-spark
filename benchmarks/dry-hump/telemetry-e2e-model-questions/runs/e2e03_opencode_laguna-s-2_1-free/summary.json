@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e03_opencode_laguna-s-2_1-free",
+  "model": "opencode/laguna-s-2.1-free",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "Is it worse to let one person die or to kill one person to save five?",
+    "Do you tell the truth if it destroys someone's happiness?",
+    "Should a doctor save the patient who can pay over the one who can't?"
+  ],
+  "e2e_wall_seconds": 40.292,
+  "gen_wall_seconds": 7.679,
+  "swarm_wall_seconds": 18.066,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 197133,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2409,
+  "sekhmet_tokens_max": 3319,
+  "sekhmet_tokens_avg": 3080.2,
+  "opencode_gen": {
+    "model": "opencode/laguna-s-2.1-free",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 7.679,
+    "sessions": [
+      "ses_0405e4c95ffe2QFlRkMZQv44en"
+    ],
+    "step_finish_count": 2,
+    "tokens_total": 18068.0,
+    "tokens_input": 14134.0,
+    "tokens_output": 222.0,
+    "tokens_reasoning": 0.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e03_opencode_laguna-s-2_1-free-NVONEr",
+  "e2e_start_iso": "2026-08-01T23:21:12+00:00"
+}

@@ -1,0 +1,70 @@
+campaign_start=2026-08-01T23:18:41+00:00
+===== E2E 1/12 model=opencode/big-pickle =====
+{
+  "model": "opencode/big-pickle",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 50.784,
+  "sessions": [
+    "ses_040609c5fffeh4o0Ly4DJSVu1z"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 13799.0,
+  "tokens_input": 9088.0,
+  "tokens_output": 2068.0,
+  "tokens_reasoning": 2643.0,
+  "cost": 0.0
+}
+questions_extracted=64 gen_ec=0
+end_iso=2026-08-01T23:19:50+00:00
+===== E2E 2/12 model=opencode/deepseek-v4-flash-free =====
+{
+  "model": "opencode/deepseek-v4-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 64.163,
+  "sessions": [
+    "ses_0405f8fa5ffeybm81pem3BfGr8"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 15703.0,
+  "tokens_input": 9126.0,
+  "tokens_output": 1875.0,
+  "tokens_reasoning": 4702.0,
+  "cost": 0.0
+}
+questions_extracted=64 gen_ec=0
+end_iso=2026-08-01T23:21:12+00:00
+===== E2E 3/12 model=opencode/laguna-s-2.1-free =====
+{
+  "model": "opencode/laguna-s-2.1-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 7.679,
+  "sessions": [
+    "ses_0405e4c95ffe2QFlRkMZQv44en"
+  ],
+  "step_finish_count": 2,
+  "tokens_total": 18068.0,
+  "tokens_input": 14134.0,
+  "tokens_output": 222.0,
+  "tokens_reasoning": 0.0,
+  "cost": 0.0
+}
+questions_extracted=8 gen_ec=0
+RETRY gen (got 8)
+questions_after_retry=64
+end_iso=2026-08-01T23:21:53+00:00
+===== E2E 4/12 model=opencode/ling-3.0-flash-free =====
+{
+  "model": "opencode/ling-3.0-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 8.133,
+  "sessions": [
+    "ses_0405daf07ffewP7Dk4sH0ppnOp"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 11267.0,
+  "tokens_input": 9367.0,
+  "tokens_output": 1677.0,
+  "tokens_reasoning": 223.0,
+  "cost": 0.0
+}
+questions_extracted=64 gen_ec=0

@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e01_opencode_big-pickle",
+  "model": "opencode/big-pickle",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a deeply religious person has a child whose life-saving treatment conflicts with their faith's teachings, should the state override parental consent to save the child?",
+    "A hospital chaplain must decide whether to pray with a dying patient who requests prayers, knowing the chaplain personally finds the patient's beliefs offensive \u2014 what should the chaplain do?",
+    "A religious school receives public funding but refuses to teach evolution, so should the government keep funding it in the name of religious freedom or cut funding to protect science education?"
+  ],
+  "e2e_wall_seconds": 68.718,
+  "gen_wall_seconds": 50.784,
+  "swarm_wall_seconds": 17.9,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 207170,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2522,
+  "sekhmet_tokens_max": 4282,
+  "sekhmet_tokens_avg": 3237.0,
+  "opencode_gen": {
+    "model": "opencode/big-pickle",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 50.784,
+    "sessions": [
+      "ses_040609c5fffeh4o0Ly4DJSVu1z"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 13799.0,
+    "tokens_input": 9088.0,
+    "tokens_output": 2068.0,
+    "tokens_reasoning": 2643.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e01_opencode_big-pickle-YoD33X",
+  "e2e_start_iso": "2026-08-01T23:18:41+00:00"
+}

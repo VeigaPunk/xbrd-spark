@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e02_opencode_deepseek-v4-flash-free",
+  "model": "opencode/deepseek-v4-flash-free",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a devout patient's family insists doctors hide their child's terminal diagnosis for religious reasons, should the physician comply against the child's wish to know?",
+    "Would it be more ethical for a hospice chaplain to gently let an agnostic patient who is suffering believe in a comforting afterlife, or to correct them for truth's sake?",
+    "If your church would expel a member for publicly admitting to an abortion, is it better to remain silent in the community or to confess and accept excommunication?"
+  ],
+  "e2e_wall_seconds": 82.598,
+  "gen_wall_seconds": 64.163,
+  "swarm_wall_seconds": 18.406,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 205871,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2466,
+  "sekhmet_tokens_max": 3698,
+  "sekhmet_tokens_avg": 3216.7,
+  "opencode_gen": {
+    "model": "opencode/deepseek-v4-flash-free",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 64.163,
+    "sessions": [
+      "ses_0405f8fa5ffeybm81pem3BfGr8"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 15703.0,
+    "tokens_input": 9126.0,
+    "tokens_output": 1875.0,
+    "tokens_reasoning": 4702.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e02_opencode_deepseek-v4-flash-free-3TiGf1",
+  "e2e_start_iso": "2026-08-01T23:19:50+00:00"
+}

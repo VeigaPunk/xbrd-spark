@@ -123,3 +123,7 @@ If an OpenCode-orchestrated primary run records `sparks_ok: 0` (agent never invo
 ```
 
 `run-once-telemetry.sh` uses `--no-keep` and deletes temp roots on EXIT. Prefer **direct** sekhmet when opencode skips the harness.
+
+## E2E model-questions campaign
+
+See [`telemetry-e2e-model-questions/`](telemetry-e2e-model-questions/) — OpenCode generates 64 questions per model, then Sekhmet swarms Titanium answers (tokens captured).

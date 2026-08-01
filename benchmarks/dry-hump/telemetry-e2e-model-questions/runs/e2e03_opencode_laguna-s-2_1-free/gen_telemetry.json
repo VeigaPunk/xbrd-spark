@@ -1,0 +1,14 @@
+{
+  "model": "opencode/laguna-s-2.1-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 7.679,
+  "sessions": [
+    "ses_0405e4c95ffe2QFlRkMZQv44en"
+  ],
+  "step_finish_count": 2,
+  "tokens_total": 18068.0,
+  "tokens_input": 14134.0,
+  "tokens_output": 222.0,
+  "tokens_reasoning": 0.0,
+  "cost": 0.0
+}

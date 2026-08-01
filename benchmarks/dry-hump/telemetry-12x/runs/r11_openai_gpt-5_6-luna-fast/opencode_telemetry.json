@@ -1,0 +1,15 @@
+{
+  "model": "openai/gpt-5.6-luna-fast",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 49.305,
+  "sessions": [
+    "ses_040703593ffeosYQeuI9TTEbC9"
+  ],
+  "step_finish_count": 7,
+  "tokens_total": 59571.0,
+  "tokens_input": 11164.0,
+  "tokens_output": 471.0,
+  "tokens_reasoning": 320.0,
+  "cost": 0.0,
+  "final_text_tail": "DONE run_id=r11_openai_gpt-5_6-luna-fast model=openai/gpt-5.6-luna-fast"
+}

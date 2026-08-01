@@ -182,3 +182,8 @@ See [`benchmarks/dry-hump/`](benchmarks/dry-hump/) — recorded **64/64 ok in ~2
 ./benchmarks/dry-hump/run-dry.sh    # free dry-run smoke
 ./benchmarks/dry-hump/run-live.sh   # live Codex Titanium (API cost)
 ```
+
+## Benchmarks
+
+- [`benchmarks/dry-hump`](benchmarks/dry-hump) — multi-model 8×8 Titanium load
+- [`benchmarks/scope-fanout-64`](benchmarks/scope-fanout-64) — public synthetic 64-way `--scope` swarm (dry-run safe)

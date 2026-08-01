@@ -1,0 +1,12 @@
+e2e01_opencode_big-pickle	SKIP_GOOD
+e2e02_opencode_deepseek-v4-flash-free	qs=64	matched=64	ok=64	fail=0	wall=73.8	ec=0
+e2e03_opencode_laguna-s-2_1-free	SKIP_GOOD
+e2e04_opencode_ling-3_0-flash-free	SKIP_GOOD
+e2e05_opencode_mimo-v2_5-free	SKIP_GOOD
+e2e06_opencode_nemotron-3-ultra-free	SKIP_GOOD
+e2e07_opencode_north-mini-code-free	SKIP_GOOD
+e2e08_openai_gpt-5_3-codex-spark	SKIP_GOOD
+e2e09_openai_gpt-5_4-mini-fast	SKIP_GOOD
+e2e10_openai_gpt-5_5-fast	SKIP_GOOD
+e2e11_openai_gpt-5_6-luna-fast	SKIP_GOOD
+e2e12_openai_gpt-5_6-sol-fast	SKIP_GOOD

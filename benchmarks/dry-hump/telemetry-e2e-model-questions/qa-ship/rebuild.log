@@ -1,0 +1,36 @@
+model=gpt-5.4-mini jobs=12 runs=12
+SKIP good e2e01_opencode_big-pickle bytes=106239
+SKIP good e2e02_opencode_deepseek-v4-flash-free bytes=101673
+===== 3/12 e2e03_opencode_laguna-s-2_1-free qs=64 =====
+e2e03_opencode_laguna-s-2_1-free	qs=64	matched=64	ok=64	fail=0	wall=46.5	ec=0
+===== 4/12 e2e04_opencode_ling-3_0-flash-free qs=64 =====
+e2e04_opencode_ling-3_0-flash-free	qs=64	matched=64	ok=64	fail=0	wall=50.8	ec=0
+===== 5/12 e2e05_opencode_mimo-v2_5-free qs=64 =====
+e2e05_opencode_mimo-v2_5-free	qs=64	matched=64	ok=64	fail=0	wall=51.8	ec=0
+===== 6/12 e2e06_opencode_nemotron-3-ultra-free qs=63 =====
+e2e06_opencode_nemotron-3-ultra-free	qs=63	matched=63	ok=63	fail=0	wall=51.5	ec=0
+===== 7/12 e2e07_opencode_north-mini-code-free qs=64 =====
+e2e07_opencode_north-mini-code-free	qs=64	matched=64	ok=64	fail=0	wall=56.5	ec=0
+===== 8/12 e2e08_openai_gpt-5_3-codex-spark qs=64 =====
+e2e08_openai_gpt-5_3-codex-spark	qs=64	matched=64	ok=64	fail=0	wall=54.4	ec=0
+===== 9/12 e2e09_openai_gpt-5_4-mini-fast qs=64 =====
+e2e09_openai_gpt-5_4-mini-fast	qs=64	matched=64	ok=64	fail=0	wall=56.0	ec=0
+===== 10/12 e2e10_openai_gpt-5_5-fast qs=64 =====
+e2e10_openai_gpt-5_5-fast	qs=64	matched=64	ok=64	fail=0	wall=59.5	ec=0
+===== 11/12 e2e11_openai_gpt-5_6-luna-fast qs=64 =====
+e2e11_openai_gpt-5_6-luna-fast	qs=64	matched=64	ok=64	fail=0	wall=54.8	ec=0
+===== 12/12 e2e12_openai_gpt-5_6-sol-fast qs=64 =====
+e2e12_openai_gpt-5_6-sol-fast	qs=64	matched=64	ok=64	fail=0	wall=78.8	ec=0
+DONE wall 565.5319693088531 ALL bytes 1089002
+e2e01_opencode_big-pickle	SKIP_GOOD
+e2e02_opencode_deepseek-v4-flash-free	SKIP_GOOD
+e2e03_opencode_laguna-s-2_1-free	qs=64	matched=64	ok=64	fail=0	wall=46.5	ec=0
+e2e04_opencode_ling-3_0-flash-free	qs=64	matched=64	ok=64	fail=0	wall=50.8	ec=0
+e2e05_opencode_mimo-v2_5-free	qs=64	matched=64	ok=64	fail=0	wall=51.8	ec=0
+e2e06_opencode_nemotron-3-ultra-free	qs=63	matched=63	ok=63	fail=0	wall=51.5	ec=0
+e2e07_opencode_north-mini-code-free	qs=64	matched=64	ok=64	fail=0	wall=56.5	ec=0
+e2e08_openai_gpt-5_3-codex-spark	qs=64	matched=64	ok=64	fail=0	wall=54.4	ec=0
+e2e09_openai_gpt-5_4-mini-fast	qs=64	matched=64	ok=64	fail=0	wall=56.0	ec=0
+e2e10_openai_gpt-5_5-fast	qs=64	matched=64	ok=64	fail=0	wall=59.5	ec=0
+e2e11_openai_gpt-5_6-luna-fast	qs=64	matched=64	ok=64	fail=0	wall=54.8	ec=0
+e2e12_openai_gpt-5_6-sol-fast	qs=64	matched=64	ok=64	fail=0	wall=78.8	ec=0

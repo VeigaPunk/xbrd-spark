@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# paste-out.sh — post large sekhmet/swarm dumps to a paste host; print URL only.
+# paste-out.sh — post large sekhmet/swarm dumps to Pastebin ONLY; print URL only.
 #
-# DIRECTIVE (sekhmet owners / agents):
-#   Large outputs, logs, swarm NDJSON dumps, and multi-KB blobs MUST go to a paste
-#   service. In-session keep only the URL + a short summary — never dump multi-KB
-#   into the TUI/chat.
+# HARD RULE (non-negotiable for sekhmet / xbrd-spark agents):
+#   Host: pastebin.com ONLY (api.pastebin.com / pastebin.com).
+#   No litterbox, catbox, 0x0, paste.rs, dpaste, hastebin, gist-as-fallback,
+#   transfer.sh, or any other paste/file host. If Pastebin fails: exit non-zero
+#   and report — do NOT switch backends.
 #
 # Usage:
 #   sekhmet swarm ... > /tmp/swarm.ndjson 2> /tmp/swarm.err
@@ -12,16 +13,27 @@
 #   ./scripts/paste-out.sh /tmp/swarm.err
 #   jq -c . /tmp/swarm.ndjson | ./scripts/paste-out.sh
 #
-# Env:
-#   PASTE_BACKEND=paste_rs|0x0|catbox|litterbox|dpaste|auto
-#   PASTE_NAME=filename.ext
-set -eu
-# note: not pipefail — head/tr pipelines must not fail the script on SIGPIPE
+# Env (required):
+#   PASTEBIN_API_DEV_KEY  — API dev key from https://pastebin.com/doc_api
+# Optional:
+#   PASTEBIN_API_USER_KEY — user key for pastes under your account
+#   PASTEBIN_EXPIRE       — N / 10M / 1H / 1D / 1W / 2W / 1M / 6M / 1Y (default 1M)
+#   PASTEBIN_PRIVATE      — 0 public | 1 unlisted | 2 private (default 1)
+#   PASTE_NAME            — paste title / filename label
+set -euo pipefail
 
-BACKEND=${PASTE_BACKEND:-auto}
+API_URL="https://pastebin.com/api/api_post.php"
+EXPIRE=${PASTEBIN_EXPIRE:-1M}
+PRIVATE=${PASTEBIN_PRIVATE:-1}
 TMP=
 cleanup() { [[ -n "${TMP:-}" && -f "$TMP" ]] && rm -f "$TMP"; }
 trap cleanup EXIT
+
+if [[ -z "${PASTEBIN_API_DEV_KEY:-}" ]]; then
+  echo "paste-out: PASTEBIN_API_DEV_KEY is required (pastebin.com only — no fallback hosts)" >&2
+  echo "paste-out: create a free key at https://pastebin.com/doc_api and export it" >&2
+  exit 2
+fi
 
 if [[ $# -ge 1 && -f "$1" ]]; then
   FILE=$1
@@ -39,81 +51,56 @@ if [[ "$BYTES" -eq 0 ]]; then
   exit 1
 fi
 
-upload_one() {
-  local be=$1
-  case "$be" in
-    paste_rs|paste.rs)
-      # paste.rs often 500s on large NDJSON; skip >64KiB in auto path
-      if [[ "$BYTES" -gt 65536 ]]; then
-        return 1
-      fi
-      curl -fsS --max-time 60 --data-binary @"$FILE" https://paste.rs
-      ;;
-    0x0|0x0.st)
-      curl -fsS --max-time 60 -F "file=@${FILE};filename=${NAME}" https://0x0.st
-      ;;
-    catbox|catbox.moe)
-      curl -fsS --max-time 90 -F "reqtype=fileupload" -F "fileToUpload=@${FILE}" \
-        https://catbox.moe/user/api.php
-      ;;
-    litterbox)
-      # temporary 1h–72h file host; reliable when catbox/0x0 flaky
-      curl -fsS --max-time 90 -F "reqtype=fileupload" -F "time=72h" \
-        -F "fileToUpload=@${FILE}" \
-        https://litterbox.catbox.moe/resources/internals/api.php
-      ;;
-    dpaste)
-      # text only; good for medium dumps
-      if [[ "$BYTES" -gt 500000 ]]; then
-        return 1
-      fi
-      curl -fsS --max-time 60 --data-urlencode "content@${FILE}" \
-        -d "syntax=text" -d "expiry_days=30" \
-        https://dpaste.com/api/v2/
-      ;;
-    *)
-      return 2
-      ;;
-  esac
-}
+# Pastebin free tier ~512 KiB per paste; refuse silently oversized so agents split
+MAX=${PASTEBIN_MAX_BYTES:-524288}
+if [[ "$BYTES" -gt "$MAX" ]]; then
+  echo "paste-out: input is ${BYTES} bytes > pastebin limit ${MAX}; split the file and re-run" >&2
+  exit 4
+fi
 
-USED=
-URL=
+CODE=$(cat "$FILE")
 
-try_backends() {
-  local be url
-  for be in "$@"; do
-    url=$(upload_one "$be" 2>/dev/null || true)
-    url=$(printf '%s' "$url" | tr -d '\r' | head -n1 | tr -d '[:space:]')
-    if [[ -n "$url" && "$url" == http* ]]; then
-      USED=$be
-      URL=$url
-      return 0
-    fi
-    echo "paste-out: backend=$be failed, trying next…" >&2
-  done
-  return 1
-}
+# Build form; never print the key
+ARGS=(
+  -fsS --max-time 90
+  -d "api_option=paste"
+  -d "api_dev_key=${PASTEBIN_API_DEV_KEY}"
+  --data-urlencode "api_paste_code@${FILE}"
+  --data-urlencode "api_paste_name=${NAME}"
+  -d "api_paste_format=text"
+  -d "api_paste_private=${PRIVATE}"
+  -d "api_paste_expire_date=${EXPIRE}"
+)
+if [[ -n "${PASTEBIN_API_USER_KEY:-}" ]]; then
+  ARGS+=(-d "api_user_key=${PASTEBIN_API_USER_KEY}")
+fi
 
-case "$BACKEND" in
-  auto)
-    # Prefer litterbox for large NDJSON; then paste.rs / dpaste / catbox / 0x0
-    try_backends litterbox paste_rs dpaste catbox 0x0 || {
-      echo "paste-out: all backends failed" >&2
-      exit 3
-    }
-    ;;
+RESP=$(curl "${ARGS[@]}" "$API_URL" 2>/tmp/paste-out.curl.err || true)
+RESP=$(printf '%s' "$RESP" | tr -d '\r' | head -n1 | tr -d '[:space:]')
+
+if [[ -z "$RESP" ]]; then
+  echo "paste-out: empty response from pastebin.com (see curl err)" >&2
+  [[ -s /tmp/paste-out.curl.err ]] && head -c 400 /tmp/paste-out.curl.err >&2
+  echo >&2
+  exit 3
+fi
+
+# API errors look like: Bad API request, ...
+if [[ "$RESP" != http* ]]; then
+  echo "paste-out: pastebin.com rejected paste: $RESP" >&2
+  echo "paste-out: NO FALLBACK — fix key/quota/size; do not use other hosts" >&2
+  exit 3
+fi
+
+# Must be pastebin.com
+case "$RESP" in
+  https://pastebin.com/*|http://pastebin.com/*) ;;
   *)
-    URL=$(upload_one "$BACKEND" 2>/dev/null || true)
-    URL=$(printf '%s' "$URL" | tr -d '\r' | head -n1 | tr -d '[:space:]')
-    USED=$BACKEND
-    if [[ -z "$URL" || "$URL" != http* ]]; then
-      echo "paste-out: backend=$BACKEND failed" >&2
-      exit 3
-    fi
+    echo "paste-out: refusing non-pastebin URL: $RESP" >&2
+    exit 3
     ;;
 esac
 
-printf '%s\n' "$URL"
-echo "paste-out: backend=$USED bytes=$BYTES name=$NAME" >&2
+printf '%s\n' "$RESP"
+echo "paste-out: backend=pastebin.com bytes=$BYTES name=$NAME" >&2
 exit 0

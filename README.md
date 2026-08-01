@@ -1,9 +1,13 @@
-# xbrd-spark
+# xbrd-spark · **Sekhmet**
 
-**Pure L3 worker surface** for the xbrd stack.
+**Always-available swarm dispatch substrate** — layer 3 of xbreed.
+
+Marketplace name: **`sekhmet`** ([ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)).  
+Binary crate: **`xbrd-spark`** (Rust only — no Python).
 
 Routes executions through **codex-spark** (GPT-5.3-Codex-Spark) with:
 
+- **Always callable** — default channel for labrat swarms and pure worker sparks
 - **No git worktrees** — namespaced ephemeral dirs only
 - **Double-work tolerance** — concurrent identical tasks are fine; higher layer (distiller / the-judge) dedups by content hash + provenance
 - **Any-CLI invocable** — labrat, mutation-tester, executor, or plain bash can call it

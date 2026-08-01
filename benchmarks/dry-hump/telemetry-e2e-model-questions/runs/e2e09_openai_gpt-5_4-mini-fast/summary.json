@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e09_openai_gpt-5_4-mini-fast",
+  "model": "openai/gpt-5.4-mini-fast",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a hospital chaplain believes a patient's refusal of life-saving treatment is spiritually dangerous, should they respect autonomy or intervene more forcefully?",
+    "Would it ever be ethical for a religious community to hide a member's scandal if public truth would devastate innocent children?",
+    "If a devoted person claims an answer came from prayer but it harms others, should faith or evidence guide the final decision?"
+  ],
+  "e2e_wall_seconds": 65.029,
+  "gen_wall_seconds": 44.113,
+  "swarm_wall_seconds": 20.889,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 203440,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2381,
+  "sekhmet_tokens_max": 3519,
+  "sekhmet_tokens_avg": 3178.8,
+  "opencode_gen": {
+    "model": "openai/gpt-5.4-mini-fast",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 44.113,
+    "sessions": [
+      "ses_040594537ffeeQutxbTpC3GG3n"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 10137.0,
+    "tokens_input": 2549.0,
+    "tokens_output": 1319.0,
+    "tokens_reasoning": 1661.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e09_openai_gpt-5_4-mini-fast-JRIEGS",
+  "e2e_start_iso": "2026-08-01T23:26:42+00:00"
+}

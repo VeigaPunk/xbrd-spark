@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e07_opencode_north-mini-code-free",
+  "model": "opencode/north-mini-code-free",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a divine being promised eternal happiness to those who sacrifice their only child's life, would you accept that terrible bargain for the greater good?",
+    "When an ancient religious text commands actions that modern society considers morally wrong, which authority should you follow?",
+    "If you could save thousands of lives by breaking one of the Ten Commandments, which commandment would you violate and why?"
+  ],
+  "e2e_wall_seconds": 115.11,
+  "gen_wall_seconds": 97.134,
+  "swarm_wall_seconds": 17.95,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 203118,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2418,
+  "sekhmet_tokens_max": 3609,
+  "sekhmet_tokens_avg": 3173.7,
+  "opencode_gen": {
+    "model": "opencode/north-mini-code-free",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 97.134,
+    "sessions": [
+      "ses_0405b8dcdffeK6obXs4TSd858T"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 10528.0,
+    "tokens_input": 7866.0,
+    "tokens_output": 515.0,
+    "tokens_reasoning": 2147.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e07_opencode_north-mini-code-free-4OZ78F",
+  "e2e_start_iso": "2026-08-01T23:24:12+00:00"
+}

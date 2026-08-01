@@ -1,0 +1,28 @@
+[package]
+name = "xbrd-spark"
+version = "0.1.0"
+edition = "2021"
+description = "Pure L3 worker surface for xbrd: namespaced ephemeral codex-spark execution without worktrees. Double-work tolerant; higher layers distill."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/VeigaPunk/xbrd-spark"
+
+[[bin]]
+name = "xbrd-spark"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+hex = "0.4"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+which = "6"
+tempfile = "3"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

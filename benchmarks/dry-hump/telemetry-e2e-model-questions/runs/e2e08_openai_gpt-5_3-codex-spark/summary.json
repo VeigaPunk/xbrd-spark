@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e08_openai_gpt-5_3-codex-spark",
+  "model": "openai/gpt-5.3-codex-spark",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a hospital obeys religious objections to blood transfusions, should emergency care bypass doctrine to save a patient who refused treatment previously?",
+    "Could a government permit faith-based schools to exclude LGBTQ students from services without violating equal protection principles?",
+    "Should state officials be required to testify about personal beliefs if their votes on reproductive policy conflict with constitutional rights?"
+  ],
+  "e2e_wall_seconds": 34.369,
+  "gen_wall_seconds": 9.322,
+  "swarm_wall_seconds": 25.02,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 169596,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2402,
+  "sekhmet_tokens_max": 3380,
+  "sekhmet_tokens_avg": 2649.9,
+  "opencode_gen": {
+    "model": "openai/gpt-5.3-codex-spark",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 9.322,
+    "sessions": [
+      "ses_04059cbd1ffejtqW1rZgk1BTa4"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 15150.0,
+    "tokens_input": 5076.0,
+    "tokens_output": 1278.0,
+    "tokens_reasoning": 7004.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e08_openai_gpt-5_3-codex-spark-Lg52it",
+  "e2e_start_iso": "2026-08-01T23:26:07+00:00"
+}

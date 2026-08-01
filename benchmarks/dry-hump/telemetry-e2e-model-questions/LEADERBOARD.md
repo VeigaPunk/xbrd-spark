@@ -12,6 +12,7 @@ OpenCode generates 64 questions → Sekhmet Titanium swarm answers them.
 | 4 | `e2e03_opencode_laguna-s-2_1-free` | `opencode/laguna-s-2.1-free` | 18.066 | 64 | 0 | 0 | 197133 | 3080.2 | 64 |
 | 5 | `e2e02_opencode_deepseek-v4-flash-free` | `opencode/deepseek-v4-flash-free` | 18.406 | 64 | 0 | 0 | 205871 | 3216.7 | 64 |
 | 6 | `e2e04_opencode_ling-3_0-flash-free` | `opencode/ling-3.0-flash-free` | 22.605 | 64 | 0 | 0 | 162676 | 2541.8 | 64 |
+| 7 | `e2e08_openai_gpt-5_3-codex-spark` | `openai/gpt-5.3-codex-spark` | 25.02 | 64 | 0 | 0 | 169596 | 2649.9 | 64 |
 
 ## Incomplete
 

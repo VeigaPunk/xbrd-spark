@@ -1,0 +1,22 @@
+{
+  "run_id": "e2e06b_opencode_nemotron-3-ultra-free",
+  "model": "opencode/nemotron-3-ultra-free",
+  "status": "ok",
+  "questions": 64,
+  "e2e_wall_seconds": 19.856,
+  "swarm_wall_seconds": 19.856,
+  "swarm_exit": 1,
+  "sparks_ok": 57,
+  "sparks_fail": 7,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 171555,
+  "sekhmet_tokens_n": 57,
+  "sekhmet_tokens_min": 2333,
+  "sekhmet_tokens_max": 3312,
+  "sekhmet_tokens_avg": 3009.7,
+  "root": "/tmp/sekhmet-e2e06b-UfLMVO",
+  "e2e_start_iso": "2026-08-01T23:32:35+00:00",
+  "e2e_end_iso": "2026-08-01T23:32:55+00:00",
+  "note": "Redo of e2e06 with padded 64th question; direct sekhmet swarm -j 64"
+}

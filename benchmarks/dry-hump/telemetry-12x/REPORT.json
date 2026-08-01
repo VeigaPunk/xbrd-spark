@@ -96,8 +96,8 @@
     {
       "run_id": "r08_openai_gpt-5_3-codex-spark",
       "model": "openai/gpt-5.3-codex-spark",
-      "sekhmet_wall_s": 0.011,
-      "ok": 0,
+      "sekhmet_wall_s": 22.090,
+      "ok": 64,
       "fail": 0,
       "timeout": 0,
       "sekhmet_tokens": 0,
@@ -160,10 +160,10 @@
     }
   ],
   "totals": {
-    "sekhmet_ok": 448,
+    "sekhmet_ok": 512,
     "sekhmet_tokens": 846928,
-    "opencode_tokens": 474315.0,
+    "opencode_tokens": 474315,
     "opencode_cost": 0,
-    "sekhmet_wall_sum": 151.155
+    "sekhmet_wall_sum": 173.23399999999998
   }
 }

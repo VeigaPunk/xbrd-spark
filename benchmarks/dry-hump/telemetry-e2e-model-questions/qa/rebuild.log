@@ -16,3 +16,7 @@ swarm_ec=1 wall=24.081
 ===== 8/12 e2e08_openai_gpt-5_3-codex-spark questions=64 root=/tmp/sekhmet-qa-rebuild-e2e08_openai_gpt-5_3-codex-spark-vFY4iE =====
 swarm_ec=1 wall=24.607
 ===== 9/12 e2e09_openai_gpt-5_4-mini-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e09_openai_gpt-5_4-mini-fast-s3ADBg =====
+swarm_ec=1 wall=20.631
+===== 10/12 e2e10_openai_gpt-5_5-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e10_openai_gpt-5_5-fast-ERJfNX =====
+swarm_ec=1 wall=17.128
+===== 11/12 e2e11_openai_gpt-5_6-luna-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e11_openai_gpt-5_6-luna-fast-ZHGsey =====

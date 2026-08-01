@@ -10,3 +10,6 @@ benchmarks/**/payload-private/
 # Large QA rebuild dumps (paste URLs in qa/PASTE_URLS.txt)
 **/ndjson.qa.out
 **/swarm.qa.stderr.log
+
+# Generated Q→A markdown dumps (use paste-out; keep SUMMARY only)
+**/qa/*-QA.md

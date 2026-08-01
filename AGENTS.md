@@ -77,3 +77,5 @@ Keep in-session: **URL + short counts** (ok/fail/timeout/wall). Prefer `scripts/
 ## Provider quota
 
 If Titanium returns usage-limit / 403 websocket / 429 model refresh, stop live swarms. Prefer dry-run gates. Resume live after the provider window (see e2e `qa/STATUS.md`).
+
+Short swarm counts (in-session): `./scripts/swarm-summary.sh /tmp/swarm.ndjson` then `./scripts/paste-out.sh /tmp/swarm.ndjson`.

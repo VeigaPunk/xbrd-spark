@@ -1,0 +1,14 @@
+{
+  "model": "opencode/ling-3.0-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 8.133,
+  "sessions": [
+    "ses_0405daf07ffewP7Dk4sH0ppnOp"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 11267.0,
+  "tokens_input": 9367.0,
+  "tokens_output": 1677.0,
+  "tokens_reasoning": 223.0,
+  "cost": 0.0
+}

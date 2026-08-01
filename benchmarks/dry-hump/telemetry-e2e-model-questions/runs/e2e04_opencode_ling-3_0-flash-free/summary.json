@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e04_opencode_ling-3_0-flash-free",
+  "model": "opencode/ling-3.0-flash-free",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "If a religious leader discovered their sacred text was fabricated, should they reveal the truth and destroy their community's faith?",
+    "Should a person secretly record their partner's intimate moments without consent if they believe it would protect their children's future?",
+    "If a doctor could illegally obtain a life-saving drug for a dying patient, should they break the law to save a life?"
+  ],
+  "e2e_wall_seconds": 30.765,
+  "gen_wall_seconds": 8.133,
+  "swarm_wall_seconds": 22.605,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 162676,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2345,
+  "sekhmet_tokens_max": 3153,
+  "sekhmet_tokens_avg": 2541.8,
+  "opencode_gen": {
+    "model": "opencode/ling-3.0-flash-free",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 8.133,
+    "sessions": [
+      "ses_0405daf07ffewP7Dk4sH0ppnOp"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 11267.0,
+    "tokens_input": 9367.0,
+    "tokens_output": 1677.0,
+    "tokens_reasoning": 223.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e04_opencode_ling-3_0-flash-free-J8SClY",
+  "e2e_start_iso": "2026-08-01T23:21:53+00:00"
+}

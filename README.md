@@ -36,11 +36,16 @@ $XBRD_SPARK_ROOT (or $XDG_RUNTIME_DIR/xbrd-spark or /tmp/xbrd-spark)
     ├── tmp/  home/  codex-home/  xdg/  cargo-home/ ...
 ```
 
-- Unique `spark_id` per invocation (UUID v4 by default).
+- Unique `spark_id` per invocation (UUID v4 by default; `--deterministic` → `sp-` + first 16 hex of `sha256(task|scope)`).
+- **Exclusive namespace**: if `$ROOT/<id>` already exists, run bails with `spark namespace already exists: {id}` (no clobber). Concurrent *different* ids are intentional double-work.
+- **Setup rollback**: if setup fails after exclusive create (ensure_dirs / seed / task write / rsync) *before* meta/finalize, the namespace is removed so the id is reusable. Dispatcher/spawn failures after meta keep the emit-record behavior (no delete when `keep=true`).
 - `TMPDIR`, `CODEX_HOME`, `CARGO_*`, `XDG_*`, `HOME` forced inside the namespace.
-- Optional `--scope PATH` does an rsync snapshot (excludes `.git`, `target`, `node_modules`, …) exactly like the existing `mutation-harbor-scaffold.sh`.
+- Auth/config seeded into `codex-home` with `0o600` files / `0o700` dirs where supported (unix). Prefer `XDG_RUNTIME_DIR` / a private root over world-writable shared `/tmp` in multi-tenant settings.
+- Optional `--scope PATH` must be a **directory** (bail otherwise); rsync snapshot excludes `.git`, `target`, `node_modules`, … (mutation-harbor style). Symlinks follow rsync `-a` defaults (not `--copy-links`).
 - Never writes into the invoker’s worktree or shared git state.
 - Artifacts are content-addressed so identical results hash-collide for free.
+- Root override: `--root` or env `XBRD_SPARK_ROOT`.
+- Initial `meta.json` and finalize paths write via `*.tmp` + rename.
 
 ## CLI
 
@@ -49,13 +54,22 @@ $XBRD_SPARK_ROOT (or $XDG_RUNTIME_DIR/xbrd-spark or /tmp/xbrd-spark)
 xbrd-spark run --task "write a rust function that ..."
 echo "probe hypothesis X" | xbrd-spark run --id sp-labrat-42
 
+# Dry-run (no xask/codex; full namespace + stub result + NDJSON)
+xbrd-spark run --dry-run --task "probe" --root /tmp/xbrd-spark-smoke
+
 # With FS context for mutation / labrat that need files
 xbrd-spark run --scope . --task "mutate the boundary check in src/lib.rs and run tests"
 
 # Prefer direct codex (skip xask loadout) for absolute min latency
 xbrd-spark run --direct --task "..."
 
-# Collect for distiller (NDJSON)
+# Deterministic id from task+scope hash (stable; collision risk under concurrent same task)
+xbrd-spark run --deterministic --task "..."
+
+# Delete namespace after run (default is keep; use gc for bulk cleanup)
+xbrd-spark run --no-keep --dry-run --task "ephemeral probe"
+
+# Collect for distiller (NDJSON); at least one id required
 xbrd-spark collect sp-aaa sp-bbb sp-ccc
 
 # GC old namespaces (default 2h)
@@ -65,7 +79,28 @@ xbrd-spark gc --max-age 2
 xbrd-spark status sp-aaa
 ```
 
-Exit non-zero on spark failure, but the structured record is still emitted so double-work can be distilled.
+Key run flags: `--id`, `--task` / `--task-file` / stdin, `--scope`, `--ro`, `--timeout`, `--direct`, `--root` / `XBRD_SPARK_ROOT`, `--no-keep`, `--deterministic`, `--dry-run`.
+
+Exit non-zero on spark failure, but the structured record is still emitted so double-work can be distilled. Live spawn uses `env_clear` + allowlisted env only.
+
+### Flags (enforcement)
+
+- **`--timeout SECS`**: wall-clock kill when `SECS > 0` (poll `try_wait` + process-group `SIGKILL` on Linux); result status is `timeout` (not `fail`). After kill, stdout/stderr reader joins are **bounded** (~2s) so orphan pipe holders cannot hang the spark forever (logs may truncate). `0` waits unlimited. Recorded in `meta.timeout_secs`.
+- **`--ro`**: **forces the codex dispatcher** with `--sandbox read-only` (skips xask so sandbox is actually enforced). Without `--ro`, prefers xask when present, else codex with `danger-full-access`. Recorded in `meta.ro`.
+- **`--scope`**: must be a directory; rsync snapshot into `workspace/` even on `--dry-run` (when rsync is available). Non-directory paths fail setup and roll back the namespace.
+- **Provenance**: `meta` also records `direct`, `dry_run`, and `timeout_secs` for every run.
+- **Spawn/dispatcher errors**: after namespace + initial meta exist, failures finalize with status `error`, emit NDJSON, and exit non-zero (record still present for distill).
+
+## Open residuals
+
+- Concurrent sparks sharing host `~/.codex` token lifetime / refresh races (seed copies auth, does not isolate refresh).
+- Host global caches (cargo registry, rustup) and ports are not namespaced; prefer private `XBRD_SPARK_ROOT` / `XDG_RUNTIME_DIR`.
+- rsync does not `--copy-links` (symlink semantics = rsync `-a`).
+- Deterministic ids collide under concurrent same task+scope.
+- After timeout kill, reader joins are bounded (~2s); escaped pipe holders may truncate logs / leak reader threads — spark still finalizes `timeout`.
+- `gc --max-age` reaps old `status=running` by **age only** (no live PID/`/proc` probe); long `--timeout 0` jobs past max-age can be deleted.
+- Live codex smoke / CI workflows are optional and out of default gates.
+- Non-unix: seed `0o700`/`0o600` permission bits are no-ops.
 
 ## Integration under xbrd
 
@@ -81,19 +116,31 @@ They can switch to (or xask can grow a thin wrapper for):
 xbrd-spark run --task "<probe>"
 # or with scope for mutation-tester
 xbrd-spark run --scope "$REPO" --task "..."
+# CI / gates without live model
+xbrd-spark run --dry-run --task "smoke"
 ```
 
 Higher layer receives the NDJSON records, hashes content, clusters duplicates, keeps the Pareto survivors. Double execution is intentional and cheap.
 
-## Build
+## Install / build
 
 ```bash
+cargo install --path .
+# or without install:
 cargo build --release
-# binary lands in target/release/xbrd-spark
-# optional: install to ~/.local/bin
+# binary: target/release/xbrd-spark
 ```
 
-Requires `xask` or `codex` on `PATH`. Prefer `xask` when present (preserves godspeed loadout + existing flags).
+Real runs need `codex` or `xask` on `PATH`; `--ro` requires `codex`; `--dry-run` needs neither.
+
+Smoke:
+
+```bash
+xbrd-spark --help
+xbrd-spark run --help
+xbrd-spark run --dry-run --task 'probe' --root "$(mktemp -d)"
+xbrd-spark status --help
+```
 
 ## Hard constraints (aligned with xbgst / xbrd)
 
@@ -101,7 +148,7 @@ Requires `xask` or `codex` on `PATH`. Prefer `xask` when present (preserves gods
 - No worktrees.
 - No internal coordination / judge logic.
 - Explicit provenance + content hashes so distill is trivial.
-- Soft resource honesty: host ports and global caches outside the forced env vars remain a residual ceiling; document and prefer `--ro` for pure probes.
+- Resource honesty: namespace forces `TMPDIR`/`HOME`/`CODEX_HOME`/…; host ports and other global caches remain a residual ceiling. Prefer `--ro` for pure probes (codex sandbox read-only).
 
 ## Relation to mutation-harbor
 

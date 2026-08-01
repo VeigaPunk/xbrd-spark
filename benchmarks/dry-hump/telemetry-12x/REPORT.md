@@ -1,4 +1,6 @@
-# dry-hump multi-model × Sekhmet 64-swarm
+# dry-hump multi-model × Sekhmet 64-swarm (primary + redo)
+
+All free-tier primary 0-ok gaps now have `*b` re-harvests where completed.
 
 | # | run_id | model | sekhmet wall s | ok/64 | sekhmet tokens |
 |--:|--------|-------|---------------:|------:|---------------:|
@@ -13,12 +15,11 @@
 | 9 | `r06_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 0.012 | 0/64 | 0 |
 | 10 | `r06b_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 23.544 | 64/64 | 0 |
 | 11 | `r07_opencode_north-mini-code-free` | `opencode/north-mini-code-free` | 0.011 | 0/64 | 0 |
-| 12 | `r08_openai_gpt-5_3-codex-spark` | `openai/gpt-5.3-codex-spark` | 22.090 | 64/64 | 0 |
-| 13 | `r09_openai_gpt-5_4-mini-fast` | `openai/gpt-5.4-mini-fast` | 19.014 | 64/64 | 219107 |
-| 14 | `r10_openai_gpt-5_5-fast` | `openai/gpt-5.5-fast` | 19.738 | 64/64 | 0 |
-| 15 | `r11_openai_gpt-5_6-luna-fast` | `openai/gpt-5.6-luna-fast` | 24.754 | 64/64 | 0 |
-| 16 | `r12_openai_gpt-5_6-sol-fast` | `openai/gpt-5.6-sol-fast` | 19.647 | 64/64 | 0 |
+| 12 | `r07b_opencode_north-mini-code-free` | `opencode/north-mini-code-free` | 22.950 | 64/64 | 0 |
+| 13 | `r08_openai_gpt-5_3-codex-spark` | `openai/gpt-5.3-codex-spark` | 22.090 | 64/64 | 0 |
+| 14 | `r09_openai_gpt-5_4-mini-fast` | `openai/gpt-5.4-mini-fast` | 19.014 | 64/64 | 219107 |
+| 15 | `r10_openai_gpt-5_5-fast` | `openai/gpt-5.5-fast` | 19.738 | 64/64 | 0 |
+| 16 | `r11_openai_gpt-5_6-luna-fast` | `openai/gpt-5.6-luna-fast` | 24.754 | 64/64 | 0 |
+| 17 | `r12_openai_gpt-5_6-sol-fast` | `openai/gpt-5.6-sol-fast` | 19.647 | 64/64 | 0 |
 
-**Totals:** sekhmet_ok=768 sekhmet_tokens=846928 wall_sum=266.406s
-
-Redo runs (`*b`) re-harvest previously 0-ok free-tier / skipped models with `--no-keep`.
+**Totals:** sekhmet_ok=832 sekhmet_tokens=846928 wall_sum=289.356s

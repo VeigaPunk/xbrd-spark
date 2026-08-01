@@ -1,6 +1,6 @@
 {
   "campaign": "dry-hump-12x-opencode-models",
-  "runs": 16,
+  "runs": 17,
   "rows": [
     {
       "run_id": "r01_opencode_big-pickle",
@@ -133,6 +133,19 @@
       "opencode_exit": 0
     },
     {
+      "run_id": "r07b_opencode_north-mini-code-free",
+      "model": "opencode/north-mini-code-free",
+      "sekhmet_wall_s": 22.950,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": null,
+      "opencode_tokens": null,
+      "opencode_cost": null,
+      "opencode_exit": null
+    },
+    {
       "run_id": "r07_opencode_north-mini-code-free",
       "model": "opencode/north-mini-code-free",
       "sekhmet_wall_s": 0.011,
@@ -212,10 +225,10 @@
     }
   ],
   "totals": {
-    "sekhmet_ok": 768,
+    "sekhmet_ok": 832,
     "sekhmet_tokens": 846928,
     "opencode_tokens": 593457,
     "opencode_cost": 0,
-    "sekhmet_wall_sum": 266.406
+    "sekhmet_wall_sum": 289.356
   }
 }

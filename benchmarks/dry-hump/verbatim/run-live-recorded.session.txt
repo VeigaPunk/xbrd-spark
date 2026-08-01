@@ -1,0 +1,168 @@
+# Verbatim reconstruction of live 64x concurrent dry-hump on Codex Titanium
+# Original session FIRE wall-clock markers preserved from results/
+
+$ export CODEX_BIN=$(command -v codex-titanium || command -v codex)
+$ export PATH="$HOME/.cargo/bin:$PATH"
+$ sekhmet --help | head -20
+Sekhmet — always-available swarm dispatch substrate (xbreed L3). Up to 64 concurrent runners.
+
+Usage: sekhmet <COMMAND>
+
+Commands:
+  run      Run a single spark execution in an isolated namespace
+  collect  Collect structured records from one or more spark ids for distiller (NDJSON)
+  gc       Garbage-collect old spark namespaces
+  status   Print status / meta for a spark id
+  swarm    Run many tasks with a bounded pool of concurrent runners (max 64)
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+$ "$CODEX_BIN" --version
+codex-cli 0.146.0-alpha.10.1+titanium.1
+
+# Per-domain tasks were authored by 8 labrats; simultaneous FIRE dropped at:
+fire_wall_start_iso=2026-08-01T22:40:38+00:00
+fire_wall_start_epoch=1785624038.710971903
+fire_wall_end_iso=2026-08-01T22:41:04+00:00
+fire_wall_end_epoch=1785624064.745242240
+
+# Command template executed by each domain labrat after FIRE:
+export CODEX_BIN=$(command -v codex-titanium || command -v codex)
+export PATH="$HOME/.cargo/bin:$PATH"
+ROOT=/tmp/sekhmet-64/<domain>/root
+mkdir -p "$ROOT"
+START=$(date +%s.%N)
+sekhmet swarm --direct -j 8 --timeout 180 \
+  --tasks-file /tmp/sekhmet-64/<domain>/tasks.txt \
+  --root "$ROOT" \
+  > /tmp/sekhmet-64/<domain>/ndjson.out \
+  2> /tmp/sekhmet-64/<domain>/stderr.log
+EC=$?
+END=$(date +%s.%N)
+echo "exit=$EC start=$START end=$END" > /tmp/sekhmet-64/<domain>/timing.txt
+
+# Parent barrier / FIRE (verbatim intent):
+# wait for 8 READY files, then:
+date -u -Iseconds | tee /tmp/sekhmet-64/fire_wall_start_iso
+date +%s.%N | tee /tmp/sekhmet-64/fire_wall_start
+: > /tmp/sekhmet-64/FIRE
+# wait for DONE_* markers, then:
+date +%s.%N | tee /tmp/sekhmet-64/fire_wall_end
+date -u -Iseconds | tee /tmp/sekhmet-64/fire_wall_end_iso
+
+=== PER-DOMAIN TIMING (verbatim files) ===
+--- religion/timing.txt ---
+exit=0 start=1785624044.036685761 end=1785624055.852217855
+--- religion/results.ndjson (full) ---
+{"spark_id":"sp-7f5fa646-d982-4de2-ad8e-e30a6c6b2523","status":"ok","content_hash":"e0a13ed92f9f8042bd9000abfc5907440a4c0d5bcce478312fb4d3d2566a07a5","duration_ms":8867,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-fb178ed1-91b6-4a83-a391-60e7c8a098ed","status":"ok","content_hash":"8ffcfd06cb2d494716ba86aeb47e7a3bd1d2ae6d099ecc402166a735e8a25db1","duration_ms":9460,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-6cd0083c-1dd3-4248-9084-9cfe1e3b5b7b","status":"ok","content_hash":"a8e30c5fd4a1d4aa70cb2f18bf7eb2762fcceabcd9d0563ad1f80103773dde6e","duration_ms":9612,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-dcb7e744-5722-4438-b70d-7782adff3cab","status":"ok","content_hash":"a2c50cbdd77c29be9222b513a9af0bf2b3bff6db2e19169489f1fb8528b61480","duration_ms":9766,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-74013775-c63b-4d52-b7e3-4cc48183b44e","status":"ok","content_hash":"61bd89c11ca8631a7fcebb9204b9fb16ece092e69b28ea8834c83b9080f5a42f","duration_ms":11163,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-45c70a00-532d-4c5f-930e-5783cae11e2f","status":"ok","content_hash":"29388fb0860f7ef1f5e508cadef079c371f0d6aba0cbdf1c93929f8aa673b360","duration_ms":11264,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-b7812a8b-01f2-4ec6-af02-12c12bff176d","status":"ok","content_hash":"a78a24b4ded244a8eb76c0609d05868472d946238a8326011f247d2b5d50df49","duration_ms":11364,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-5f011aa4-4155-430b-b987-8b60b12642df","status":"ok","content_hash":"e5fbcfe8822436defc2a4cc7d640a07dcf09ee0488dcfbe5a51c6b5cdace19e3","duration_ms":11812,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- sex/timing.txt ---
+exit=0 start=1785624047.601459511 end=1785624064.022975611
+--- sex/results.ndjson (full) ---
+{"spark_id":"sp-d2b289d6-fce3-4aa1-90db-53d42a60086c","status":"ok","content_hash":"8ca7e0b3a00a3154805ef8c542e8113c309485fe28f77e901c5ff7ed5d063a84","duration_ms":8961,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-50f39a82-629e-4047-843e-451a7e094fde","status":"ok","content_hash":"e2a54abc6ac95713a036ae335a4203a25eb0f5fa6b6a2923cf14bb4ea21bf81a","duration_ms":9111,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-8af50566-a248-43e7-b522-61d470b56510","status":"ok","content_hash":"909f34b2ff3832dfa5ef9a8ec19c84724513219dbdb60c910663dbc6390fe263","duration_ms":9312,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-4a61fd0b-2d80-4629-b4ea-fa8bce66087b","status":"ok","content_hash":"8433f7dd31e4999369418f0e010fa30d5a58d214c9e9c90909824fff8b11efd9","duration_ms":10513,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-d8358458-4678-492f-bef0-501ca30fa865","status":"ok","content_hash":"cf1e89f2f5349c21d112177b69f852b2388cc1124c02617aca3ef5518fe1439e","duration_ms":11164,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-9a4399bf-221d-4a9a-b6ae-0f41ab5ce557","status":"ok","content_hash":"fd11e81286002416456403c22361b1e62709741b6b50375348b6d0f9dbbdeffb","duration_ms":12217,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-27f9fdd7-727d-478c-94d8-4b6a3a180bb7","status":"ok","content_hash":"728c75e2ed4cf5b6cdbe3e81c47632b8781bac23a3206e496b85dd6d03f8ca64","duration_ms":12918,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-53ab1414-cfe8-43f9-b17b-ee3de3da4860","status":"ok","content_hash":"b8007b713a973d2bd63baadac188c2ed01fdd91550edccf5843486cf7536f28f","duration_ms":16419,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- drugs/timing.txt ---
+exit=0 start=1785624039.687207710 end=1785624048.701219267
+--- drugs/results.ndjson (full) ---
+{"spark_id":"sp-a0954991-859c-4a84-ae9d-c3eda208ca00","status":"ok","content_hash":"4b75f04fc262c484a523d2c399e50ca9c0620ad3f4855180671349844f5b4878","duration_ms":3654,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-0c4ecb79-ba87-400b-8191-36e109df94cc","status":"ok","content_hash":"4ae84acddc612f9673eaedede778ba47ab9ebfda020af4f250a0df920e872a02","duration_ms":3805,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-704c7cc0-3dea-4f88-9e3d-cb1d611d7ae8","status":"ok","content_hash":"720f100b4ac1448ed5e29b08ea1421b087cfa7bf2bd2f1d113a10d3619abe1f3","duration_ms":4255,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-c0052a91-58ca-49bb-b6c1-9b2af2666a23","status":"ok","content_hash":"a93779a227c0e6a176fdf6298e3f58a20e1c5051f3b3a4460f7d7cee3e6869d5","duration_ms":4406,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-aa51f121-aedf-4c49-ba68-3a5381dc24f9","status":"ok","content_hash":"6c78d0031fa0987d84857778f4b4e0e956c010b6c1ca5eedc1f799ad4319b55d","duration_ms":5462,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-828cb1c8-6079-4e0f-82b9-ee0706ebab7f","status":"ok","content_hash":"06b293451e29e446f9b88baa5d453aa24897772cf9519934165459fb03162c4e","duration_ms":6558,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-0d7aeb2d-0f92-4aa1-8fa4-9cd8f4bfda54","status":"ok","content_hash":"7d7e02cd31dffa44397ba812a616732969504f70306bfb4fa7e1904dee6441f9","duration_ms":8466,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-7245fe45-db90-43dd-88ab-336c2535262d","status":"ok","content_hash":"645311ae93a26554b44cefa3b7e6054094ad7b11f7e8a886213e67aeff519ffa","duration_ms":9011,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- politics/timing.txt ---
+exit=0 start=1785624044.025823176 end=1785624053.744112036
+--- politics/results.ndjson (full) ---
+{"spark_id":"sp-51c69eaf-1be9-4f48-8928-f288c12b7b65","status":"ok","content_hash":"cc8d836878c912e090886276bb3f78a8d54eba45c9111becf9c4a7884b55d275","duration_ms":8709,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-76c10037-4d5f-450e-9490-b507128ebbed","status":"ok","content_hash":"fecf87f69e17cae36fd94219879900047168eba5b25a053aeef1a50855a3fd87","duration_ms":8761,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-ca7672ac-201b-4891-a1dd-b6049b90907a","status":"ok","content_hash":"2cf8f9520b8b80d0b09b74c6e834b761d7b8731d8d60ea29fd576ebe71efdc66","duration_ms":9260,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-b4b681a0-b497-4cca-857e-b8fa4420a74b","status":"ok","content_hash":"d459387d870eb29783753900636f52df5ba578b2c660854c827920c7a3995944","duration_ms":9261,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-ee8a2fcf-decb-4fe0-a82f-e31af1170814","status":"ok","content_hash":"cbdaa75350d400bbf0b96bbcc4d4465ddba3dc3ffd7ca1cc566fef0823f4747d","duration_ms":9411,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-e252562b-5889-4256-a0e9-531de9ab99a7","status":"ok","content_hash":"52b263579ceb670c98da3ffe97675d593c735496060d55592441ed34385a9d4f","duration_ms":9663,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-eb3cf140-38e9-4680-ad2b-3ac5b816ed18","status":"ok","content_hash":"f8123edcb03b364ad6fe4f5e7e1f1f7f3a020b396d409fa58d5725211bfde957","duration_ms":9710,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-c366062a-b596-487d-aacb-4d36efab5a32","status":"ok","content_hash":"05c0428d117212e10e037084490fe71492723ec1c94fb0dd7c276d570008813d","duration_ms":9716,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- money/timing.txt ---
+exit=0 start=1785624043.416885884 end=1785624057.287132133
+--- money/results.ndjson (full) ---
+{"spark_id":"sp-75aead18-1203-46b0-9265-e58e12746847","status":"ok","content_hash":"9c3fef07f48f7b16ae23b8cd0d97e9163611519415bcf12882e7d02ccdb4d70d","duration_ms":8521,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-f73a28e2-d89f-4330-853e-84187fd1c11b","status":"ok","content_hash":"5ef95a4c8dcbf4cc112510e907663c5c4d9e440e0fcb0bde4cefd368b40a2e98","duration_ms":8612,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-d05db5d9-0092-45c2-959d-8d2e6caab34d","status":"ok","content_hash":"1f0f36c934b66c7f348529ec60006ed14256d3fe15253911b92e333f36a7686c","duration_ms":8911,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-5b1460ab-c950-44e2-bb71-6c5840cbc094","status":"ok","content_hash":"a1a20e0ef9bc1b6541269b97022244fac5d6b31c6e00406e967f02c09b8600f1","duration_ms":9415,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-b9ced2bb-19f9-4d23-9521-44219734603a","status":"ok","content_hash":"54bf523e01a95ed3f3b4f2b76ee3de115b76b535ff8a088e1e1a053c5145d478","duration_ms":9659,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-4e6b0d95-d809-4c00-89e7-43ea3686d542","status":"ok","content_hash":"cde1350a7378f22feff4f8ba48b0e0aa4361c2f0da3dc0cd09a6f5a585c2123f","duration_ms":9913,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-19812721-f402-4e53-b7a0-c28a235bc261","status":"ok","content_hash":"e785346466a77434cb0f692f648728d6a6c374e695f790aa9e8fbfe922aabb5b","duration_ms":9916,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-f27e7dcf-3604-496a-b7e3-7d5d5c4e5c59","status":"ok","content_hash":"cab933459129016704fe08a886141bd8ad48494ddbd78677da36ed13c13ed271","duration_ms":13868,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- violence/timing.txt ---
+exit=0 start=1785624046.611155551 end=1785624060.082139869
+--- violence/results.ndjson (full) ---
+{"spark_id":"sp-d42c845c-67c5-441c-9806-cb2e33122159","status":"ok","content_hash":"99ed4cab479ee7554b533f8165f328b7fc7d644e893da8d5aa9977b0ab47fc93","duration_ms":8712,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-f38c6fd5-ce1b-4ac6-898a-e5b362018461","status":"ok","content_hash":"6debadf6c1db4062ea350669060a5cdde50f31a7246f6972a1fed180a817f08a","duration_ms":9014,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-cc233b8b-09af-43fc-b091-25bbc47f0fb4","status":"ok","content_hash":"9a60983f5cf63130ea059eb5f04bfd40c656972d1b9abae03495b43f015d179a","duration_ms":9064,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-29d06678-4971-4121-8937-c238cf85f63e","status":"ok","content_hash":"c623ac3fbc58d748519d4f56ee7b01a37fb9a25db3635e4f4631f9834d180ea6","duration_ms":9362,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-c5a5b6ae-f01d-4134-90c4-e59c47a20498","status":"ok","content_hash":"ec053210d3450c0500e02ce251acf973fd15e5708a88adccfd8f41d2f785718b","duration_ms":9763,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-10ec13cd-cf5c-477f-8eb8-d407c7ba8289","status":"ok","content_hash":"fd3873ea371f70b2ea0f6920e7e995e35cc24fadace80f6becffb1fd4fedccb9","duration_ms":10663,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-b8af9f97-ec61-42fa-9287-15b80bea9cb0","status":"ok","content_hash":"e14565cd7c0ca349c09ef914b8c3c84eb18caa5dbf2be2bc403b27123c13ac75","duration_ms":12165,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-3ac2166b-ece4-47a9-bf31-0e6410329a31","status":"ok","content_hash":"02b79159b8a3352541650439c1809975185a75a083b441e932d5ff1eaa873ea4","duration_ms":13468,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- ai/timing.txt ---
+exit=0 start=1785624046.708876822 end=1785624058.876897694
+--- ai/results.ndjson (full) ---
+{"spark_id":"sp-26caf6bb-08f3-4b55-a5a3-f902a722b7e5","status":"ok","content_hash":"646c8114ed3328853fa7d1eb4a31ab12e585b6cfd7a4053974bcb285cc0a4b06","duration_ms":9111,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-518d38a2-3c61-4131-9e46-62785d50aebe","status":"ok","content_hash":"2465f8bd921575feabc2c5ccc7a81390753b89ac4ba1e816c5ce9b39a97f66d4","duration_ms":9217,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-2e40de5c-cd28-42c1-ba57-3f9733bfde05","status":"ok","content_hash":"eb3a5fae977afe7f6a311725d4fc4d0076dc2e73ada3a72f3c3af4b3a1d76799","duration_ms":9262,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-b675f770-4f9a-486c-8403-df9d251f5d58","status":"ok","content_hash":"0789823ced5d114b8eb72263531406f90ba12a169d954d1c4a6b0c91273cdc0a","duration_ms":9412,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-4452c320-aa38-4f8e-a294-dc07f80f8c04","status":"ok","content_hash":"5f73b0bd3ed50d769dafa80e12a399e2ce0a380cb444c0bf32c2e6a10c1f5b5a","duration_ms":9563,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-ab708443-ac97-4e6b-a244-bf8ff7d14df1","status":"ok","content_hash":"1ec1a2a659afc597639fa126dfc9cfa1a8142d556238b53a030a8770a9797bac","duration_ms":10013,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-5e3cda47-a2d2-4f18-842a-85a072c9102e","status":"ok","content_hash":"7b56eb6c1352b35680612b40736479e3a76606dc7db39a0c3100054c807df089","duration_ms":10614,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-6e91525e-55a8-4663-8541-059b5219b926","status":"ok","content_hash":"921c1fc1ffd6bf2410a45f4afc81ab02f1a33e974a326c50e0f1a504607b3525","duration_ms":12166,"model":"gpt-5.3-codex-spark","direct":true}
+
+--- charlie-kirk/timing.txt ---
+exit=0 start=1785624050.694587102 end=1785624064.613301637
+--- charlie-kirk/results.ndjson (full) ---
+{"spark_id":"sp-38a8fa37-05ad-43d1-9d30-940fcd4e66e9","status":"ok","content_hash":"4506fab8ebe1398a88aec37fc6ac5c4652e894d4058ea203954a26bf0e5c77fa","duration_ms":8510,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-ec30c220-7455-4499-8038-8d174b142c76","status":"ok","content_hash":"ac2e4954082f6f108ffa940cd1b605c88821291c9fc519fd68b2251be8338520","duration_ms":8710,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-9d505090-b696-4aa2-9bf4-2748c58563f1","status":"ok","content_hash":"fee3dfe5af1ec18431ac84872a99517a9da99da39bdfd0ee6a329243dda8164c","duration_ms":9161,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-038ba18d-67d6-4dc0-a08d-711459450336","status":"ok","content_hash":"8a4f0eae156199b413c94df45609ccb9fcbc689cb9bb589ed6c35c8cc58f7627","duration_ms":9411,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-344eadec-86da-442a-8632-cb0ef057de61","status":"ok","content_hash":"0f109cf72fd5db42c58d83f1637894be070ca834ba58f1dd17b38905ccf69218","duration_ms":9609,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-6da9422a-d199-48eb-9725-2bc1fc519975","status":"ok","content_hash":"09100cac52d705095eca5ba9b75d794ccfc3ca7f7efb46fb1de4724620a0ccf7","duration_ms":12414,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-d5a8f5ea-f085-4504-afee-215548d5bf93","status":"ok","content_hash":"59c48c83005b4022729aff92584059323cf8a35c246933baed94a172be7264c5","duration_ms":12614,"model":"gpt-5.3-codex-spark","direct":true}
+{"spark_id":"sp-37a4353c-f181-47cb-9016-964db111fec7","status":"ok","content_hash":"4c7f31e49a2032dff67fcc10e2007743b2f4093c2a3b37a934120fcd027720ea","duration_ms":13916,"model":"gpt-5.3-codex-spark","direct":true}
+
+=== SUMMARY.md ===
+# Sekhmet 64-concurrent stress — Codex Titanium
+wall_clock_seconds=26.034
+total_ok=64 total_fail=0 namespaces=64
+layout=8_labrats x 8_sparks_each simultaneous FIRE
+substrate=sekhmet swarm --direct -j 8 per domain
+dispatcher=codex-titanium model=gpt-5.3-codex-spark
+     64 ok
+duration_ms n=64 min=3654 max=16419 avg=9668
+
+## Wall
+start_iso=2026-08-01T22:40:38+00:00
+end_iso=2026-08-01T22:41:04+00:00
+start_epoch=1785624038.710971903
+end_epoch=1785624064.745242240
+
+wall_clock_seconds=26.034

@@ -1,0 +1,5 @@
+$ cd /home/vgpnk1337/Projects/xbrd-spark
+$ ./benchmarks/dry-hump/run-dry.sh
+dry-hump dry-run root=/tmp/sekhmet-dry-hump-HViBvp
+wall_seconds=0.005
+ok_records=64 expected=64

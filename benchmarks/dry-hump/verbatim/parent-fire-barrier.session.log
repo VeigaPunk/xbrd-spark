@@ -1,0 +1,45 @@
+ready=2/8 t=1
+ready=3/8 t=2
+ready=3/8 t=3
+ready=4/8 t=4
+ready=7/8 t=5
+ready=7/8 t=6
+ready=7/8 t=7
+ready=7/8 t=8
+ready=8/8 t=9
+8 /tmp/sekhmet-64/religion/tasks.txt
+8 /tmp/sekhmet-64/sex/tasks.txt
+8 /tmp/sekhmet-64/drugs/tasks.txt
+8 /tmp/sekhmet-64/politics/tasks.txt
+8 /tmp/sekhmet-64/money/tasks.txt
+8 /tmp/sekhmet-64/violence/tasks.txt
+8 /tmp/sekhmet-64/ai/tasks.txt
+8 /tmp/sekhmet-64/charlie-kirk/tasks.txt
+ready_final=8
+religion lines=8
+sex lines=8
+drugs lines=8
+politics lines=8
+money lines=8
+violence lines=8
+ai lines=8
+charlie-kirk lines=8
+2026-08-01T22:40:38+00:00
+1785624038.710971903
+FIRE dropped
+done=0/8 t=5s
+done=0/8 t=10s
+done=1/8 t=15s
+done=4/8 t=20s
+done=6/8 t=25s
+1785624064.745242240
+2026-08-01T22:41:04+00:00
+DONE markers:
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:40 /tmp/sekhmet-64/DONE_ai
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:41 /tmp/sekhmet-64/DONE_charlie-kirk
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:40 /tmp/sekhmet-64/DONE_drugs
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:40 /tmp/sekhmet-64/DONE_money
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:40 /tmp/sekhmet-64/DONE_politics
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:40 /tmp/sekhmet-64/DONE_religion
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:41 /tmp/sekhmet-64/DONE_sex
+-rw-r--r-- 1 vgpnk1337 vgpnk1337 44 Aug  1 19:41 /tmp/sekhmet-64/DONE_violence

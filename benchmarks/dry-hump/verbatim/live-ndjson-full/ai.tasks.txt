@@ -1,0 +1,8 @@
+If an AI system can perform a worker's job more cheaply and safely, is the employer morally obligated to retrain or compensate displaced humans, or is market efficiency alone sufficient?
+Is generating a deepfake of a person without their consent inherently wrong even when used for satire, research, or memorial purposes—and who holds moral authority to grant or withhold that consent after death?
+Do AI companions that satisfy emotional and intimate needs reduce human flourishing by displacing real relationships, or do they expand autonomy for people who lack access to healthy human intimacy?
+Can autonomous weapons that select and engage targets without meaningful human control ever be just, or does removing human judgment from lethal force always violate moral responsibility?
+If an artificial system exhibits behavioral markers of consciousness (self-model, preference, suffering-avoidance), what rights or moral considerability follow—and who decides the threshold?
+Is training generative models on copyrighted or personal data without explicit consent a form of theft, fair use of the commons, or something morally distinct that law has not yet named?
+When reducing one form of demographic bias in an AI system increases error rates or harms another group, how should designers weigh competing fairness criteria and who bears residual risk?
+If a person's mind is uploaded or fully simulated, is the upload continuous with the original identity, a copy with separate rights, or does continuity depend on irreversible destruction of the biological original?

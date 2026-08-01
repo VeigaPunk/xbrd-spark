@@ -79,3 +79,15 @@ Hard cap: Sekhmet swarm `--jobs` max **64**. This example uses **8×8** parallel
 - Questions are moral/policy dilemmas for load-gen + qualitative stress, not product advice.
 - Recorded run: 2026-08-01T22:40:38Z → 22:41:04Z UTC.
 
+
+## Verbatim command + output
+
+Full command transcripts and Titanium NDJSON streams:
+
+- [`verbatim/COMMANDS.md`](verbatim/COMMANDS.md) — command blocks
+- [`verbatim/run-dry.session.txt`](verbatim/run-dry.session.txt) — dry-run `$` + stdout
+- [`verbatim/run-live-recorded.session.txt`](verbatim/run-live-recorded.session.txt) — live session reconstruction + timings
+- [`verbatim/run-live-all-domains.ndjson.txt`](verbatim/run-live-all-domains.ndjson.txt) — full live NDJSON (all domains)
+- [`verbatim/live-ndjson-full/`](verbatim/live-ndjson-full/) — per-domain raw `sekhmet swarm` stdout
+- [`verbatim/parent-fire-barrier.session.log`](verbatim/parent-fire-barrier.session.log) — parent READY/FIRE/DONE monitor (if present)
+

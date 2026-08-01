@@ -108,3 +108,18 @@ RETRY gen (got 60)
 questions_after_retry=63
 end_iso=2026-08-01T23:24:12+00:00
 ===== E2E 7/12 model=opencode/north-mini-code-free =====
+{
+  "model": "opencode/north-mini-code-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 97.134,
+  "sessions": [
+    "ses_0405b8dcdffeK6obXs4TSd858T"
+  ],
+  "step_finish_count": 1,
+  "tokens_total": 10528.0,
+  "tokens_input": 7866.0,
+  "tokens_output": 515.0,
+  "tokens_reasoning": 2147.0,
+  "cost": 0.0
+}
+questions_extracted=64 gen_ec=0

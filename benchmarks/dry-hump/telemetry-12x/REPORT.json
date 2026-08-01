@@ -1,6 +1,6 @@
 {
   "campaign": "dry-hump-12x-opencode-models",
-  "runs": 14,
+  "runs": 16,
   "rows": [
     {
       "run_id": "r01_opencode_big-pickle",
@@ -81,6 +81,19 @@
       "opencode_exit": 0
     },
     {
+      "run_id": "r05b_opencode_mimo-v2_5-free",
+      "model": "opencode/mimo-v2.5-free",
+      "sekhmet_wall_s": 23.639,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 30.695,
+      "opencode_tokens": 29913.0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
       "run_id": "r05_opencode_mimo-v2_5-free",
       "model": "opencode/mimo-v2.5-free",
       "sekhmet_wall_s": 0.012,
@@ -90,6 +103,19 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 12.449,
       "opencode_tokens": 40575.0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r06b_opencode_nemotron-3-ultra-free",
+      "model": "opencode/nemotron-3-ultra-free",
+      "sekhmet_wall_s": 23.544,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 33.664,
+      "opencode_tokens": 30207.0,
       "opencode_cost": 0.0,
       "opencode_exit": 0
     },
@@ -186,10 +212,10 @@
     }
   ],
   "totals": {
-    "sekhmet_ok": 640,
+    "sekhmet_ok": 768,
     "sekhmet_tokens": 846928,
-    "opencode_tokens": 533337,
+    "opencode_tokens": 593457,
     "opencode_cost": 0,
-    "sekhmet_wall_sum": 219.22299999999998
+    "sekhmet_wall_sum": 266.406
   }
 }

@@ -13,10 +13,12 @@ Shape: **8 domains × 8 sparks = 64 concurrent** via `sekhmet swarm -j 8`.
 | 4 | `r10_openai_gpt-5_5-fast` | `openai/gpt-5.5-fast` | 19.738 | 64 | 0 | 0 | 0 |
 | 5 | `r08_openai_gpt-5_3-codex-spark` | `openai/gpt-5.3-codex-spark` | 22.090 | 64 | 0 | 0 | 0 |
 | 6 | `r04b_opencode_ling-3_0-flash-free` | `opencode/ling-3.0-flash-free` | 22.170 | 64 | 0 | 0 | 0 |
-| 7 | `r02b_opencode_deepseek-v4-flash-free` | `opencode/deepseek-v4-flash-free` | 23.819 | 64 | 0 | 0 | 0 |
-| 8 | `r01_opencode_big-pickle` | `opencode/big-pickle` | 24.299 | 64 | 0 | 0 | 215835 |
-| 9 | `r11_openai_gpt-5_6-luna-fast` | `openai/gpt-5.6-luna-fast` | 24.754 | 64 | 0 | 0 | 0 |
-| 10 | `r03_opencode_laguna-s-2_1-free` | `opencode/laguna-s-2.1-free` | 25.094 | 64 | 0 | 0 | 222500 |
+| 7 | `r06b_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 23.544 | 64 | 0 | 0 | 0 |
+| 8 | `r05b_opencode_mimo-v2_5-free` | `opencode/mimo-v2.5-free` | 23.639 | 64 | 0 | 0 | 0 |
+| 9 | `r02b_opencode_deepseek-v4-flash-free` | `opencode/deepseek-v4-flash-free` | 23.819 | 64 | 0 | 0 | 0 |
+| 10 | `r01_opencode_big-pickle` | `opencode/big-pickle` | 24.299 | 64 | 0 | 0 | 215835 |
+| 11 | `r11_openai_gpt-5_6-luna-fast` | `openai/gpt-5.6-luna-fast` | 24.754 | 64 | 0 | 0 | 0 |
+| 12 | `r03_opencode_laguna-s-2_1-free` | `opencode/laguna-s-2.1-free` | 25.094 | 64 | 0 | 0 | 222500 |
 
 ## Incomplete / failed harvests
 

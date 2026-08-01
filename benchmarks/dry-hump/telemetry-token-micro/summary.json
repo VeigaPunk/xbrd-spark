@@ -1,0 +1,21 @@
+{
+  "kind": "token-micro",
+  "sekhmet": "sekhmet 0.1.1",
+  "tasks": 2,
+  "jobs": 2,
+  "usage_tokens_sum": 5991,
+  "results_with_usage": 2,
+  "samples": [
+    {
+      "status": "ok",
+      "usage_tokens": 3292,
+      "spark_id": "sp-ef71a5b1-a9b6-4630-895a-3100067f73d5"
+    },
+    {
+      "status": "ok",
+      "usage_tokens": 2699,
+      "spark_id": "sp-be016c6d-6c50-4bb0-8c6c-23b8f204670f"
+    }
+  ],
+  "note": "PATH sekhmet after cargo install --path .; proves usage_tokens on swarm NDJSON"
+}

@@ -20,3 +20,11 @@ swarm_ec=1 wall=20.631
 ===== 10/12 e2e10_openai_gpt-5_5-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e10_openai_gpt-5_5-fast-ERJfNX =====
 swarm_ec=1 wall=17.128
 ===== 11/12 e2e11_openai_gpt-5_6-luna-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e11_openai_gpt-5_6-luna-fast-ZHGsey =====
+rebuild_stopped=2026-08-01T23:38:37Z reason=titanium_usage_limit
+swarm_ec=1 wall=21.750
+===== 12/12 e2e12_openai_gpt-5_6-sol-fast questions=64 root=/tmp/sekhmet-qa-rebuild-e2e12_openai_gpt-5_6-sol-fast-96Wpvi =====
+swarm_ec=143 wall=18.067
+rebuild_end=2026-08-01T23:38:57+00:00
+rebuild_wall_seconds=248.523
+
+rebuild_stopped_by_orch=2026-08-01T23:39:22+00:00 reason=titanium_usage_limit_stop_burn

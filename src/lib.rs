@@ -26,6 +26,7 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 #[derive(Parser, Debug)]
 #[command(
     name = "sekhmet",
+    version,
     about = "Sekhmet — always-available swarm dispatch substrate (xbreed L3). Up to 64 concurrent runners."
 )]
 struct Cli {
@@ -1193,7 +1194,7 @@ fn status(id: &str, root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn main() -> Result<()> {
+pub fn run_cli() -> Result<()> {
     let cli = Cli::parse();
     match cli.cmd {
         Commands::Run {

@@ -8,12 +8,11 @@ repository = "https://github.com/VeigaPunk/xbrd-spark"
 
 [[bin]]
 name = "xbrd-spark"
-path = "src/main.rs"
+path = "src/bin/xbrd-spark.rs"
 
-# Marketplace / always-on alias — same binary surface as xbrd-spark
 [[bin]]
 name = "sekhmet"
-path = "src/main.rs"
+path = "src/bin/sekhmet.rs"
 
 [dependencies]
 anyhow = "1"

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # swarm-summary.sh — one-line in-session summary from sekhmet NDJSON (no paste, no bloat).
 # Usage: ./scripts/swarm-summary.sh /tmp/swarm.ndjson
-#        sekhmet swarm ... | tee /tmp/swarm.ndjson | tail -0; ./scripts/swarm-summary.sh /tmp/swarm.ndjson
 set -euo pipefail
 F=${1:-/dev/stdin}
 if [[ "$F" != /dev/stdin && ! -f "$F" ]]; then
@@ -13,6 +12,8 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 2
 fi
 jq -s -c '
+  def reasons:
+    [.[] | .fail_reason // .provenance.fail_reason // empty];
   {
     lines: length,
     ok: [.[]|select(.status=="ok")]|length,
@@ -20,6 +21,7 @@ jq -s -c '
     timeout: [.[]|select(.status=="timeout")]|length,
     error: [.[]|select(.status=="error")]|length,
     usage_tokens_sum: ([.[]|.usage_tokens//empty|numbers]|add//0),
-    usage_tokens_n: ([.[]|select(.usage_tokens!=null)]|length)
+    usage_tokens_n: ([.[]|select(.usage_tokens!=null)]|length),
+    fail_reasons: (reasons | group_by(.) | map({(.[0]): length}) | add // {})
   }
 ' "$F"

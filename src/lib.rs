@@ -2196,6 +2196,14 @@ mod tests {
     }
 
     #[test]
+    fn classify_provider_error_missing_dispatcher() {
+        assert_eq!(
+            classify_provider_error("", "neither xask nor codex found on PATH"),
+            Some("missing_dispatcher")
+        );
+    }
+
+    #[test]
     fn finalize_records_fail_reason_usage_limit() {
         let tmp = TempDir::new().unwrap();
         let base = tmp.path().join("sp-failreason01");

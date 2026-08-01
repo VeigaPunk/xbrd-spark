@@ -73,3 +73,7 @@ jq -s '{lines:length, ok:[.[]|select(.status=="ok")]|length, fail:[.[]|select(.s
 ```
 
 Keep in-session: **URL + short counts** (ok/fail/timeout/wall). Prefer `scripts/paste-out.sh` (backends: paste.rs → 0x0.st → catbox).
+
+## Provider quota
+
+If Titanium returns usage-limit / 403 websocket / 429 model refresh, stop live swarms. Prefer dry-run gates. Resume live after the provider window (see e2e `qa/STATUS.md`).

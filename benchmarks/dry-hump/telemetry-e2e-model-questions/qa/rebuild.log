@@ -1,0 +1,14 @@
+rebuild_start=2026-08-01T23:34:49+00:00
+===== 1/12 e2e01_opencode_big-pickle questions=64 root=/tmp/sekhmet-qa-rebuild-e2e01_opencode_big-pickle-7C9LCW =====
+swarm_ec=1 wall=16.348
+===== 2/12 e2e02_opencode_deepseek-v4-flash-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e02_opencode_deepseek-v4-flash-free-n23PkK =====
+swarm_ec=1 wall=21.073
+===== 3/12 e2e03_opencode_laguna-s-2_1-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e03_opencode_laguna-s-2_1-free-iZB6jD =====
+swarm_ec=1 wall=25.546
+===== 4/12 e2e04_opencode_ling-3_0-flash-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e04_opencode_ling-3_0-flash-free-wFBz3C =====
+swarm_ec=1 wall=15.877
+===== 5/12 e2e05_opencode_mimo-v2_5-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e05_opencode_mimo-v2_5-free-yIHyre =====
+swarm_ec=1 wall=21.328
+===== 6/12 e2e06_opencode_nemotron-3-ultra-free questions=63 root=/tmp/sekhmet-qa-rebuild-e2e06_opencode_nemotron-3-ultra-free-kfq7l7 =====
+swarm_ec=1 wall=21.154
+===== 7/12 e2e07_opencode_north-mini-code-free questions=64 root=/tmp/sekhmet-qa-rebuild-e2e07_opencode_north-mini-code-free-UgnDqS =====

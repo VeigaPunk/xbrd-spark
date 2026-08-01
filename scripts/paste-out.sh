@@ -13,8 +13,8 @@
 #   jq -c . /tmp/swarm.ndjson | ./scripts/paste-out.sh
 #
 # Env:
-#   PASTE_BACKEND=paste_rs|0x0|catbox|auto   (default: auto — try paste_rs then 0x0 then catbox)
-#   PASTE_NAME=filename.ext                  (optional display name)
+#   PASTE_BACKEND=paste_rs|0x0|catbox|litterbox|dpaste|auto
+#   PASTE_NAME=filename.ext
 set -euo pipefail
 
 BACKEND=${PASTE_BACKEND:-auto}
@@ -42,13 +42,33 @@ upload_one() {
   local be=$1
   case "$be" in
     paste_rs|paste.rs)
-      curl -fsS --data-binary @"$FILE" https://paste.rs
+      # paste.rs often 500s on large NDJSON; skip >64KiB in auto path
+      if [[ "$BYTES" -gt 65536 ]]; then
+        return 1
+      fi
+      curl -fsS --max-time 60 --data-binary @"$FILE" https://paste.rs
       ;;
     0x0|0x0.st)
-      curl -fsS -F "file=@${FILE};filename=${NAME}" https://0x0.st
+      curl -fsS --max-time 60 -F "file=@${FILE};filename=${NAME}" https://0x0.st
       ;;
     catbox|catbox.moe)
-      curl -fsS -F "reqtype=fileupload" -F "fileToUpload=@${FILE}" https://catbox.moe/user/api.php
+      curl -fsS --max-time 90 -F "reqtype=fileupload" -F "fileToUpload=@${FILE}" \
+        https://catbox.moe/user/api.php
+      ;;
+    litterbox)
+      # temporary 1h–72h file host; reliable when catbox/0x0 flaky
+      curl -fsS --max-time 90 -F "reqtype=fileupload" -F "time=72h" \
+        -F "fileToUpload=@${FILE}" \
+        https://litterbox.catbox.moe/resources/internals/api.php
+      ;;
+    dpaste)
+      # text only; good for medium dumps
+      if [[ "$BYTES" -gt 500000 ]]; then
+        return 1
+      fi
+      curl -fsS --max-time 60 --data-urlencode "content@${FILE}" \
+        -d "syntax=text" -d "expiry_days=30" \
+        https://dpaste.com/api/v2/
       ;;
     *)
       return 2
@@ -61,6 +81,7 @@ try_backends() {
   local be url
   for be in "${list[@]}"; do
     if url=$(upload_one "$be" 2>/dev/null); then
+      url=$(printf '%s' "$url" | tr -d '\r' | awk 'NR==1{print; exit}')
       if [[ -n "$url" && "$url" == http* ]]; then
         USED=$be
         URL=$url
@@ -76,7 +97,8 @@ USED=
 URL=
 case "$BACKEND" in
   auto)
-    try_backends paste_rs 0x0 catbox || {
+    # Prefer durable free hosts first; litterbox before flaky catbox/0x0 spam walls
+    try_backends litterbox paste_rs dpaste catbox 0x0 || {
       echo "paste-out: all backends failed" >&2
       exit 3
     }

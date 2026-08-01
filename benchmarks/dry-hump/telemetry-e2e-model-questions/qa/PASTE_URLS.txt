@@ -1,0 +1,4 @@
+e2e01_opencode_big-pickle/ndjson.qa.out 130696 FAIL
+e2e02_opencode_deepseek-v4-flash-free/ndjson.qa.out 134071 FAIL
+e2e03_opencode_laguna-s-2_1-free/ndjson.qa.out 125070 FAIL
+e2e04_opencode_ling-3_0-flash-free/ndjson.qa.out 129954 FAIL

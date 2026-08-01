@@ -1,3 +1,8 @@
-https://litter.catbox.moe/0t8rlw.txt
-https://litter.catbox.moe/trnyza.md
-https://litter.catbox.moe/9hpdfs.txt
+WALL=https://litter.catbox.moe/jjza15.txt
+REPORT=https://litter.catbox.moe/ru48l0.md
+QA=https://litter.catbox.moe/5w207h.txt
+DOMAINS=https://litter.catbox.moe/vxuvc1.md
+MEGA=https://litter.catbox.moe/criras.md
+GITHUB_WALL=https://raw.githubusercontent.com/VeigaPunk/xbrd-spark/main/benchmarks/dry-hump/telemetry-12x/WALL.txt
+GITHUB_REPORT=https://raw.githubusercontent.com/VeigaPunk/xbrd-spark/main/benchmarks/dry-hump/telemetry-12x/REPORT.md
+GITHUB_QA=https://raw.githubusercontent.com/VeigaPunk/xbrd-spark/main/benchmarks/dry-hump/verbatim/SESSION-2026-08-01T22-50-qa.txt

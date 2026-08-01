@@ -26,7 +26,12 @@ API_URL="https://pastebin.com/api/api_post.php"
 EXPIRE=${PASTEBIN_EXPIRE:-1M}
 PRIVATE=${PASTEBIN_PRIVATE:-1}
 TMP=
-cleanup() { [[ -n "${TMP:-}" && -f "$TMP" ]] && rm -f "$TMP"; }
+cleanup() {
+  if [[ -n "${TMP:-}" && -f "$TMP" ]]; then
+    rm -f "$TMP" || true
+  fi
+  return 0
+}
 trap cleanup EXIT
 
 if [[ -z "${PASTEBIN_API_DEV_KEY:-}" ]]; then

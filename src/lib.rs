@@ -186,6 +186,9 @@ struct Meta {
     direct: bool,
     dry_run: bool,
     root: String,
+    /// Best-effort parse of model usage tokens from dispatcher stdout/stderr.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    usage_tokens: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -195,6 +198,8 @@ struct ResultJson {
     stderr: String,
     exit: Option<i32>,
     duration_ms: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    usage_tokens: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -204,7 +209,59 @@ struct CollectRecord {
     status: String,
     result_path: String,
     artifacts: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    usage_tokens: Option<u64>,
     provenance: Meta,
+}
+
+/// Parse a usage token count from Titanium/codex-style logs (best-effort).
+/// Handles multi-line "tokens used\\n  1,234" and JSON-ish total_tokens fields.
+pub fn extract_usage_tokens(stdout: &str, stderr: &str) -> Option<u64> {
+    let blob = format!("{}\n{}", stdout, stderr);
+    // Prefer explicit "tokens used" lines (possibly split across lines).
+    let lower = blob.to_ascii_lowercase();
+    if let Some(idx) = lower.find("tokens used") {
+        let tail = &blob[idx..];
+        if let Some(n) = first_int_token(tail) {
+            return Some(n);
+        }
+    }
+    for key in [
+        "total_tokens",
+        "\"total\"",
+        "token usage",
+        "tokens:",
+        "tok=",
+    ] {
+        if let Some(idx) = lower.find(key) {
+            let tail = &blob[idx..];
+            if let Some(n) = first_int_token(tail) {
+                return Some(n);
+            }
+        }
+    }
+    None
+}
+
+fn first_int_token(s: &str) -> Option<u64> {
+    let mut num = String::new();
+    let mut seen_digit = false;
+    for ch in s.chars() {
+        if ch.is_ascii_digit() {
+            num.push(ch);
+            seen_digit = true;
+        } else if ch == ',' && seen_digit {
+            // thousands separator inside a number
+            continue;
+        } else if seen_digit {
+            break;
+        }
+    }
+    if num.is_empty() {
+        None
+    } else {
+        num.parse().ok()
+    }
 }
 
 /// Serialize NDJSON emit only (never hold this lock across Titanium spawn).
@@ -821,6 +878,7 @@ fn collect_one(id: &str, root: &Path) -> Result<Option<CollectRecord>> {
         status: meta.status.clone(),
         result_path: result_path.display().to_string(),
         artifacts: list_artifacts(&base),
+        usage_tokens: None,
         provenance: meta,
     }))
 }
@@ -846,12 +904,14 @@ fn finalize_result(
     exit: Option<i32>,
     duration_ms: u64,
 ) -> Result<(String, CollectRecord)> {
+    let usage_tokens = extract_usage_tokens(stdout, stderr);
     let result = ResultJson {
         status: status.into(),
         stdout: stdout.to_string(),
         stderr: stderr.to_string(),
         exit,
         duration_ms,
+        usage_tokens,
     };
     let tmp_result = base.join("out/result.json.tmp");
     fs::write(&tmp_result, serde_json::to_string_pretty(&result)?)?;
@@ -867,6 +927,7 @@ fn finalize_result(
     meta.status = status.into();
     meta.exit_code = exit;
     meta.content_hash = Some(ch.clone());
+    meta.usage_tokens = usage_tokens;
     let tmp_meta = base.join("meta.json.tmp");
     fs::write(&tmp_meta, serde_json::to_string_pretty(&meta)?)?;
     fs::rename(&tmp_meta, base.join("meta.json"))?;
@@ -879,6 +940,7 @@ fn finalize_result(
         status: status.into(),
         result_path: base.join("out/result.json").display().to_string(),
         artifacts: list_artifacts(base),
+        usage_tokens,
         provenance: meta.clone(),
     };
     Ok((ch, record))
@@ -950,6 +1012,7 @@ fn run_spark(
             timeout_secs: timeout,
             direct,
             dry_run: true,
+            usage_tokens: None,
             root: base.display().to_string(),
         };
         write_meta_atomic(&base, &meta)?;
@@ -997,7 +1060,8 @@ fn run_spark(
         timeout_secs: timeout,
         direct,
         dry_run: false,
-        root: base.display().to_string(),
+        usage_tokens: None,
+            root: base.display().to_string(),
     };
     write_meta_atomic(&base, &meta)?;
 
@@ -1310,6 +1374,7 @@ mod tests {
             timeout_secs: 0,
             direct: false,
             dry_run: true,
+            usage_tokens: None,
             root: base.display().to_string(),
         };
         fs::write(
@@ -1323,6 +1388,7 @@ mod tests {
             stderr: "".into(),
             exit: Some(0),
             duration_ms: 1,
+            usage_tokens: None,
         };
         fs::write(
             base.join("out/result.json"),
@@ -1331,6 +1397,9 @@ mod tests {
         .unwrap();
         fs::write(base.join("out/artifacts").join("deadbeef"), b"artifact").unwrap();
     }
+
+
+
 
     #[test]
     fn hash_str_stable() {
@@ -1569,6 +1638,7 @@ mod tests {
             timeout_secs: 0,
             direct: false,
             dry_run: true,
+            usage_tokens: None,
             root: "/tmp".into(),
         };
         assert!(!gc_should_delete(Some(&meta_running_young), None, cutoff));
@@ -1590,6 +1660,7 @@ mod tests {
         // missing meta: mtime older than cutoff → delete
         let old_mtime = std::time::SystemTime::now() - std::time::Duration::from_secs(10_000);
         assert!(gc_should_delete(None, Some(old_mtime), cutoff));
+
 
         // missing meta + no mtime → keep (safer)
         assert!(!gc_should_delete(None, None, cutoff));
@@ -2050,4 +2121,25 @@ mod tests {
         );
         assert!(args.windows(2).any(|w| w[0] == "-m" && w[1].contains("codex")));
     }
+
+
+
+
+    #[test]
+    fn extract_usage_tokens_multiline_tokens_used() {
+        let n = extract_usage_tokens("tokens used\n  1,234\n", "").unwrap();
+        assert_eq!(n, 1234);
+    }
+
+    #[test]
+    fn extract_usage_tokens_total_tokens_jsonish() {
+        let n = extract_usage_tokens("{\"total_tokens\": 42}", "").unwrap();
+        assert_eq!(n, 42);
+    }
+
+    #[test]
+    fn extract_usage_tokens_none_when_absent() {
+        assert!(extract_usage_tokens("hello", "world").is_none());
+    }
+
 }

@@ -39,3 +39,9 @@ Key flags:
 Exclusive ns; setup rollback (id reusable); gc age-only for running. Seeded auth 0o600/0o700 on unix.
 
 Double-work is intentional. Emit everything; let the layer above distill. Max swarm concurrency: **64**.
+
+Gates (local ship):
+```
+cargo check && cargo test && cargo build --release && cargo clippy --all-targets -- -D warnings
+target/release/sekhmet --help
+```

@@ -550,6 +550,7 @@ fn load_swarm_tasks(path: Option<&Path>) -> Result<Vec<SwarmTask>> {
 
 /// Bounded concurrent swarm: up to [`MAX_SWARM_CONCURRENCY`] runners.
 /// Each task is an isolated spark (same as `run`). NDJSON records print on completion.
+#[allow(clippy::too_many_arguments)] // CLI-mapped pool knobs; packing would obscure the L3 surface
 fn run_swarm(
     tasks: Vec<SwarmTask>,
     jobs: usize,
@@ -882,6 +883,7 @@ fn finalize_result(
     Ok((ch, record))
 }
 
+#[allow(clippy::too_many_arguments)] // mirrors `run` CLI flags 1:1 for L3 invokers
 fn run_spark(
     id: &str,
     task: &str,

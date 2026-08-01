@@ -23,6 +23,7 @@ OpenCode generates 64 questions → Sekhmet Titanium swarm answers them.
 | run_id | model | swarm wall s | ok | fail | timeout | tokens |
 |--------|-------|-------------:|---:|-----:|--------:|-------:|
 | `e2e06b_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 19.856 | 57 | 7 | 0 | 171555 |
+| `e2e06c_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 45.312 | 0 | 64 | 0 | 0 |
 | `e2e06_opencode_nemotron-3-ultra-free` | `opencode/nemotron-3-ultra-free` | 25.547 | 63 | 0 | 0 | 193452 |
 
 _Regenerate: `./gen-leaderboard.sh`_

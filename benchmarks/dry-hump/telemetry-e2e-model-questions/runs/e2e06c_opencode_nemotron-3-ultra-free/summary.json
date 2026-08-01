@@ -1,0 +1,19 @@
+{
+  "run_id": "e2e06c_opencode_nemotron-3-ultra-free",
+  "model": "opencode/nemotron-3-ultra-free",
+  "status": "partial",
+  "questions": 64,
+  "swarm_wall_seconds": 45.312,
+  "e2e_wall_seconds": 45.312,
+  "swarm_exit": 1,
+  "sparks_ok": 0,
+  "sparks_fail": 64,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 0,
+  "sekhmet_tokens_n": 0,
+  "sekhmet_tokens_min": 0,
+  "sekhmet_tokens_max": 0,
+  "sekhmet_tokens_avg": 0,
+  "note": "Redo of e2e06 with 64 tasks at -j 8 (e2e06b -j 64 had 7 fails)"
+}

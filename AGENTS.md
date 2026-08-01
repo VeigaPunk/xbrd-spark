@@ -55,3 +55,5 @@ Install (refresh PATH binary after pull):
 cargo install --path . --force
 ```
 Stale `~/.cargo/bin/sekhmet` may lack `usage_tokens` / `--version`.
+
+Live Titanium tip: prefer `swarm -j 8` (or lower) under provider rate limits; `-j 64` can yield fail/null usage_tokens.

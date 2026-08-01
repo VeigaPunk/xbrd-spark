@@ -140,7 +140,7 @@ Higher layer receives the NDJSON records, hashes content, clusters duplicates, k
 ## Install / build
 
 ```bash
-cargo install --path .
+cargo install --path . --force  # refresh ~/.cargo/bin after pulls
 # or without install:
 cargo build --release
 # binary: target/release/xbrd-spark

@@ -45,3 +45,5 @@ Gates (local ship):
 cargo check && cargo test && cargo build --release && cargo clippy --all-targets -- -D warnings
 target/release/sekhmet --help
 ```
+
+CI: `.github/workflows/ci.yml` runs check / test / clippy / release --help on push to main.

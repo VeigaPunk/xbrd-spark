@@ -2,3 +2,7 @@
 
 # xbgst live orch artifacts
 .xbgst/
+
+# Local copyrighted / out-of-tree payloads (never ship)
+benchmarks/poor-things-cc/
+benchmarks/**/payload-private/

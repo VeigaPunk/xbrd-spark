@@ -82,3 +82,10 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 If Titanium returns usage-limit / 403 websocket / 429 model refresh, stop live swarms. Prefer dry-run gates. Resume live after the provider window (see e2e `qa/STATUS.md`).
 
 Short swarm counts (in-session): `./scripts/swarm-summary.sh /tmp/swarm.ndjson` then `./scripts/paste-out.sh /tmp/swarm.ndjson`.
+
+## Offline / Titanium quota mode
+
+Until provider quota reopens (see e2e `qa/STATUS.md`, currently **2026-08-08**):
+- **Do not** run live sekhmet/Titanium rebuilds.
+- Run network-free gates: `./scripts/dry-gates.sh`
+- Pastebin: requires `PASTEBIN_API_DEV_KEY`; if missing, report blocker — **no alternate hosts**.

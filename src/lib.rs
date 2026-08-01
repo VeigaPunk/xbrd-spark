@@ -189,6 +189,9 @@ struct Meta {
     /// Best-effort parse of model usage tokens from dispatcher stdout/stderr.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     usage_tokens: Option<u64>,
+    /// Known provider failure class (usage_limit, rate_limit, auth, …).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fail_reason: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -200,6 +203,8 @@ struct ResultJson {
     duration_ms: u64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     usage_tokens: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fail_reason: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -211,6 +216,8 @@ struct CollectRecord {
     artifacts: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     usage_tokens: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    fail_reason: Option<String>,
     provenance: Meta,
 }
 
@@ -263,6 +270,28 @@ fn first_int_token(s: &str) -> Option<u64> {
         num.parse().ok()
     }
 }
+
+/// Classify known provider/dispatcher failures for distill (network-free heuristics).
+pub fn classify_provider_error(stdout: &str, stderr: &str) -> Option<&'static str> {
+    let blob = format!("{}\n{}", stdout, stderr).to_ascii_lowercase();
+    if blob.contains("usage limit") || blob.contains("hit your usage limit") {
+        return Some("usage_limit");
+    }
+    if blob.contains("429 too many requests") || blob.contains("rate limit") {
+        return Some("rate_limit");
+    }
+    if blob.contains("401") && (blob.contains("unauthorized") || blob.contains("auth")) {
+        return Some("auth");
+    }
+    if blob.contains("403 forbidden") && blob.contains("websocket") {
+        return Some("auth_ws");
+    }
+    if blob.contains("neither xask nor codex") || blob.contains("codex not found") {
+        return Some("missing_dispatcher");
+    }
+    None
+}
+
 
 /// Serialize NDJSON emit only (never hold this lock across Titanium spawn).
 fn emit_ndjson(record: &CollectRecord) -> Result<()> {
@@ -878,7 +907,8 @@ fn collect_one(id: &str, root: &Path) -> Result<Option<CollectRecord>> {
         status: meta.status.clone(),
         result_path: result_path.display().to_string(),
         artifacts: list_artifacts(&base),
-        usage_tokens: None,
+        usage_tokens: meta.usage_tokens,
+        fail_reason: meta.fail_reason.clone(),
         provenance: meta,
     }))
 }
@@ -905,6 +935,7 @@ fn finalize_result(
     duration_ms: u64,
 ) -> Result<(String, CollectRecord)> {
     let usage_tokens = extract_usage_tokens(stdout, stderr);
+    let fail_reason = classify_provider_error(stdout, stderr).map(|s| s.to_string());
     let result = ResultJson {
         status: status.into(),
         stdout: stdout.to_string(),
@@ -912,6 +943,7 @@ fn finalize_result(
         exit,
         duration_ms,
         usage_tokens,
+        fail_reason: fail_reason.clone(),
     };
     let tmp_result = base.join("out/result.json.tmp");
     fs::write(&tmp_result, serde_json::to_string_pretty(&result)?)?;
@@ -928,6 +960,7 @@ fn finalize_result(
     meta.exit_code = exit;
     meta.content_hash = Some(ch.clone());
     meta.usage_tokens = usage_tokens;
+    meta.fail_reason = fail_reason.clone();
     let tmp_meta = base.join("meta.json.tmp");
     fs::write(&tmp_meta, serde_json::to_string_pretty(&meta)?)?;
     fs::rename(&tmp_meta, base.join("meta.json"))?;
@@ -941,6 +974,7 @@ fn finalize_result(
         result_path: base.join("out/result.json").display().to_string(),
         artifacts: list_artifacts(base),
         usage_tokens,
+        fail_reason,
         provenance: meta.clone(),
     };
     Ok((ch, record))
@@ -1013,6 +1047,7 @@ fn run_spark(
             direct,
             dry_run: true,
             usage_tokens: None,
+            fail_reason: None,
             root: base.display().to_string(),
         };
         write_meta_atomic(&base, &meta)?;
@@ -1061,7 +1096,8 @@ fn run_spark(
         direct,
         dry_run: false,
         usage_tokens: None,
-            root: base.display().to_string(),
+        fail_reason: None,
+        root: base.display().to_string(),
     };
     write_meta_atomic(&base, &meta)?;
 
@@ -1375,6 +1411,7 @@ mod tests {
             direct: false,
             dry_run: true,
             usage_tokens: None,
+            fail_reason: None,
             root: base.display().to_string(),
         };
         fs::write(
@@ -1389,6 +1426,7 @@ mod tests {
             exit: Some(0),
             duration_ms: 1,
             usage_tokens: None,
+            fail_reason: None,
         };
         fs::write(
             base.join("out/result.json"),
@@ -1639,6 +1677,7 @@ mod tests {
             direct: false,
             dry_run: true,
             usage_tokens: None,
+            fail_reason: None,
             root: "/tmp".into(),
         };
         assert!(!gc_should_delete(Some(&meta_running_young), None, cutoff));
@@ -2143,6 +2182,60 @@ mod tests {
     }
 
     #[test]
+    fn classify_provider_error_usage_limit() {
+        let err = "ERROR: You've hit your usage limit for GPT-5.3-Codex-Spark.";
+        assert_eq!(classify_provider_error("", err), Some("usage_limit"));
+    }
+
+    #[test]
+    fn classify_provider_error_rate_limit() {
+        assert_eq!(
+            classify_provider_error("", "failed: 429 Too Many Requests"),
+            Some("rate_limit")
+        );
+    }
+
+    #[test]
+    fn finalize_records_fail_reason_usage_limit() {
+        let tmp = TempDir::new().unwrap();
+        let base = tmp.path().join("sp-failreason01");
+        ensure_dirs(&base).unwrap();
+        let mut meta = Meta {
+            spark_id: "sp-failreason01".into(),
+            started_at: chrono::Utc::now().to_rfc3339(),
+            finished_at: None,
+            duration_ms: None,
+            model: "test".into(),
+            cmdline: vec!["test".into()],
+            status: "running".into(),
+            exit_code: None,
+            content_hash: None,
+            task_hash: hash_str("t"),
+            invoker: "test".into(),
+            scope: None,
+            ro: false,
+            timeout_secs: 0,
+            direct: true,
+            dry_run: false,
+            root: base.display().to_string(),
+            usage_tokens: None,
+            fail_reason: None,
+        };
+        let (_, rec) = finalize_result(
+            &base,
+            &mut meta,
+            "fail",
+            "",
+            "ERROR: You've hit your usage limit for GPT-5.3-Codex-Spark.",
+            Some(1),
+            5,
+        )
+        .unwrap();
+        assert_eq!(rec.fail_reason.as_deref(), Some("usage_limit"));
+        assert_eq!(meta.fail_reason.as_deref(), Some("usage_limit"));
+    }
+
+    #[test]
     fn finalize_records_usage_tokens_in_meta_and_result() {
         let tmp = TempDir::new().unwrap();
         let base = tmp.path().join("sp-tokentest01");
@@ -2166,6 +2259,7 @@ mod tests {
             dry_run: false,
             root: base.display().to_string(),
             usage_tokens: None,
+            fail_reason: None,
         };
         let (_, rec) = finalize_result(
             &base,

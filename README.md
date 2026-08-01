@@ -189,6 +189,18 @@ See [`benchmarks/dry-hump/`](benchmarks/dry-hump/) — recorded **64/64 ok in ~2
 - [`benchmarks/dry-hump`](benchmarks/dry-hump) — multi-model 8×8 Titanium load
 - [`benchmarks/scope-fanout-64`](benchmarks/scope-fanout-64) — public synthetic 64-way `--scope` swarm (dry-run safe)
 
-### Large swarm dumps
+### Offline / quota dry gates
 
-Post NDJSON/logs with [`scripts/paste-out.sh`](scripts/paste-out.sh); keep only the URL + short summary in chat.
+While Titanium or Pastebin is unavailable:
+
+```bash
+./scripts/dry-gates.sh
+```
+
+Network-free: `cargo test`/`clippy`, dry-run 3-task swarm, paste-out offline negative check.
+
+### Large swarm dumps → pastebin.com ONLY
+
+Post NDJSON/logs with [`scripts/paste-out.sh`](scripts/paste-out.sh) (**pastebin.com API only**; requires `PASTEBIN_API_DEV_KEY`).  
+In-session: **pastebin.com URL + short summary** via `scripts/swarm-summary.sh`.  
+If Pastebin fails: **stop and report** — do not use any other paste host.

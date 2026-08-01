@@ -1,0 +1,14 @@
+{
+  "model": "opencode/nemotron-3-ultra-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 33.664,
+  "sessions": [
+    "ses_0406c7539ffexny4SGTTxVy05J"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 30207.0,
+  "tokens_input": 4573.0,
+  "tokens_output": 230.0,
+  "tokens_reasoning": 60.0,
+  "cost": 0.0
+}

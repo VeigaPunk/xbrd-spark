@@ -110,3 +110,16 @@ Full command transcripts and Titanium NDJSON streams:
 ## Multi-model leaderboard
 
 See [`telemetry-12x/LEADERBOARD.md`](telemetry-12x/LEADERBOARD.md) (regenerate with `./gen-leaderboard.sh`).
+
+## Redo protocol (`*b` runs)
+
+If an OpenCode-orchestrated primary run records `sparks_ok: 0` (agent never invoked sekhmet), re-harvest with:
+
+```bash
+./benchmarks/dry-hump/run-once-telemetry.sh rNNb_<slug> \
+  benchmarks/dry-hump/telemetry-12x/runs/rNNb_<slug> \
+  'provider/model'
+./benchmarks/dry-hump/gen-leaderboard.sh
+```
+
+`run-once-telemetry.sh` uses `--no-keep` and deletes temp roots on EXIT. Prefer **direct** sekhmet when opencode skips the harness.

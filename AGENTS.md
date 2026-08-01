@@ -57,3 +57,19 @@ cargo install --path . --force
 Stale `~/.cargo/bin/sekhmet` may lack `usage_tokens` / `--version`.
 
 Live Titanium tip: prefer `swarm -j 8` (or lower) under provider rate limits; `-j 64` can yield fail/null usage_tokens.
+
+## Large outputs → pastebin (mandatory for agents)
+
+Do **not** dump multi-KB swarm NDJSON, logs, or transcripts into chat/TUI.
+
+```bash
+sekhmet swarm --direct -j 8 --tasks-file tasks.txt --root "$ROOT" \
+  > /tmp/swarm.ndjson 2> /tmp/swarm.err
+# short in-session summary only:
+jq -s '{lines:length, ok:[.[]|select(.status=="ok")]|length, fail:[.[]|select(.status=="fail")]|length}' /tmp/swarm.ndjson
+# full blob off-session:
+./scripts/paste-out.sh /tmp/swarm.ndjson    # prints URL only
+./scripts/paste-out.sh /tmp/swarm.err
+```
+
+Keep in-session: **URL + short counts** (ok/fail/timeout/wall). Prefer `scripts/paste-out.sh` (backends: paste.rs → 0x0.st → catbox).

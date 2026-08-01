@@ -188,3 +188,7 @@ See [`benchmarks/dry-hump/`](benchmarks/dry-hump/) — recorded **64/64 ok in ~2
 
 - [`benchmarks/dry-hump`](benchmarks/dry-hump) — multi-model 8×8 Titanium load
 - [`benchmarks/scope-fanout-64`](benchmarks/scope-fanout-64) — public synthetic 64-way `--scope` swarm (dry-run safe)
+
+### Large swarm dumps
+
+Post NDJSON/logs with [`scripts/paste-out.sh`](scripts/paste-out.sh); keep only the URL + short summary in chat.

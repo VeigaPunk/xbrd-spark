@@ -76,39 +76,40 @@ upload_one() {
   esac
 }
 
+USED=
+URL=
+
 try_backends() {
-  local list=("$@")
   local be url
-  for be in "${list[@]}"; do
-    if url=$(upload_one "$be" 2>/dev/null); then
-      url=$(printf '%s' "$url" | tr -d '\r' | awk 'NR==1{print; exit}')
-      if [[ -n "$url" && "$url" == http* ]]; then
-        USED=$be
-        URL=$url
-        return 0
-      fi
+  for be in "$@"; do
+    url=$(upload_one "$be" 2>/dev/null || true)
+    url=$(printf '%s' "$url" | tr -d '\r' | head -n1 | tr -d '[:space:]')
+    if [[ -n "$url" && "$url" == http* ]]; then
+      USED=$be
+      URL=$url
+      return 0
     fi
     echo "paste-out: backend=$be failed, trying next…" >&2
   done
   return 1
 }
 
-USED=
-URL=
 case "$BACKEND" in
   auto)
-    # Prefer durable free hosts first; litterbox before flaky catbox/0x0 spam walls
+    # Prefer litterbox for large NDJSON; then paste.rs / dpaste / catbox / 0x0
     try_backends litterbox paste_rs dpaste catbox 0x0 || {
       echo "paste-out: all backends failed" >&2
       exit 3
     }
     ;;
   *)
-    URL=$(upload_one "$BACKEND") || {
+    URL=$(upload_one "$BACKEND" 2>/dev/null || true)
+    URL=$(printf '%s' "$URL" | tr -d '\r' | head -n1 | tr -d '[:space:]')
+    USED=$BACKEND
+    if [[ -z "$URL" || "$URL" != http* ]]; then
       echo "paste-out: backend=$BACKEND failed" >&2
       exit 3
-    }
-    USED=$BACKEND
+    fi
     ;;
 esac
 

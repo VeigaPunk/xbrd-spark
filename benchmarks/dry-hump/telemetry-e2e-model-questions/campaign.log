@@ -106,3 +106,5 @@ end_iso=2026-08-01T23:23:04+00:00
 questions_extracted=60 gen_ec=0
 RETRY gen (got 60)
 questions_after_retry=63
+end_iso=2026-08-01T23:24:12+00:00
+===== E2E 7/12 model=opencode/north-mini-code-free =====

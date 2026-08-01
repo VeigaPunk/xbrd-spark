@@ -1,0 +1,14 @@
+{
+  "model": "opencode/north-mini-code-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 39.684,
+  "sessions": [
+    "ses_0406bf1a3ffeYCgzysDPq2MHiZ"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 24495.0,
+  "tokens_input": 24115.0,
+  "tokens_output": 95.0,
+  "tokens_reasoning": 285.0,
+  "cost": 0.0
+}

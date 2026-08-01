@@ -1,0 +1,40 @@
+{
+  "run_id": "e2e11_openai_gpt-5_6-luna-fast",
+  "model": "openai/gpt-5.6-luna-fast",
+  "status": "ok",
+  "questions": 64,
+  "questions_sample": [
+    "Should a religious community forgive a leader whose private misconduct contradicts teachings but whose public service benefits vulnerable people?",
+    "Should parents allow an adult child to leave their faith if doing so fractures family relationships and community support?",
+    "Should governments exempt religious hospitals from procedures that conflict with doctrine when no alternative provider exists nearby?"
+  ],
+  "e2e_wall_seconds": 48.396,
+  "gen_wall_seconds": 27.068,
+  "swarm_wall_seconds": 21.302,
+  "swarm_exit": 0,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "sekhmet_tokens_total": 166362,
+  "sekhmet_tokens_n": 64,
+  "sekhmet_tokens_min": 2448,
+  "sekhmet_tokens_max": 3037,
+  "sekhmet_tokens_avg": 2599.4,
+  "opencode_gen": {
+    "model": "openai/gpt-5.6-luna-fast",
+    "opencode_exit": 0,
+    "opencode_wall_seconds": 27.068,
+    "sessions": [
+      "ses_040578404ffeG8Ui6fFxpMczva"
+    ],
+    "step_finish_count": 1,
+    "tokens_total": 8551.0,
+    "tokens_input": 3574.0,
+    "tokens_output": 1342.0,
+    "tokens_reasoning": 51.0,
+    "cost": 0.0
+  },
+  "root": "/tmp/sekhmet-e2e-e2e11_openai_gpt-5_6-luna-fast-ExA7d8",
+  "e2e_start_iso": "2026-08-01T23:28:37+00:00"
+}

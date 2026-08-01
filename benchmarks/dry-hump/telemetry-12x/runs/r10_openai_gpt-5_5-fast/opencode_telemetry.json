@@ -1,0 +1,15 @@
+{
+  "model": "openai/gpt-5.5-fast",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 34.607,
+  "sessions": [
+    "ses_04070bccfffeQVPlfUivlWDm6Q"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 23338.0,
+  "tokens_input": 3954.0,
+  "tokens_output": 219.0,
+  "tokens_reasoning": 221.0,
+  "cost": 0.0,
+  "final_text_tail": "DONE run_id=r10_openai_gpt-5_5-fast model=openai/gpt-5.5-fast"
+}

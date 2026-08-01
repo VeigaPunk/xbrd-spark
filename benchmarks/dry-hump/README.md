@@ -106,3 +106,7 @@ Full command transcripts and Titanium NDJSON streams:
 - [`verbatim/live-ndjson-full/`](verbatim/live-ndjson-full/) — per-domain raw `sekhmet swarm` stdout
 - [`verbatim/parent-fire-barrier.session.log`](verbatim/parent-fire-barrier.session.log) — parent READY/FIRE/DONE monitor (if present)
 
+
+## Multi-model leaderboard
+
+See [`telemetry-12x/LEADERBOARD.md`](telemetry-12x/LEADERBOARD.md) (regenerate with `./gen-leaderboard.sh`).

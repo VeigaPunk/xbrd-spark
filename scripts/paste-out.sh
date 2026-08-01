@@ -15,7 +15,8 @@
 # Env:
 #   PASTE_BACKEND=paste_rs|0x0|catbox|litterbox|dpaste|auto
 #   PASTE_NAME=filename.ext
-set -euo pipefail
+set -eu
+# note: not pipefail — head/tr pipelines must not fail the script on SIGPIPE
 
 BACKEND=${PASTE_BACKEND:-auto}
 TMP=

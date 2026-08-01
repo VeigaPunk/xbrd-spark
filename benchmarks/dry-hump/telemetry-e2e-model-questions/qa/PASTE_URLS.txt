@@ -6,5 +6,3 @@ e2e05_opencode_mimo-v2_5-free bytes=125226 url=https://litter.catbox.moe/s36qcl.
 e2e06_opencode_nemotron-3-ultra-free bytes=125026 url=https://litter.catbox.moe/6xqjty.out
 e2e07_opencode_north-mini-code-free bytes=130268 url=https://litter.catbox.moe/aj7tis.out
 e2e08_openai_gpt-5_3-codex-spark bytes=129820 url=https://litter.catbox.moe/owz5w3.out
-e2e09_openai_gpt-5_4-mini-fast bytes=128576 url=FAIL
-e2e10_openai_gpt-5_5-fast bytes=1979 url=FAIL

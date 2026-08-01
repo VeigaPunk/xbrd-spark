@@ -1,0 +1,15 @@
+{
+  "model": "openai/gpt-5.3-codex-spark",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 10.766,
+  "sessions": [
+    "ses_04071c965ffeZX1vyP5wdIUxBP"
+  ],
+  "step_finish_count": 5,
+  "tokens_total": 43136.0,
+  "tokens_input": 11002.0,
+  "tokens_output": 351.0,
+  "tokens_reasoning": 807.0,
+  "cost": 0.0,
+  "final_text_tail": "DONE run_id=r08_openai_gpt-5_3-codex-spark model=openai/gpt-5.3-codex-spark"
+}

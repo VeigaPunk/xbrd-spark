@@ -1,0 +1,15 @@
+{
+  "model": "opencode/mimo-v2.5-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 12.449,
+  "sessions": [
+    "ses_04072b3c9ffexDsrUibxiYcsJ5"
+  ],
+  "step_finish_count": 4,
+  "tokens_total": 40575.0,
+  "tokens_input": 10081.0,
+  "tokens_output": 411.0,
+  "tokens_reasoning": 323.0,
+  "cost": 0.0,
+  "final_text_tail": "```json\n{\n  \"run_id\": \"r05_opencode_mimo-v2_5-free\",\n  \"model_label\": \"opencode/mimo-v2.5-free\",\n  \"wall_seconds\": 0.012,\n  \"sparks_expected\": 64,\n  \"sparks_ok\": 0,\n  \"sparks_fail\": 0,\n  \"sparks_timeout\": 0,\n  \"ndjson_lines\": 0,\n  \"tokens_total\": 0\n}\n```\n\nNote: Disk quota exceeded errors on the run. All spark counts are 0 \u2014 the swarm likely hit quota before producing output.\n\nDONE run_id=r05_opencode_mimo-v2_5-free model=opencode/mimo-v2.5-free"
+}

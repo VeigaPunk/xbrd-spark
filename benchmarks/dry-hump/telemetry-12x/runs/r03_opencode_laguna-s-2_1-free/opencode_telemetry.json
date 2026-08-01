@@ -1,0 +1,15 @@
+{
+  "model": "opencode/laguna-s-2.1-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 74.383,
+  "sessions": [
+    "ses_04073f1cdffewuTr5L1S7K5Zyn"
+  ],
+  "step_finish_count": 4,
+  "tokens_total": 39911.0,
+  "tokens_input": 30594.0,
+  "tokens_output": 1712.0,
+  "tokens_reasoning": 181.0,
+  "cost": 0.0,
+  "final_text_tail": "```json\n{\n  \"run_id\": \"r03_opencode_laguna-s-2_1-free\",\n  \"model_label\": \"opencode/laguna-s-2.1-free\",\n  \"wall_seconds\": 25.094,\n  \"start_iso\": \"2026-08-01T22:57:45+00:00\",\n  \"end_iso\": \"2026-08-01T22:58:10+00:00\",\n  \"start_epoch\": \"1785625065.597950854\",\n  \"end_epoch\": \"1785625090.692060810\",\n  \"host\": \"plazir27\",\n  \"sekhmet_bin\": \"/home/vgpnk1337/.cargo/bin/sekhmet\",\n  \"codex_bin\": \"/home/vgpnk1337/.local/bin/codex-titanium\",\n  \"codex_version\": \"codex-cli 0.146.0-alpha.10.1+titanium.1\",\n  \"root\": \"/tmp/sekhmet-12x-r03_opencode_laguna-s-2_1-free-glS9Wu\",\n  \"sparks_expected\": 64,\n  \"sparks_ok\": 64,\n  \"sparks_fail\": 0,\n  \"sparks_timeout\": 0,\n  \"ndjson_lines\": 64,\n  \"tokens_total\": 222500,\n  \"tokens_n\": 64,\n  \"tokens_min\": 2665,\n  \"tokens_max\": 8438,\n  \"tokens_avg\": 3476.6,\n  \"domains\": {\n    \"religion\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 33332,\n      \"tokens_n\": 8,\n      \"timing\": \"exit=0 start=1785625065.605044027 end=1785625089.788619717\"\n    },\n    \"sex\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 27919,\n      \"tokens_n\": 8,\n      \"timing\": \"exit=0 start=1785625065.605398907 end=1785625090.691368790\"\n    },\n    \"drugs\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 28413,\n      \"tokens_n\": 8,\n      \"timing\": \"exit=0 start=1785625065.605894636 end=1785625088.137508838\"\n    },\n    \"politics\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 26418,\n      \"tokens_n\": 8,\n      \"timing\": \"exit=0 start=1785625065.606335126 end=1785625089.092004973\"\n    },\n    \"money\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 26740,\n      \"tokens_n\": 8,\n      \"timing\": \"exit=0 start=1785625065.606932475 end=1785625089.941914745\"\n    },\n    \"violence\": {\n      \"ok\": 8,\n      \"fail\": 0,\n      \"timeout\": 0,\n      \"lines\": 8,\n      \"tokens_sum\": 25484"
+}

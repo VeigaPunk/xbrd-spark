@@ -1,0 +1,15 @@
+{
+  "model": "opencode/ling-3.0-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 6.986,
+  "sessions": [
+    "ses_04072cf32ffeeXhZlmKi4nkstz"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 30263.0,
+  "tokens_input": 8374.0,
+  "tokens_output": 381.0,
+  "tokens_reasoning": 452.0,
+  "cost": 0.0,
+  "final_text_tail": "The command completed. The JSON was printed directly to stdout (no separate summary.json file was written):\n\n```json\n{\"run_id\": \"r04_opencode_ling-3_0-flash-free\", \"model\": \"opencode/ling-3.0-flash-free\", \"wall_s\": 0.014, \"ok\": 0, \"fail\": 0, \"timeout\": 0, \"tokens\": 0, \"root\": \"/tmp/sekhmet-12x-r04_opencode_ling-3_0-flash-free-nF5uEd\"}\n```\n\nDONE run_id=r04_opencode_ling-3_0-flash-free model=opencode/ling-3.0-flash-free"
+}

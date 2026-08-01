@@ -1,0 +1,15 @@
+{
+  "model": "opencode/deepseek-v4-flash-free",
+  "opencode_exit": 0,
+  "opencode_wall_seconds": 29.362,
+  "sessions": [
+    "ses_04074648bffe0URzUyVNtOp5Xa"
+  ],
+  "step_finish_count": 3,
+  "tokens_total": 30008.0,
+  "tokens_input": 10278.0,
+  "tokens_output": 955.0,
+  "tokens_reasoning": 87.0,
+  "cost": 0.0,
+  "final_text_tail": "Summary JSON at `benchmarks/dry-hump/telemetry-12x/runs/r02_opencode_deepseek-v4-flash-free/summary.json`:\n\n```json\n{\n  \"run_id\": \"r02_opencode_deepseek-v4-flash-free\",\n  \"model_label\": \"opencode/deepseek-v4-flash-free\",\n  \"wall_seconds\": 18.549,\n  \"start_iso\": \"2026-08-01T22:57:08+00:00\",\n  \"end_iso\": \"2026-08-01T22:57:26+00:00\",\n  \"host\": \"plazir27\",\n  \"sekhmet_bin\": \"/home/vgpnk1337/.cargo/bin/sekhmet\",\n  \"codex_bin\": \"/home/vgpnk1337/.local/bin/codex-titanium\",\n  \"codex_version\": \"codex-cli 0.146.0-alpha.10.1+titanium.1\",\n  \"root\": \"/tmp/sekhmet-12x-r02_opencode_deepseek-v4-flash-free-O5gQHL\",\n  \"sparks_expected\": 64,\n  \"sparks_ok\": 64,\n  \"sparks_fail\": 0,\n  \"sparks_timeout\": 0,\n  \"ndjson_lines\": 64,\n  \"tokens_total\": 189486,\n  \"tokens_n\": 64,\n  \"tokens_min\": 2509,\n  \"tokens_max\": 9736,\n  \"tokens_avg\": 2960.7,\n  \"domains\": {\n    \"religion\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 22425 },\n    \"sex\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 29148 },\n    \"drugs\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 21507 },\n    \"politics\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 28424 },\n    \"money\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 20971 },\n    \"violence\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 21832 },\n    \"ai\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 22334 },\n    \"charlie-kirk\": { \"ok\": 8, \"fail\": 0, \"timeout\": 0, \"lines\": 8, \"tokens_sum\": 22845 }\n  }\n}\n```\n\nDONE run_id=r02_opencode_deepseek-v4-flash-free model=opencode/deepseek-v4-flash-free"
+}

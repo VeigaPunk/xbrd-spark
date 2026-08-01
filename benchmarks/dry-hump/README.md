@@ -73,9 +73,24 @@ awk -v s="$START" -v e="$END" 'BEGIN{printf "wall_seconds=%.3f\n", e-s}'
 
 Hard cap: Sekhmet swarm `--jobs` max **64**. This example uses **8×8** parallel processes for organizational isolation by domain; host concurrency peaks near **64** Titanium children.
 
+## Multi-model telemetry
+
+```bash
+# requires sekhmet + codex-titanium + jq on PATH
+mkdir -p benchmarks/dry-hump/telemetry-12x/runs/rNN_label
+./benchmarks/dry-hump/run-once-telemetry.sh rNN_label \
+  benchmarks/dry-hump/telemetry-12x/runs/rNN_label \
+  'provider/model-label'
+```
+
+`run-once-telemetry.sh` is **bash + jq only** (no Python). It always `rm -rf` the temp `--root` tree on exit so large Titanium namespaces do not exhaust `/tmp` (disk quota / tmpfs fill will break `cargo test` and later swarms).
+
+Recorded summaries live under `telemetry-12x/runs/*/summary.json` (compact; live codex homes stay off-tree).
+
 ## Notes
 
-- Live namespaces under `/tmp` are **not** checked in (hundreds of MB of codex homes).
+- Live namespaces under `/tmp` are **not** checked in (often multi-GB of codex homes). Prefer private roots and delete after harvest.
+- After large campaigns, free space: `rm -rf /tmp/sekhmet-*` (or use the telemetry trap cleanup).
 - Questions are moral/policy dilemmas for load-gen + qualitative stress, not product advice.
 - Recorded run: 2026-08-01T22:40:38Z → 22:41:04Z UTC.
 

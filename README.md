@@ -114,6 +114,7 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 - `gc --max-age` reaps old `status=running` by **age only** (no live PID/`/proc` probe); long `--timeout 0` jobs past max-age can be deleted.
 - Live codex smoke / CI workflows are optional and out of default gates.
 - Non-unix: seed `0o700`/`0o600` permission bits are no-ops.
+- Large live swarms can fill `/tmp` (tmpfs quota); use private roots, `gc`, and delete `/tmp/sekhmet-*` after harvest or tests will fail with `Disk quota exceeded`.
 
 ## Integration under xbrd
 

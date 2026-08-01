@@ -25,7 +25,7 @@ for d in "${DOMAINS[@]}"; do
   mkdir -p "$ROOT/$d"
   (
     DS=$(date +%s.%N)
-    sekhmet swarm --direct -j 8 --timeout 180 \
+    sekhmet swarm --direct --no-keep -j 8 --timeout 180 \
       --tasks-file "$HERE/domains/$d/tasks.txt" \
       --root "$ROOT/$d" \
       > "$ROOT/$d/ndjson.out" \

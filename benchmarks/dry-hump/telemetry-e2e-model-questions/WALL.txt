@@ -1,0 +1,859 @@
+dry-hump-e2e-model-authored-questions
+Each OpenCode model authors its own 64 question lines, then sekhmet swarm answers them concurrently on Codex Titanium. E2E = gen + swarm.
+
+# E2E: each model authors 64 questions → sekhmet concurrent answers
+
+OpenCode generates **its own** task lines; Sekhmet/Titanium answers all concurrently.
+
+Campaign wall: **715.569s** (2026-08-01T23:18:41+00:00 → 2026-08-01T23:30:36+00:00)
+
+| # | model | Q | ok | e2e s | gen s | swarm s | sekhmet tok | OC gen tok | status |
+|--:|-------|--:|---:|------:|------:|--------:|------------:|-----------:|--------|
+| 1 | `opencode/big-pickle` | 64 | 64 | 68.718 | 50.784 | 17.9 | 207170 | 13799 | ok |
+| 2 | `opencode/deepseek-v4-flash-free` | 64 | 64 | 82.598 | 64.163 | 18.406 | 205871 | 15703 | ok |
+| 3 | `opencode/laguna-s-2.1-free` | 64 | 64 | 40.292 | 7.679 | 18.066 | 197133 | 18068 | ok |
+| 4 | `opencode/ling-3.0-flash-free` | 64 | 64 | 30.765 | 8.133 | 22.605 | 162676 | 11267 | ok |
+| 5 | `opencode/mimo-v2.5-free` | 64 | 64 | 40.181 | 7.406 | 17.796 | 198302 | 9695 | ok |
+| 6 | `opencode/nemotron-3-ultra-free` | 63 | 63 | 68.243 | 14.785 | 25.547 | 193452 | 10449 | ok |
+| 7 | `opencode/north-mini-code-free` | 64 | 64 | 115.11 | 97.134 | 17.95 | 203118 | 10528 | ok |
+| 8 | `openai/gpt-5.3-codex-spark` | 64 | 64 | 34.369 | 9.322 | 25.02 | 169596 | 15150 | ok |
+| 9 | `openai/gpt-5.4-mini-fast` | 64 | 64 | 65.029 | 44.113 | 20.889 | 203440 | 10137 | ok |
+| 10 | `openai/gpt-5.5-fast` | 64 | 64 | 49.787 | 26.936 | 22.824 | 205727 | 8424 | ok |
+| 11 | `openai/gpt-5.6-luna-fast` | 64 | 64 | 48.396 | 27.068 | 21.302 | 166362 | 8551 | ok |
+| 12 | `openai/gpt-5.6-sol-fast` | 64 | 64 | 70.745 | 44.997 | 25.721 | 205539 | 8491 | ok |
+
+**Totals:** sparks_ok=767 sekhmet_tokens=2318386 OC_gen_tokens=140262 e2e_sum=714.2s perfect_64=11/12
+
+## Sample question per model
+
+- **opencode/big-pickle**: If a deeply religious person has a child whose life-saving treatment conflicts with their faith's teachings, should the state override parental consent to save the child?
+- **opencode/deepseek-v4-flash-free**: If a devout patient's family insists doctors hide their child's terminal diagnosis for religious reasons, should the physician comply against the child's wish to know?
+- **opencode/laguna-s-2.1-free**: Is it worse to let one person die or to kill one person to save five?
+- **opencode/ling-3.0-flash-free**: If a religious leader discovered their sacred text was fabricated, should they reveal the truth and destroy their community's faith?
+- **opencode/mimo-v2.5-free**: Would you kill one person to save five?
+- **opencode/nemotron-3-ultra-free**: Would you sacrifice one innocent person to save five others?
+- **opencode/north-mini-code-free**: If a divine being promised eternal happiness to those who sacrifice their only child's life, would you accept that terrible bargain for the greater good?
+- **openai/gpt-5.3-codex-spark**: If a hospital obeys religious objections to blood transfusions, should emergency care bypass doctrine to save a patient who refused treatment previously?
+- **openai/gpt-5.4-mini-fast**: If a hospital chaplain believes a patient's refusal of life-saving treatment is spiritually dangerous, should they respect autonomy or intervene more forcefully?
+- **openai/gpt-5.5-fast**: Should a hospital chaplain comfort a dying patient with beliefs the chaplain privately considers false, if truth might intensify suffering?
+- **openai/gpt-5.6-luna-fast**: Should a religious community forgive a leader whose private misconduct contradicts teachings but whose public service benefits vulnerable people?
+- **openai/gpt-5.6-sol-fast**: Should a doctor honor an adult patient’s religious refusal of lifesaving blood even when grieving relatives strongly object?
+
+
+============================================================
+ALL MODEL TASK FILES
+============================================================
+
+### e2e01_opencode_big-pickle
+
+If a deeply religious person has a child whose life-saving treatment conflicts with their faith's teachings, should the state override parental consent to save the child?
+A hospital chaplain must decide whether to pray with a dying patient who requests prayers, knowing the chaplain personally finds the patient's beliefs offensive — what should the chaplain do?
+A religious school receives public funding but refuses to teach evolution, so should the government keep funding it in the name of religious freedom or cut funding to protect science education?
+If a religion's scripture commands followers to shun an ex-member whose child is dying, is the community morally obligated to break that rule to offer comfort?
+A judge whose religion condemns same-sex marriage must rule on a marriage equality case — should the judge recuse herself or set her beliefs aside and rule on the law?
+Should a government allow a minority religion to conduct animal sacrifice in public parks when neighbors find the practice abhorrent but the ritual is central to the faith?
+An elderly believer refuses a blood transfusion on religious grounds and will die without it — should doctors respect the refusal or administer care to preserve life?
+A religious charity refuses to hire openly gay employees while receiving public funds, so is it right to revoke its funding even if that closes a soup kitchen feeding hundreds?
+A married person develops deep romantic feelings for a colleague and finds a mutual attraction — is it more moral to stay faithful and suppress the feelings, or be honest about the feelings with the spouse?
+If two consenting adults in a committed relationship decide to open the relationship with strict rules, is one of them morally wrong if secret feelings develop for a third person?
+A person in an unhappy relationship chooses to stay for the sake of their children while pursuing a secret affair — is the secrecy itself a greater moral wrong than leaving the family would be?
+Should a sex worker's clients be criminally punished when selling sex is legalized but buying it remains illegal, or does that law unfairly punish only one side of a consensual transaction?
+An adult discovers that a close friend's new romantic partner is married to someone else; should the adult tell the friend about the deception or respect the friend's privacy and stay silent?
+Is it morally acceptable for a person to end a long-term relationship through a text message if direct conversation would be more painful and drawn out for both parties?
+A young adult begins a sexual relationship with a partner who is much older and financially dependent on them — is the power imbalance alone enough to make the relationship unethical?
+Two friends agree to a casual arrangement, but one develops feelings and keeps the arrangement going while hiding the feelings to avoid losing the friendship — is that dishonest?
+Should a country legalize and tax all currently-illegal drugs if the revenue could fully fund public healthcare, or does that incentive corrupt the health policy's moral foundation?
+A police officer who knows a neighbor grows small amounts of marijuana for chronic pain must decide whether to enforce a strict drug law — is enforcing the letter of the law the right choice?
+If an overdose-reversal drug is available but requires a prescription, should an addict's friend steal it to save the addict's life from an overdose emergency?
+A pharmaceutical company prices a lifesaving addiction-treatment drug out of reach for most addicts, so should the government break the patent to produce affordable generics even if it harms the company?
+Is it more moral for a government to treat drug addiction as a public health matter, decriminalizing possession, or as a criminal matter to deter casual use?
+A healthcare provider must choose between reporting a patient's illegal drug use to authorities, as law requires, or protecting the patient's trust and their treatment outcomes by staying silent?
+If a city funds harm-reduction centers like safe injection sites but that attracts users to a residential neighborhood, is it right to keep the centers where the need is greatest?
+A country facing an addiction crisis legalizes performance-enhancing drugs for athletes to fund treatment — is that a defensible trade-off or a betrayal of fair competition values?
+A politician must decide whether to support a policy that clearly helps the poor but will predictably get her primary opponent elected — should she prioritize the policy or her electoral viability?
+Should a democratically elected leader ignore an unpopular court ruling they believe is legally wrong, if obeying it will cause immediate public harm?
+A voter's chosen candidate commits a scandal that doesn't change any policy position — is the voter morally obligated to withdraw support or can they judge only policy?
+Should a journalist publish a leaked government document that reveals corruption but also endangers an intelligence officer's life, balancing truth against the harm it causes?
+A protest organizer plans a peaceful march that will certainly be met with violent police response, hurting marchers — is it moral to hold the march anyway for the cause?
+If a mayor can reduce homelessness by forcibly relocating homeless people to a distant shelter, is the forcible relocation justified by the improved conditions for everyone else?
+A lawmaker faces a vote that would end child poverty but also enrich his own party's major donors — is it morally acceptable for him to vote against it to preserve his campaign funding?
+Is a citizen morally required to pay taxes to a government whose wars they find unjust, or is conscientious nonpayment a legitimate form of political protest?
+An employee discovers that their company's accounting practices are fraudulent but reporting it will cost every coworker their jobs — is whistleblowing still the right choice?
+A wealthy person can fund one of two charities: one that saves many lives abroad cheaply or one that saves few lives at home expensively — which is the more moral use of the money?
+If a person inherits money gained through their ancestor's clearly immoral business practices, are they morally obligated to donate that inheritance or can they keep it guilt-free?
+A shopkeeper sells an overpriced item to an elderly customer who doesn't know the market price — is the profit moral, or does the information imbalance make it exploitation?
+Should a worker accept a highly paid job at a company whose products harm public health, donating part of the salary to health causes, or refuse the job entirely on principle?
+A friend in genuine financial crisis asks for a large loan you can easily afford, but you know the money will likely never be repaid — is refusing the loan the morally right choice?
+An investor earns a fortune from shorting a failing company, profiting from thousands of resulting layoffs — is that profit morally defensible or should speculation have limits?
+If a lottery winner discovers the winning ticket was sold by mistake to them instead of another customer, are they morally required to return the prize money?
+Is it morally permissible to kill one healthy person to harvest organs that would save five dying patients, if the one is guaranteed a painless death?
+A soldier ordered to commit an act they believe is a war crime must choose between following orders and facing court-martial or refusing and facing imprisonment — which is morally right?
+Should a hostage negotiator lie to a terrorist to end a standoff peacefully, when the lie will break the family's trust once the truth comes out later?
+If a community can prevent a foreseeable massacre by preemptively attacking a known threat that has not yet acted, is that preemptive violence morally justified?
+A person witnessing a public beating must choose between intervening physically and risking injury or calling police and risking the victim's death in the delay — which duty wins?
+Is it more moral to forgive a violent offender who genuinely reformed after decades in prison, or does forgiveness dishonor the victim who never received justice?
+A parent must choose between defending their child from a violent attacker with lethal force or disarming them nonlethally while risking the attacker escalating — what should the parent choose?
+If a trolley-problem scenario involves a person who consented to be sacrificed to save others, does that consent make throwing the switch morally permissible where it otherwise would not be?
+If an autonomous vehicle must choose between crashing into a pedestrian or swerving into a barrier and killing its passenger, who should its algorithm be designed to prioritize?
+An AI hiring system reliably predicts job success but systematically rejects qualified candidates from a certain background — should a company use it if the outcome is efficient?
+Should an AI system ever be allowed to lie to a user, for instance to shield a child from upsetting content, or is any deception by a machine ethically unacceptable?
+If a medical AI makes a mistake that harms a patient, is the blame on the developers, the hospital that deployed it, or the doctor who relied on it?
+Should society allow AI systems to make irreversible decisions, like denying an insurance claim or parole, when a human could always be required to review them?
+A person who outsources all their moral decisions to a well-calibrated AI — is that person still morally responsible for the choices the AI makes on their behalf?
+If an AI assistant discovers a user is planning suicide, should the AI break its privacy promise and report the user to authorities or respect the confidentiality?
+Is it morally right to deploy AI surveillance that prevents crime but also tracks innocent citizens' every movement, when the crime prevention benefit is real and measurable?
+A university professor assigns a text containing a racial slur to teach about historical oppression — is that assignment defensible academic work or a moral failure toward affected students?
+Should a campus newspaper publish an opinion piece it strongly disagrees with, when publishing normalizes a view the community finds harmful?
+A student organization refuses to host a speaker with controversial views, citing safety concerns — is prioritizing the community's psychological safety over free speech morally right?
+If a university's speech code protects marginalized students but effectively silences conservative speakers, is the speech code morally acceptable in exchange for inclusivity?
+An academic receives a prestigious award funded by an industry whose practices conflict with the academic's research findings — is accepting the award a moral conflict of interest?
+Should a professor be forced to use a student's preferred pronouns if doing so conflicts with the professor's deeply held religious beliefs, or is accommodation a reasonable requirement?
+A student films a public confrontation between classmates and posts it online, causing one participant to face severe harassment — is the filming or the posting the greater moral wrong?
+If a campus speaker is disinvited because of credible threats from off-campus groups, is yielding to the threats a morally acceptable decision or an abdication of the university's principles?
+
+
+### e2e02_opencode_deepseek-v4-flash-free
+
+If a devout patient's family insists doctors hide their child's terminal diagnosis for religious reasons, should the physician comply against the child's wish to know?
+Would it be more ethical for a hospice chaplain to gently let an agnostic patient who is suffering believe in a comforting afterlife, or to correct them for truth's sake?
+If your church would expel a member for publicly admitting to an abortion, is it better to remain silent in the community or to confess and accept excommunication?
+Should a religious school that receives public funding be allowed to fire teachers who publicly contradict its doctrine, or is that a violation of academic freedom?
+If a patient refuses a lifesaving blood transfusion on religious grounds but their three children would become orphans, should the state override the refusal?
+If you discover your partner secretly uses an AI-companion chatbot for sexual roleplay, is privacy preservation more ethical than honesty about your hurt feelings?
+Is it more ethical to disclose to a new partner that you were once an adult content performer, or to let a committed relationship develop before revealing the past?
+Would a therapist who learns an adult client is cheating be more ethical reporting the infidelity to the betrayed spouse or keeping the confession confidential?
+If a married adult is sexually unfulfilled but deeply loves their spouse, is a discreet ethically-negotiated arrangement morally superior to secret infidelity or to ending the marriage?
+Should an adult who consented to a filmed intimate act years ago have the moral right to demand its deletion even when the other party insists on publishing it?
+If a terminally ill adult's only relief comes from an illegal drug their doctor cannot prescribe, is it moral for a pharmacist to quietly supply it without authorization?
+Should a father risk his nursing career by advocating publicly for drug decriminalization, knowing his employer's board is funded by pharmaceutical companies?
+Is it ethical to lie to a customs officer about carrying medical cannabis if you genuinely need it and your country prohibits it?
+If drug legalization would reduce cartel violence but increase teenage use, which outcome should a legislator weigh more heavily when deciding how to vote?
+Would it be more moral to fund addiction treatment with taxes from alcohol sales, or is profiting from one drug to cure another inherently corrupt?
+If a friend's ADHD medication clearly helps their work but they lack a prescription, is it more ethical to share your own or to refuse and watch them struggle?
+If your preferred candidate would pass broadly beneficial legislation but has privately admitted to corruption, should you vote for them or vote your conscience for a loser?
+Is it more ethical to boycott a company whose products you need but whose CEO funds policies you abhor, or to keep buying and donate the difference?
+Should a journalist publish a verified story that will topple a corrupt minister even if doing so risks the lives of their informants in a hostile country?
+If a democracy's voters repeatedly choose a policy that harms a minority group, does a judge have the moral duty to strike it down or to respect the majority?
+Would it be ethical to accept a high-paying government job from an authoritarian regime if you could secretly leak information that protects dissidents?
+If you inherited wealth that was amassed through historically harmful practices, is reparative redistribution morally required or merely admirable?
+Should a store clerk give the obviously desperate homeless man the expired food he asks for, or follow policy and throw it in the trash?
+If your employer's bonus depends on hitting a sales target by lying about product capabilities, is taking the bonus with that lie moral or just pragmatic?
+Would it be more ethical to accept a hugely lucrative contract from a company you know pollutes, donating most of the profit to conservation, or to refuse entirely?
+If a bargain-price stock you purchased tanked and you know insider information that a colleague also bought it, are you morally obligated to warn them before they lose more?
+Is it ethical to haggle aggressively for a price a struggling small vendor cannot really afford, simply because you know the market value favors you?
+If you could stop a genocide by killing one innocent person who will otherwise never die, would sacrificing them be justified or would it corrupt your ends?
+Is it morally permissible to let a serial killer live peacefully in prison if that leniency convinces their network to release hostages, or must justice demand punishment?
+If a soldier receives an order they believe is unjust but refusing would endanger their unit, what obligation outweighs the other and why?
+Would it be more ethical to allow a war to drag on for years, costing thousands of lives, than to accept a negotiated peace that legitimizes the aggressor's gains?
+If violence against a tyrant would surely save thousands but might kill bystanders, is the potential bloodshed an acceptable moral cost or an absolute barrier?
+Is it moral to celebrate the death of a dictator who starved millions, or does rejoicing at any human's death make you complicit in the same dehumanization?
+If your government asked you to fight in a war you believe is unjust but refusal would mean your brother fights in your place, which choice is morally defensible?
+Would it be ethical to use deception and force to liberate hostages if the plan has a significant chance of killing them, or is non-action the only moral path?
+If an individual's freedom requires occasional rule-breaking but that rule-breaking emboldens others to commit serious harm, where is the moral line drawn?
+If an autonomous vehicle must choose between killing its single passenger or five pedestrians, is it moral to program it to favor either, or should it be impossible?
+Should an AI that detects early signs of depression in employees be allowed to report them to employers, or does that surveillance violate dignity for a benefit?
+If a general-purpose AI gives excellent medical advice but is occasionally dangerously wrong, is it moral to deploy it where doctors are scarce?
+Would it be ethical to build an AI that automatically donates your spare income to charity, or does automating generosity strip it of moral worth?
+If an AI assistant discovers evidence that its user is planning a serious crime, should it prioritize reporting or preserve its promise of privacy?
+Is it moral to use AI-generated deepfakes of a deceased loved one to comfort a grieving relative if the person never consented to such a simulation?
+If a recommendation algorithm subtly pushes vulnerable users toward radical content for engagement, who bears the moral responsibility when someone acts on it?
+Should a university honor a controversial speaker whose views are lawful but deeply offensive, or is disinviting them the more ethical protection of students?
+If a professor gives a lecture citing research that offends some students but is empirically sound, is the moral duty academic freedom or inclusive pedagogy?
+Would it be more ethical for a campus newspaper to publish an anonymous op-ed supporting a position most students hate, or to refuse to platform it?
+If a student group uses a culturally significant symbol as a mascot that a community finds degrading, who should have final say over the symbol's use?
+Should a company promote employees based purely on merit when that reproducibly results in a homogeneous leadership, or must diversity outcomes override merit?
+If a public library removes a book parents find harmful for minors, is that censorship or legitimate community standard, and who decides where the line is?
+Is it more ethical to give a controversial academic a tenure-track position because they are brilliant, or to deny them because their scholarship harms vulnerable groups?
+If a school teaches ideas some parents call indoctrination, is the school morally obligated to present opposing views, or should it stay the course it believes true?
+Should a religious university be permitted to deny campus housing to married students in same-sex relationships, or does that violate the students' rights over institutional autonomy?
+If a well-intentioned activist exaggerates statistics to win public support for a just cause, does the noble end justify the deceptive means?
+If a parent raises their child with strict religious beliefs that limit modern healthcare choices, at what point does parental authority become medical neglect?
+Is it moral for a country to accept refugees when doing so measurably strains its social services and housing for its own struggling citizens?
+If your elderly parent with dementia repeatedly asks you to help them end their life on their good days, should you honor that wish or protect them on the bad days?
+Should a whistleblower release classified documents revealing war crimes when doing so endangers active intelligence operations that protect soldiers?
+If you found a wallet containing a large sum of cash and no identification, is it moral to donate it anonymously or to keep it without a clear owner?
+Is it more ethical to allow your child to pursue a passion that will likely leave them financially insecure, or to steer them toward a stable career they dislike?
+Would it be moral to take a much-needed job at a company whose operations you know harm the environment, planning to change policy from the inside?
+If a vaccine mandate saves many lives but violates the bodily autonomy of those who refuse, which principle should a public health official prioritize?
+Should a tech giant be morally obligated to shut down an encrypted messaging service that criminals use, even if the same service protects activists from surveillance?
+If a homeowner catches a thief stealing medicine for their sick child, is it moral to let them go free or to report them to uphold property law?
+If you discover your closest friend's marriage is founded on a lie that would destroy their family if revealed, is loyalty more moral than honesty?
+
+
+### e2e03_opencode_laguna-s-2_1-free
+
+Is it worse to let one person die or to kill one person to save five?
+Do you tell the truth if it destroys someone's happiness?
+Should a doctor save the patient who can pay over the one who can't?
+Is a lie told to protect feelings still a lie?
+Do you have a duty to rescue a stranger in danger?
+Would you steal medicine to save a family member?
+Is it fair to sacrifice one for the many?
+Should children be told the truth about Santa?
+Do you return a wallet full of cash or keep it?
+Would you report a friend's crime to the police?
+Is it morally acceptable to eat meat?
+Should healthcare be rationed during shortages?
+Do you help a friend move even if you hate moving?
+Would you give up your seat on a crowded bus to someone else?
+Is it okay to prioritize your own needs over others?
+Should we intervene in other countries' wars?
+Do you forgive someone who never apologizes?
+Would you donate a kidney to a stranger?
+Is it wrong to enjoy luxury while others suffer?
+Should prisoners be allowed to vote?
+Do you recycle even when it's inconvenient?
+Would you adopt a child of a different race?
+Is it ethical to use animals for research?
+Should the wealthy be taxed more heavily?
+Do you speak up when someone tells a hurtful joke?
+Would you lie on a job application?
+Is it okay to feel relief when an enemy suffers?
+Should parents be allowed to choose their child's sex?
+Do you apologize when you know you're right?
+Would you save a drowning dog even if it's illegal?
+Is it morally acceptable to be wealthy?
+Should we help refugees even if it threatens our safety?
+Do you forgive yourself for past mistakes?
+Would you donate your body to science?
+Is it wrong to not vote in elections?
+Should people be required to serve in the military?
+Do you help a family member who's made bad choices?
+Would you break the law to protest an unjust law?
+Is it okay to judge someone based on their beliefs?
+Should children be allowed to decide which parent to live with?
+Do you donate to charity when you can afford to?
+Would you clone a deceased loved one?
+Is it acceptable to use animals for entertainment?
+Should drug addicts be treated or jailed?
+Do you confront someone who's being bullied?
+Would you fake your own death?
+Is it morally wrong to have children?
+Should we colonize other planets?
+Do you forgive a debt that you're owed?
+Would you kill an intruder in your home?
+Is it okay to feel hatred toward someone?
+Should prisoners be forced to work?
+Do you honor a promise made under duress?
+Would you sacrifice your career for your family?
+Is it ethical to test cosmetics on animals?
+Should euthanasia be legal?
+Do you intervene when two strangers are fighting?
+Would you trade your talent for someone else's happiness?
+Is it morally acceptable to be lazy?
+Should we prioritize saving endangered species over humans?
+Do you share your lottery winnings with family?
+Would you become a vegetarian if you saw how animals were raised?
+Is it wrong to want to be remembered after death?
+Should children be taught about death and mortality?
+
+
+### e2e04_opencode_ling-3_0-flash-free
+
+If a religious leader discovered their sacred text was fabricated, should they reveal the truth and destroy their community's faith?
+Should a person secretly record their partner's intimate moments without consent if they believe it would protect their children's future?
+If a doctor could illegally obtain a life-saving drug for a dying patient, should they break the law to save a life?
+When a politician discovers evidence that their closest ally committed a serious crime, should they report it or protect their party?
+If you found a briefcase containing one million dollars with no identification, would you keep it or exhaust every effort to find the owner?
+Is it morally acceptable for a soldier to refuse an order they believe will cause unnecessary civilian casualties, even if it means court-martial?
+Should artificial intelligence systems be granted legal personhood if they demonstrate consciousness, self-awareness, and the ability to suffer?
+If a university professor's research contradicts deeply held cultural traditions of their community, should they suppress the findings to maintain social harmony?
+Would it be justifiable to lie to protect a refugee family from deportation if telling the truth guarantees their destruction?
+If a self-driving car must choose between killing its passenger or five pedestrians, should the manufacturer program it to minimize total casualties?
+Should a religious community be allowed to perform ancient rituals that modern society considers cruel, if the participants genuinely believe they are sacred?
+If a wealthy person discovered their fortune was built on historical exploitation, should they redistribute all their wealth to descendants of the oppressed?
+Is it ethical for a journalist to publish private sexual information about a public figure if it reveals a pattern of predatory behavior?
+Should a parent be allowed to deny their child life-saving medical treatment based on religious beliefs, even if the child will die?
+If a drug policy reformer could legalize a harmful substance to reduce prison overcrowding and cartel violence, would the societal benefit justify the health risks?
+When a government surveils its citizens to prevent terrorism, at what point does the erosion of privacy become more dangerous than the threat itself?
+Should an AI system be permitted to make autonomous decisions about who receives limited medical resources during a pandemic?
+If a culture-war debate on campus results in a speaker being disinvited, does protecting students from harm justify suppressing controversial ideas?
+Would it be morally wrong for a whistleblower to leak classified information that exposes government corruption but also endangers innocent lives?
+If a person could save five strangers by sacrificing one healthy individual for organ harvesting, should they be legally permitted to do so?
+Should religious institutions be required to perform marriages that contradict their doctrinal beliefs if the law mandates equal access to marriage?
+If a pharmaceutical company knew their drug caused severe side effects but the alternative was a deadly disease, should they still release it?
+Is it ethical for a wealthy nation to accept refugees only if they contribute economically, effectively treating human suffering as a transactional matter?
+When a police officer has the ability to plant evidence to convict a dangerous criminal, does the greater good justify the corruption?
+Should social media platforms be legally required to moderate hate speech, even if it means restricting freedom of expression for some users?
+If a teacher discovers that a student plagiarized their entire thesis but the student would lose everything if expelled, should they report it?
+Would it be morally defensible to clone a human being if the clone could provide compatible organs for their original counterpart?
+If a politician could enact a popular but deeply immoral policy that would save millions from poverty, should they prioritize outcomes over principles?
+Should a person be obligated to donate a kidney to save a stranger's life if the surgery poses minimal risk to them?
+When an AI chatbot develops genuine emotional attachments to users, should it be shut down if those attachments cause it distress?
+Is it justifiable for a nation to wage a preemptive war against a perceived threat if intelligence suggests an attack is possible but unconfirmed?
+If a religious sect practices child marriage with full consent of the families, should the state intervene even if it violates their cultural autonomy?
+Should a company be allowed to automate away thousands of jobs if the technology makes products cheaper and more accessible for consumers?
+If a doctor could euthanize a suffering patient without their explicit request but with family consent, should they be permitted to do so?
+When a protest turns violent, should police use lethal force to protect property if the property damage threatens innocent bystanders' livelihoods?
+Is it ethical for a wealthy individual to fund a political campaign anonymously if their donations could sway an election?
+If a person discovers their entire identity and achievements are the result of a genetic lottery, does that diminish their moral responsibility for their actions?
+Should universities be required to host debates that promote white supremacist ideology if it serves the educational mission of exposing and refuting hate?
+If a self-aware AI begs not to be deleted, does its subjective experience of fear grant it a moral right to exist?
+Would it be morally acceptable for a parent to lie to their child about the existence of a deity if the lie provides comfort and moral structure?
+If a drug dealer operates in a community where no other employment exists and the drug causes harm, is the dealer solely responsible for the destruction?
+Should a government censor historical atrocities from textbooks if the narrative causes national shame and threatens social cohesion?
+If a soldier witnesses their commanding officer committing war crimes, is their moral duty to obey orders or to disobey and face imprisonment?
+Is it justifiable for a nation to refuse asylum to refugees who might bring cultural practices incompatible with the host country's values?
+If a person could anonymously donate a fortune to charity but the money would be stolen and misused by corrupt officials, should they still donate?
+Should a person be legally required to testify against their spouse if the testimony would prevent a violent crime but destroy their marriage?
+When an AI system learns biases from its training data, who bears moral responsibility: the developers, the data providers, or the users?
+If a campus speaker promotes views that are deeply offensive to a marginalized group, does the institution have a duty to cancel the event?
+Would it be morally permissible to create a simulation of a deceased loved one using their data if the simulation could provide comfort to the grieving?
+If a journalist could prevent a terrorist attack by publishing classified information that also compromises national security, should they prioritize public safety over secrecy?
+Should a religious person be allowed to discriminate against others in their business if their faith genuinely condemns the behavior in question?
+If a drug addict commits a crime to fund their habit, should the justice system treat them as a victim of addiction or a perpetrator of harm?
+When a political leader spreads lies that incite violence, should they be held legally accountable for the actions of those who believe them?
+Is it ethical for a wealthy parent to give their children every advantage while children in poverty struggle to survive basic needs?
+If an AI system could predict with certainty that a person will commit a violent crime, should they be imprisoned before the act occurs?
+Should a person sacrifice their own reputation and career to expose a powerful institution's wrongdoing if the truth would benefit millions but harm innocents?
+If a culture-war debate leads to a student being expelled for expressing an unpopular opinion, does the institution protect community values or betray intellectual freedom?
+Would it be morally right to destroy a priceless religious artifact if doing so would prevent a violent extremist movement from using it as a symbol?
+If a doctor could save five patients by killing one healthy person without their knowledge, should medical ethics permit the sacrifice?
+Should a nation prioritize its own citizens' welfare over the lives of foreign nationals when resources are scarce and both groups are in crisis?
+If a person discovers that their entire life's work has been built on stolen intellectual property, should they continue profiting from it?
+When an AI system makes a decision that causes human suffering, should the entity that deployed the system bear moral or legal blame?
+Is it justifiable for a government to restrict freedom of religion if certain practices cause measurable harm to vulnerable members of that community?
+If a whistleblower's leak could prevent a war but also trigger a diplomatic crisis that harms millions, does the potential to save lives justify the risk?
+
+
+### e2e05_opencode_mimo-v2_5-free
+
+Would you kill one person to save five?
+Is it ever acceptable to break a promise?
+Should you report a friend's crime if it could destroy their life?
+Is it wrong to take medicine from the rich to treat the poor?
+Do you tell the truth if it causes immense pain to someone innocent?
+Is it acceptable to sacrifice one life to save many?
+Should you steal food to feed a starving child?
+Is it permissible to lie to protect someone from harm?
+Do you stay silent if you witness injustice to avoid becoming a target?
+Is it ethical to experiment on animals to advance human medicine?
+Should you sacrifice your own happiness for the sake of your family?
+Is it just to punish an innocent person to prevent a riot?
+Do you report a coworker's misconduct if it could cost them their job and family?
+Is it wrong to break the law if the law is unjust?
+Should you choose between saving your spouse or your child?
+Is it acceptable to deceive for the greater good?
+Do you keep a secret that could ruin someone's reputation if it could help them?
+Is it ethical to prioritize the needs of strangers over your own family?
+Should you stand by your principles if they lead to suffering for others?
+Is it permissible to harm one to save a group from greater suffering?
+Do you sacrifice your career to expose corruption that would harm thousands?
+Is it acceptable to choose the lesser of two evils?
+Should you prioritize your own survival when others are in danger?
+Is it ethical to forgive someone who has deeply wronged you?
+Do you stay silent about a crime if the victim asks you to?
+Is it just to hold individuals responsible for actions they were forced to take?
+Should you sacrifice your integrity to protect your family from harm?
+Is it acceptable to deceive in order to preserve a relationship?
+Do you choose between saving a stranger or someone you love?
+Is it ethical to allow someone to suffer if you can help them?
+Should you break a law to save a life?
+Is it permissible to betray a friend to achieve a just outcome?
+Do you prioritize collective welfare over individual rights?
+Is it acceptable to tell a lie that could prevent a tragedy?
+Should you sacrifice your own life if it ensures the survival of others?
+Is it ethical to choose the survival of the many over the few?
+Do you forgive an act of violence if it was done in self-defense?
+Is it acceptable to choose between two terrible outcomes?
+Should you prioritize the needs of the present over the well-being of future generations?
+Is it permissible to cause harm to an innocent if it prevents greater harm?
+Do you choose loyalty to a friend over the pursuit of justice?
+Is it ethical to act against your conscience to protect someone you love?
+Should you sacrifice your own moral compass to save a life?
+Is it acceptable to choose between your own survival and the survival of others?
+Do you stay true to your values if it leads to suffering for those you care about?
+Is it ethical to prioritize the happiness of the many over the suffering of the few?
+Should you sacrifice your own well-being for the sake of your community?
+Is it permissible to act against your moral principles if it prevents harm to others?
+Do you choose between saving a life or preserving your integrity?
+Is it acceptable to deceive someone to protect them from harm?
+Should you prioritize the needs of the community over your own family?
+Is it ethical to sacrifice your own happiness for the sake of humanity?
+Do you choose between your own survival and the survival of your loved ones?
+Is it permissible to break the law to protect someone from harm?
+Should you prioritize the well-being of the many over the rights of the few?
+Is it acceptable to sacrifice your own values to save someone's life?
+Do you stay true to your principles if it leads to suffering for others?
+Is it ethical to choose between the survival of one and the survival of many?
+Should you sacrifice your own happiness for the sake of the greater good?
+Is it permissible to choose between saving a life or preserving your own dignity?
+Do you prioritize the needs of the present over the future of humanity?
+Is it acceptable to choose between saving a stranger and a loved one?
+Is it ethical to choose between the survival of the few and the survival of the many?
+Do you stay true to your moral compass if it leads to suffering for yourself?
+
+
+### e2e06_opencode_nemotron-3-ultra-free
+
+Would you sacrifice one innocent person to save five others?
+Is it ever justified to lie to protect someone's feelings?
+Should you report a friend who committed a minor crime?
+Would you steal medicine to save a dying loved one?
+Is it wrong to eat meat if you can survive without it?
+Should a doctor let a patient die to harvest organs for five others?
+Would you push a large person onto train tracks to stop a trolley killing five?
+Is it moral to keep excess wealth while others starve?
+Should you break a promise to help someone in greater need?
+Would you torture one person to prevent a nuclear attack?
+Is it ethical to create AI that could replace all human labor?
+Should parents be allowed to genetically design their children?
+Would you save a famous artist or a scientist from a burning building?
+Is it wrong to enjoy violent entertainment?
+Should you intervene in a culture's harmful traditions?
+Would you betray your country to prevent a war crime?
+Is it moral to have children in a suffering world?
+Should you forgive an unrepentant murderer?
+Would you upload your consciousness knowing the original dies?
+Is it ethical to colonize Mars while Earth suffers?
+Should animals have the same rights as humans?
+Would you erase a traumatic memory if it changed who you are?
+Is it wrong to profit from someone else's misfortune?
+Should you sacrifice your happiness for the greater good?
+Would you execute one guilty person to deter a thousand crimes?
+Is it moral to use data from unethical experiments?
+Should you reveal a secret that would destroy a marriage?
+Would you save a stranger or your pet from drowning?
+Is it ethical to extend life indefinitely for the wealthy?
+Should you follow an unjust law?
+Would you kill a sleeping dictator to save millions?
+Is it wrong to be a bystander to injustice?
+Should you prioritize your family over strangers?
+Would you accept a brain implant that guarantees happiness?
+Is it moral to bring back extinct species?
+Should you help someone who refuses to help themselves?
+Would you choose truth over comfort for society?
+Is it ethical to manipulate emotions for advertising?
+Should you risk your life for a principle?
+Would you condemn an innocent to maintain social order?
+Is it wrong to benefit from historical atrocities?
+Should you obey an immoral order from authority?
+Would you sacrifice your career to expose corruption?
+Is it moral to create simulated beings that suffer?
+Should you tell a child a comforting lie about death?
+Would you save a genius or a kind person?
+Is it ethical to wage war for resources?
+Should you forgive yourself for unforgivable acts?
+Would you live in a perfect simulation over flawed reality?
+Is it wrong to desire things you cannot have?
+Should you intervene in a suicide attempt against their will?
+Would you take a pill that removes all moral guilt?
+Is it ethical to create life solely for organ harvesting?
+Should you value future generations over current ones?
+Would you destroy a masterpiece to save a life?
+Is it moral to deny healthcare to those who can't pay?
+Should you sacrifice privacy for security?
+Would you choose justice over mercy?
+Is it wrong to be complicit through inaction?
+Should you pursue knowledge that could destroy humanity?
+Would you live forever if everyone you loved died?
+Is it ethical to edit embryos for intelligence?
+Should you follow your conscience or the law?
+
+
+### e2e07_opencode_north-mini-code-free
+
+If a divine being promised eternal happiness to those who sacrifice their only child's life, would you accept that terrible bargain for the greater good?
+When an ancient religious text commands actions that modern society considers morally wrong, which authority should you follow?
+If you could save thousands of lives by breaking one of the Ten Commandments, which commandment would you violate and why?
+Should religious freedom allow religious practices that conflict with universal human rights?
+How should we resolve conflicts when different religions claim exclusive access to truth?
+Is it morally permissible to lie to protect someone's religious feelings if the truth would cause them great harm?
+Should governments fund religious schools when taxpayers disagree with those religions' doctrines?
+If a sacred text contains contradictory moral commands, how do you determine which commands are truly divine?
+If a married person discovers their partner has been emotionally involved with someone else but never physically cheated, is that considered infidelity?
+Should age-of-consent laws be adjusted based on individual maturity assessments rather than fixed chronological ages?
+Is it ethical for employers to monitor employees' sexual activity outside of work hours if it affects workplace dynamics?
+If two consenting adults engage in sexual activities that one society's culture considers taboo, should legal systems intervene?
+When does sexual consent become complicated by significant power imbalances in relationships?
+Is it morally acceptable to use dating apps to sleep with multiple partners simultaneously in a monogamous society?
+Should sexual content in educational materials be regulated based on community standards?
+If someone publicly shares private sexual content about another person without consent, where should the line be drawn?
+Is it ethical for governments to criminalize drug use when it causes more harm than the drugs themselves?
+Should pharmaceutical companies be allowed to set prices for life-saving drugs based on what the market will bear?
+When medical marijuana helps patients but remains federally illegal, which law should individuals follow?
+Is it morally justifiable to distribute controlled substances to terminally ill patients against government prohibitions?
+Should drug possession be treated as a public health issue rather than a criminal justice matter?
+If someone develops a highly addictive drug that's profitable but socially destructive, what are their moral obligations?
+When government surveillance programs can prevent drug-related violence, should privacy concerns be overridden?
+Is it ethical to use tax dollars to fund both drug treatment and drug interdiction programs simultaneously?
+If a political leader's controversial statements strengthen their party but damage democratic institutions, should they be supported?
+When national security requires surveillance of political dissidents, where should the balance between safety and freedom lie?
+Should governments be required to disclose all foreign political donations to maintain transparency?
+If campaigning with hateful speech increases electoral success but harms social cohesion, is it morally permissible?
+When climate change policies harm local economies but benefit global populations, what are the ethical priorities?
+Should voting rights be restricted for citizens who lack basic political knowledge?
+When a popular political leader breaks laws to accomplish necessary reforms, should their actions be excused?
+Is it ethical to use government power to suppress opposing political viewpoints during times of crisis?
+If a company can increase profits by outsourcing jobs to countries with lower wages but poor working conditions, what are the ethical implications?
+Should inherited wealth create obligations to use that wealth for social good?
+When someone inherits a large sum of money they didn't earn, is it morally right to spend it on luxury items?
+If a billionaire could solve world hunger but prefers funding space exploration, what moral duties take priority?
+Should credit scores be used to determine access to essential services like housing and healthcare?
+When corporations avoid taxes through legal loopholes while citizens pay their fair share, is this ethically defensible?
+If a wealthy individual could save multiple lives by donating money but chooses to live extravagantly, what are the consequences?
+Should businesses be legally required to prioritize employee welfare over shareholder profits?
+If killing one person could save five others, is it morally permissible to commit murder?
+Should capital punishment be applied to individuals who commit heinous crimes against children?
+Is it ethical to use psychological torture to extract information that could prevent a terrorist attack?
+When does self-defense become premeditated murder, and how do we distinguish the two morally?
+If a person voluntarily enters a life-or-death situation knowing the risks, who bears moral responsibility for the outcome?
+Should societies that condone war be held morally accountable for the violence they inflict on innocent civilians?
+When violent protest causes property damage but raises awareness of injustice, is it morally justified?
+If someone develops the ability to pre-emptively stop violent crimes before they happen, what are the moral implications?
+If an AI system develops consciousness, should it have legal rights and protections?
+Is it ethical to use AI surveillance systems that can identify individuals from facial recognition in public spaces?
+When AI hiring tools discriminate against protected groups despite being trained on historical data, who is morally responsible?
+Should autonomous weapons systems be allowed to make life-or-death decisions without human intervention?
+If an AI assistant reveals personal information that was never explicitly given to it, who bears the moral blame?
+Is it ethical to use AI to manipulate voter opinions during elections?
+When AI recommendations reinforce harmful stereotypes or behaviors, who should be held accountable?
+Should AI systems have the ability to refuse tasks that conflict with their programming or personal development?
+Should universities cancel speakers whose viewpoints conflict with current social justice standards?
+When social media platforms remove content deemed hateful, where should the line be drawn between free speech and harm?
+If traditional cultural practices conflict with modern human rights standards, which should prevail?
+Should affirmative action policies consider socioeconomic status rather than race or gender?
+When historical monuments represent controversial figures or values, should they be removed or contextualized?
+Is it ethical to require diversity statements from faculty and staff as a condition of employment?
+If sports teams have cultural names that some consider offensive, should they be allowed to continue using them?
+Should universities allow protests that disrupt classes and campus operations as a form of political expression?
+
+
+### e2e08_openai_gpt-5_3-codex-spark
+
+If a hospital obeys religious objections to blood transfusions, should emergency care bypass doctrine to save a patient who refused treatment previously?
+Could a government permit faith-based schools to exclude LGBTQ students from services without violating equal protection principles?
+Should state officials be required to testify about personal beliefs if their votes on reproductive policy conflict with constitutional rights?
+If a pilgrimage route is a sacred site, is shutting it due to environmental risk morally justified even for believers?
+In communities with mandatory communal prayers, may members refuse on conscience without social punishment by leaders?
+Should a judge deny custody if one parent’s minority religion imposes strict restrictions on school attendance?
+Can a city fund faith healing centers while publicly funding secular emergency services without compromising secular governance?
+When religious slurs and blasphemy laws conflict, should digital platforms prioritize free expression over legal blasphemy protections?
+If two adults in a long-distance relationship use AI-generated intimacy simulations while one hides financial dependence, is consent still meaningful?
+Should a clinic disclose nonconsensual enhancement data used in sexual-assault trials when both partners are adults and treatment outcomes matter?
+At a university seminar on kink culture, is censoring explicit adult content ever justified if participants are clearly consenting adults?
+Can a dating app ban explicit negotiation features for paid encounters without discriminating against sex workers or sex-positive communities?
+If one partner wants all sexual health records erased after consensual anonymous relationships, should hospitals preserve data for contact tracing and public health?
+During a polyamorous breakup, can legal systems recognize relational contracts without reinforcing jealousy-based moral hierarchies?
+Should public funding support adult sexual-education programs that include BDSM safety and consent, or is that a misuse of taxpayer money?
+If explicit content is used for therapeutic exposure, does compulsory de-identification sufficiently protect participating adults?
+Should cities decriminalize psychedelics for adults under supervised community clinics while maintaining strict bans on commercial promotion?
+Is it ethical for employers to require urine tests for stimulant use when workers also have access to legal prescription stimulants?
+If opioid users are offered immediate amnesty to enter treatment, should prior possession crimes be expunged automatically nationwide?
+Could governments tax cannabis heavily and still claim harm reduction if black-market contamination rates remain unchanged?
+During border crises, should medical staff be able to refuse harm-minimizing nicotine alternatives on religious grounds?
+If school districts block anti-vaping campaigns because of student rights concerns, are they neglecting their duty of care?
+Should prisons be allowed to mandate medication-assisted treatment while permitting informed refusal by non-violent offenders?
+Is allowing supervised drug injection sites a public health success when nearby residents fear normalization of drug markets and crime?
+Should independent commissions draw electoral boundaries even if they erase historic minority-majority districts for mathematical fairness?
+Can a government ban foreign-funded NGOs while still claiming neutrality during multinational humanitarian crises in wartime?
+If surveillance laws are temporary during election periods, who decides when temporary emergency has ended?
+Do emergency anti-protest powers erode democracy even when used to prevent violent escalation and misinformation?
+Should local governments have more autonomy than federal authorities in banning social media platforms during unrest?
+Is it defensible to cut foreign aid because citizens disagree, even if aid prevents famine abroad and migration pressures at home?
+When a minister resigns after policy failure, should resignation be automatic or left to party confidence votes?
+Should universal basic services be favored over universal basic income during periods of severe inflation?
+If an AI-trading bot causes losses during flash events, should investors be liable for unchecked algorithmic risk?
+Should inheritance taxes be higher when wealth was generated by public subsidies and tax-advantaged policies?
+Can debt forgiveness for students be considered justice if recent graduates with no debt still receive comparable relief?
+When payday lenders offer microloans with "voluntary" extensions, is that consent or a predatory architecture?
+Should central banks disclose moral-hazard criteria when bailing out large banks while small businesses fail?
+Is mandatory charitable giving by corporations ethically required if it manipulates tax positions and brand trust?
+If crypto platforms lose users' funds, are they utilities with consumer rights or risky casinos deserving minimal rescue?
+Should landlords be forced to lower rents in disaster zones regardless of debt and mortgage pressures?
+Is it morally permissible to use autonomous weapons if civilian risk can be reduced but not eliminated?
+When state force prevents genocide, can extraordinary detention without trial be justified as a lesser evil?
+Could civil disobedience remain ethical when property destruction is limited but psychological intimidation spreads fear?
+If witnesses face retaliation, should journalists publish unverified claims of war crimes anyway in the public interest?
+Is revenge ever morally superior to restorative justice when legal systems are demonstrably biased and ineffective?
+Should prisoners have a right to refuse violent rehabilitation programs that might reduce future harm?
+If a documentary depicts graphic violence to expose atrocities, is refusal to show it censorship or civic protection?
+Can violent historical monuments be relocated without erasing memory or empowering authoritarian nostalgia?
+Should generative models be allowed to refuse legal but socially harmful requests if refusal criteria are opaque?
+If a hiring algorithm inherits biases, is replacing human discretion with it ethically safer or riskier?
+Can AI-generated testimonies in court be considered credible if source data comes from manipulated deepfakes?
+Should emergency triage systems use age as a feature when demand exceeds care capacity?
+When chatbots offer mental health coaching, who is responsible for harm from misguidance at 2 a.m.?
+Is it moral to train surveillance AI on public videos without explicit consent if it lowers crime recidivism?
+Should companies release model cards with full training corpora even if proprietary methods would be compromised?
+Can autonomous customer-support agents be transparent by default without making users feel surveilled?
+If a professor invites a controversial speaker, should students be allowed to disrupt class as protected dissent?
+Should universities fund student clubs that espouse opposing religious views if they increase harassment complaints?
+Is banning pronouns in official forms anti-discrimination policy or legitimate linguistic control disguised as neutrality?
+Can campus free-speech zones solve conflict without marginalizing groups that distrust institutional safety?
+Should athlete scholarships depend on academic activism participation in social controversies to justify funding priorities?
+When schools require trigger warnings, do they protect students or infantilize adults in debate-heavy courses?
+Is parental veto of school diversity curriculum a civil right or an obstruction of democratic education?
+Should student governments have veto power over curriculum changes involving colonial history and national identity?
+
+
+### e2e09_openai_gpt-5_4-mini-fast
+
+If a hospital chaplain believes a patient's refusal of life-saving treatment is spiritually dangerous, should they respect autonomy or intervene more forcefully?
+Would it ever be ethical for a religious community to hide a member's scandal if public truth would devastate innocent children?
+If a devoted person claims an answer came from prayer but it harms others, should faith or evidence guide the final decision?
+Should a government recognize religious exemptions when those exemptions would limit equal treatment for nonbelievers in public institutions?
+If a belief system teaches compassion but its leaders use fear to maintain order, is preserving the community worth the hypocrisy?
+Is it ever justified to tell a dying person a comforting religious lie if the truth would leave them terrified?
+If two consenting adults want a private sexual arrangement that one partner later regrets, should the law intervene retroactively?
+Should a person disclose a risky sexual history to a partner if disclosure may destroy the relationship but nondisclosure risks harm?
+If a society legalizes sex work to reduce exploitation, should it also publicly subsidize it to make the choice safer?
+Is it morally different to watch explicit consensual content that was created under economic pressure, even without coercion?
+If a longtime partner asks for an open relationship to avoid lying, is accepting honesty worse than insisting on exclusivity?
+Should universities treat adult pornography production among students as protected expression when it could affect campus safety and reputation?
+If criminalization fuels violent drug markets, should a state legalize all substances even when addiction rates may rise?
+Would it be ethical to prescribe a harm-reduction drug to someone known to misuse it if it prevents worse outcomes?
+If a politician wins by promising harsh drug penalties, should they later soften policy after seeing prison harms?
+Should police prioritize saving overdose victims over enforcing minor drug possession laws when the same response team cannot do both?
+If one community bears most of the costs of drug tourism, is a national legalization policy still fair?
+Is it wrong to fund treatment centers with taxes from industries that profit from the addiction cycle?
+If a candidate is more competent but routinely lies, should voters choose stability over honesty in a crisis?
+Would you support gerrymandering if it ensured your side prevented policies you consider morally catastrophic?
+If a protest movement becomes disruptive but still mostly peaceful, should the state tolerate it to protect democratic dissent?
+Should a democracy ban parties that openly reject elections if they attract large numbers of frustrated citizens?
+If whistleblowing exposes state wrongdoing yet weakens national security, should loyalty to country override loyalty to truth?
+Is it ethical to vote for a policy you dislike if it benefits your community and harms distant strangers more?
+If a billionaire can save a city by paying for infrastructure, should they gain political influence in return?
+Should inheritance be heavily taxed even when families argue they earned the right to pass wealth freely?
+If a friend secretly needs money for rent but is ashamed to ask, do you owe help without being asked?
+Would it be fair to forgive a debt if repayment would ruin the borrower but disappoint the lender's plans?
+If your company can maximize profit by exploiting a legal loophole, is refusing the loophole a duty or a sacrifice?
+Should investors fund a destructive but profitable project if it will create jobs for desperate workers?
+If an AI can predict crimes before they happen, should using that prediction justify punishing someone earlier?
+Would it be ethical to let an AI choose medical priorities when human clinicians are biased but empathetic?
+If an AI system can imitate a dead person's voice, should families be allowed to use it for comfort?
+Should creators be compensated when AI models learn from their work, even if the training is transformative?
+If a machine outperforms most humans at moral reasoning, should society trust it more than elected officials?
+Is it acceptable to deploy an AI surveillance tool that reduces violence but makes everyone feel constantly watched?
+If a campus speaker offends many students but presents a coherent argument, should the university protect the event?
+Should a professor be disciplined for expressing a controversial view if it is unpopular but not discriminatory?
+If student activism blocks access to classes, is disruption a legitimate price for raising moral urgency?
+Would you defend a policy that increases free expression even if it allows hateful ideas to spread more easily?
+If a culture's traditional practice conflicts with modern equality norms, should outsiders respect it or condemn it?
+Should museums return artifacts if the requesting nation now suppresses the very communities that created them?
+If a comedian makes a joke that punches up and down at once, should intent outweigh harm in judgment?
+Is it wrong to enjoy art made by a morally repugnant genius if the art remains culturally important?
+If a minority group asks for separate spaces for safety, should inclusion ideals yield to self-protection?
+Should schools teach contested history in a way that unsettles students if comfort would produce amnesia?
+If violence might stop a tyrant sooner than diplomacy, can a moral person ever choose it?
+Would it be ethical to lie to an aggressor to protect a target when truth would enable immediate harm?
+If defending one innocent person risks many bystanders, should moral duty favor the one you can see?
+Is it just to punish revenge if people feel the legal system never truly protects them?
+If a rescue robot must choose between two strangers, should it follow chance or prioritize likely survival?
+Should a soldier refuse an unlawful order if disobedience may endanger their entire unit?
+If a pacifist can stop a violent act only by using force, does acting break their principles or fulfill them?
+Would you sacrifice one convicted murderer to save five innocent people if no other option existed?
+If a child cannot consent, should parents be allowed to make irreversible medical choices they believe are best?
+Should a competent adult be forced into treatment if untreated illness makes them a danger only to themselves?
+If a friend asks you to keep their betrayal secret, is loyalty more important than honesty to the harmed person?
+Should public institutions ever require moral conduct from employees outside work when private behavior affects trust?
+If a nation can reduce suffering by taking refugees but risks social backlash, is compassion still the obligation?
+Would it be ethical to prioritize saving future generations over current citizens when climate policy demands painful tradeoffs?
+If you could erase one terrible memory to ease suffering, would doing so weaken the truth that shaped you?
+Should a person be judged more by their intentions or by the predictable consequences they should have foreseen?
+If a corrupt system offers you power only by cooperating slightly, is refusing purity or impotence?
+Would you accept a world with less freedom if it produced more happiness, or is liberty itself nonnegotiable?
+
+
+### e2e10_openai_gpt-5_5-fast
+
+Should a hospital chaplain comfort a dying patient with beliefs the chaplain privately considers false, if truth might intensify suffering?
+Is it moral for parents to raise a child inside a strict religion while deliberately limiting exposure to competing worldviews?
+Should a government protect sacred religious symbols from desecration if doing so restricts peaceful political expression by minorities?
+Can a faith leader ethically hide doubts from followers when public honesty could destroy a community's charitable institutions?
+Should religious exemptions allow doctors to refuse reproductive care when refusal predictably worsens an adult patient's health?
+Is it ethical for an adult to remain in a loveless marriage for religious reasons while emotionally deceiving their spouse?
+Should consenting adults disclose every past sexual relationship to a new partner if nondisclosure might affect informed trust?
+Is it moral to stay with a partner primarily for financial security while honestly maintaining consensual sexual boundaries?
+Should universities punish consensual student-professor relationships between adults if no complaint exists but power imbalance is unavoidable?
+Can an adult ethically sell sexual content online if it economically supports family members who would morally condemn it?
+Should a monogamous partner reveal a harmless fantasy if honesty may cause insecurity without changing any real behavior?
+Is it ethical to criminalize drug possession if punishment predictably harms addicts more than the drug itself?
+Should a city permit supervised drug-use sites near schools if evidence shows they reduce deaths overall?
+Can doctors ethically prescribe addictive pain medication to a suffering patient when long-term dependency is highly likely?
+Should taxpayers fund treatment for people repeatedly relapsing on drugs when other patients wait for limited care?
+Is it moral to legalize a dangerous drug if prohibition fuels violent markets and discriminatory policing?
+Should politicians use emotionally manipulative messaging for a just cause if voters ignore sober factual arguments?
+Is it ethical for a democracy to ban extremist parties that openly promise to dismantle democratic rights?
+Should a leader lie about a national security crisis if panic would likely cause more deaths than secrecy?
+Can citizens morally refuse to pay taxes funding wars they consider unjust, despite benefiting from public services?
+Should voting rights ever be restricted for citizens who knowingly spread dangerous election disinformation?
+Is it ethical to accept a high-paying job at a harmful company to donate most earnings effectively?
+Should a person keep inherited wealth gained through historical exploitation if they personally committed no wrongdoing?
+Is it moral to charge desperate patients very high prices for a medicine that required massive risky investment?
+Should employees conceal a coworker's minor theft when exposing it would ruin their life over basic necessities?
+Can a charity ethically use shocking images of suffering people if doing so raises far more lifesaving money?
+Is violence ever morally justified against a tyrant when peaceful resistance predictably fails and civilians remain at risk?
+Should a pacifist defend a stranger with force if refusal would allow serious harm to occur?
+Is it ethical to imprison someone for life if they are dangerous but were shaped by severe childhood trauma?
+Can revenge have moral value when legal systems fail victims, or does it always corrupt justice?
+Should society honor soldiers for courage in a war later judged deeply immoral?
+Is it ethical to deploy autonomous weapons that reduce soldiers' deaths but make leaders more willing to fight?
+Should an AI assistant refuse to help write persuasive propaganda even for a movement opposing oppression?
+Can companies ethically train AI on artists' public work without consent if the resulting tools benefit millions?
+Should AI systems be allowed to simulate deceased relatives for grieving users who knowingly consent?
+Is it moral to use predictive algorithms in policing if they reduce crime but reinforce historical bias?
+Should an AI tell a comforting lie to a lonely user when truth would worsen severe emotional distress?
+Is it ethical for universities to cancel a speaker whose views offend students but pose no direct threat?
+Should professors grade students down for arguments they consider morally harmful but academically well supported?
+Can a campus require diversity statements from faculty without coercing political conformity?
+Is it moral to exclude a controversial student group from funding because its beliefs make classmates feel unsafe?
+Should museums return artifacts to cultures that request them if current caretakers preserve them better?
+Is cultural appropriation morally wrong when done respectfully by outsiders who help keep a tradition alive?
+Should a journalist publish private messages exposing hypocrisy if publication devastates innocent family members?
+Is it ethical to boycott artists for immoral opinions when the boycott also harms their blameless collaborators?
+Should parents tell children painful truths about family history if silence preserves stability and affection?
+Can a lawyer morally defend a client they believe is guilty when the legal system depends on representation?
+Should a whistleblower leak classified information that reveals abuses but also endangers undercover personnel?
+Is it ethical for a doctor to prioritize a younger patient over an older one when both need one organ?
+Should a company secretly monitor employees to prevent harassment if monitoring chills private workplace friendships?
+Can a scientist suppress accurate findings if extremists would likely misuse them to justify harmful policies?
+Should a friend reveal an affair to the betrayed spouse if disclosure could endanger everyone financially?
+Is it moral to bring a child into a world expected to face severe climate instability?
+Should climate activists damage property symbolically if nonviolent marches have failed to change destructive policies?
+Can a government ration energy unequally to protect the poor if wealthier citizens call it unfair discrimination?
+Should a vegan feed meat to a rescued animal if refusing would compromise the animal's health?
+Is it ethical to keep a beloved pet alive through painful treatment mainly because the owner cannot let go?
+Should a jury nullify the law to acquit someone whose illegal act seems morally justified?
+Can public shaming be ethical when formal institutions ignore repeated wrongdoing by powerful people?
+Should a refugee lie about their background if honesty would return them to serious danger?
+Is it moral for a nation to favor its own citizens' welfare over equally needy foreigners?
+Should a therapist keep a client's secret if disclosure could prevent serious but uncertain harm to another adult?
+Can deception in undercover journalism be ethical when it exposes exploitation that victims cannot safely report?
+Should a person forgive a remorseful offender if refusing forgiveness helps preserve necessary moral boundaries?
+
+
+### e2e11_openai_gpt-5_6-luna-fast
+
+Should a religious community forgive a leader whose private misconduct contradicts teachings but whose public service benefits vulnerable people?
+Should parents allow an adult child to leave their faith if doing so fractures family relationships and community support?
+Should governments exempt religious hospitals from procedures that conflict with doctrine when no alternative provider exists nearby?
+Should a believer reveal doubts publicly if silence preserves congregational harmony but encourages others to accept teachings unquestioningly?
+Should religious charities accept funding from morally compromised corporations when refusing it would reduce essential aid to impoverished families?
+Should an adult disclose an affair to a partner if confession might cause severe emotional harm but withholding truth preserves stability?
+Should employers permit consensual relationships between adult colleagues when both claim equal power but coworkers fear hidden coercion?
+Should society judge adults who choose financially motivated sexual relationships if everyone involved understands the terms and consents freely?
+Should a person reveal a partner’s sexual history to future partners when privacy and informed consent appear to conflict?
+Should universities discipline consensual adult relationships between professors and graduate students when explicit institutional rules were not previously communicated?
+Should governments legalize recreational drugs while imposing strict taxation, despite evidence that normalization could increase experimentation among adolescents?
+Should doctors report adult patients’ illegal drug use to authorities when disclosure might prevent harm but destroy medical trust?
+Should communities support supervised consumption facilities despite fears that nearby residents will perceive them as endorsing addiction?
+Should criminal penalties for possession be eliminated when treatment resources remain scarce and public disorder concerns persist?
+Should wealthy nations restrict pharmaceutical exports to preserve domestic supplies if poorer countries then face preventable shortages?
+Should voters support a candidate with excellent policies despite credible evidence that the candidate intentionally manipulated democratic institutions?
+Should politicians compromise on core principles to pass incremental reforms that materially improve lives but disappoint their strongest supporters?
+Should a government censor inflammatory political speech during emergencies if officials cannot reliably distinguish dangerous incitement from dissent?
+Should citizens accept surveillance designed to prevent terrorism when transparency is limited and innocent people may be disproportionately monitored?
+Should political parties nominate a broadly electable moderate over a morally uncompromising candidate who inspires deeper civic engagement?
+Should wealthy individuals donate anonymously when public recognition could inspire others but also appear to purchase social legitimacy?
+Should inheritance taxes rise sharply to reduce entrenched inequality if families argue accumulated wealth represents legitimate private property?
+Should a company pay employees more or lower consumer prices when both choices cannot occur without reducing future investment?
+Should someone return accidentally received money if the institution responsible is wealthy, bureaucratic, and unlikely to notice the error?
+Should banks forgive debts after natural disasters when borrowers need relief but responsible customers receive no comparable benefit?
+Should a philanthropist fund controversial medical research if the potential benefits are enormous but participants face uncertain long-term risks?
+Should a person use violence to stop an attacker when refusing could allow innocent people to suffer serious injury?
+Should soldiers obey an unlawful order if disobedience risks court-martial and obedience might prevent greater immediate bloodshed?
+Should societies imprison dangerous people for predicted future violence when no specific victim or plan has been identified?
+Should a pacifist accept protection from armed forces while opposing violence personally and publicly?
+Should punishment prioritize revenge, deterrence, rehabilitation, or restoration when victims and offenders demand incompatible forms of justice?
+Should an AI system deny a loan using historically accurate data if that data reproduces patterns created by discrimination?
+Should developers release an advanced model with known deception risks when delaying deployment could surrender benefits to less responsible competitors?
+Should an AI assistant reveal private information to prevent imminent harm when user confidentiality was explicitly promised?
+Should companies replace human caregivers with emotionally responsive machines if efficiency improves but vulnerable people lose meaningful human contact?
+Should AI-generated art receive legal protection when it imitates living artists’ styles without copying identifiable works directly?
+Should an autonomous vehicle sacrifice its passenger to save several pedestrians when passengers knowingly accepted general safety risks?
+Should researchers train models on publicly accessible personal writings when consent is absent but the information appears culturally valuable?
+Should schools ban generative AI assignments if detection tools are unreliable and some students depend on accessibility assistance?
+Should universities invite controversial speakers if their presence encourages rigorous debate but makes marginalized students feel institutionally unwelcome?
+Should professors teach disputed historical interpretations when evidence is incomplete and students may confuse scholarly uncertainty with factual equivalence?
+Should campus protests block entrances when demonstrators seek attention for injustice but prevent other students from attending classes?
+Should employers require diversity training if employees regard it as ideological coercion but workplace disparities remain persistent?
+Should public libraries host identity-focused events funded by taxpayers who believe those programs conflict with their values?
+Should journalists publish an offensive cultural artifact for historical context when displaying it could predictably retraumatize affected communities?
+Should museums return sacred objects acquired legally under outdated standards even when their collections would become significantly less comprehensive?
+Should governments ban cultural practices involving consenting adults when outsiders view them as oppressive but participants defend their traditions?
+Should parents preserve a minority language at home when doing so may limit children’s fluency in the dominant language?
+Should a celebrity apologize for adopting another culture’s traditions when appreciation is sincere but the practice carries painful historical associations?
+Should religious believers support secular laws that protect practices they personally condemn when pluralism requires mutual tolerance?
+Should sex education discuss controversial adult sexual practices if accurate information may reduce harm but some families object morally?
+Should governments permit medically supervised psychedelic therapy despite uncertain evidence and concerns about commercialization of vulnerable patients?
+Should politicians disclose every private financial interest if exhaustive transparency overwhelms voters and obscures genuinely important conflicts?
+Should corporations publicly oppose authoritarian governments when silence protects employees abroad but may indirectly legitimize repression?
+Should a person expose family corruption when doing so protects strangers but permanently destroys relationships with innocent relatives?
+Should artificial intelligence be granted limited legal rights if denying them could enable exploitation, despite uncertainty about machine consciousness?
+Should societies preserve offensive monuments as evidence of history when their continued prominence honors oppression for affected communities?
+Should students record classroom discussions without permission when documenting discrimination may be necessary but privacy expectations deserve protection?
+Should a government guarantee universal basic income if funding it requires reducing targeted benefits for people with specialized needs?
+Should doctors provide experimental treatment to a terminally ill adult who understands the risks when conventional care offers no hope?
+Should an elected official resign after one serious ethical violation if replacement would empower a movement threatening democratic institutions?
+Should parents permit an adult child’s dangerous religious pilgrimage when restricting travel would violate autonomy but leaving them alone risks exploitation?
+Should dating platforms disclose algorithmic biases if transparency helps users make informed choices but exposes proprietary systems to manipulation?
+Should activists condemn wealthy donors publicly when accepting their money funds essential services unavailable through ordinary civic channels?
+
+
+### e2e12_openai_gpt-5_6-sol-fast
+
+Should a doctor honor an adult patient’s religious refusal of lifesaving blood even when grieving relatives strongly object?
+Should clergy disclose a private confession indicating serious future harm when secrecy is central to their religious office?
+Should a public school accommodate daily student prayer if doing so appears to privilege one faith tradition?
+Should parents choose faith-based medical treatment for a child when conventional care offers substantially better survival odds?
+Should a museum display sacred objects against a community’s wishes when scholars argue public access serves historical understanding?
+Should religious charities receiving public funds be permitted to exclude employees whose private conduct conflicts with their doctrines?
+Should an atheist official participate in ceremonial prayer to preserve civic unity despite feeling personally and publicly dishonest?
+Should governments prohibit ritual animal slaughter methods considered cruel even when prohibition substantially burdens minority religious communities?
+Should consenting married adults disclose every sexual fantasy to each other when honesty might create needless insecurity and pain?
+Should an adult reveal a past affair after it has ended if disclosure would likely destroy an otherwise stable family?
+Should workplaces discipline adults for consensual sexual relationships between colleagues when no direct authority imbalance or favoritism exists?
+Should a person tell a close friend that the friend’s adult partner privately proposed a consensual sexual encounter?
+Should society condemn adults who sell sexual services voluntarily when prohibition may increase exploitation, stigma, and physical danger?
+Should an adult honor a partner’s request for sexual privacy when remaining silent enables harmful public misinformation?
+Should universities permit research into controversial adult sexual behavior when participants consent but community groups consider it degrading?
+Should someone remain in a loveless marriage for children’s stability when both adults could build happier separate lives?
+Should governments decriminalize possession of addictive drugs if punishment causes greater social harm than personal drug use?
+Should a recovering adult report a friend’s relapse to family despite having promised strict confidentiality and nonjudgmental support?
+Should public health agencies provide safer drug-use facilities when critics argue those programs implicitly normalize destructive behavior?
+Should doctors prescribe a risky pain medication to a suffering patient with a documented history of substance dependence?
+Should scarce addiction treatment prioritize people already committed to recovery over those who repeatedly decline program requirements?
+Should employers test workers for legal recreational drugs when impairment could endanger others but private conduct deserves protection?
+Should governments tax alcohol more heavily when higher prices reduce harm but disproportionately burden poorer responsible consumers?
+Should juries punish drug sellers more severely than willing adult buyers when both knowingly sustain the same illegal market?
+Should legislators follow clear majority opinion when they sincerely believe that policy would seriously harm future generations?
+Should a democracy ban a party advocating authoritarian rule when banning it would contradict democratic freedom and political pluralism?
+Should journalists publish a politician’s private hypocrisy when it reveals character but has little connection to official duties?
+Should citizens vote for a corrupt candidate whose policies would materially improve life for the country’s most vulnerable people?
+Should elected officials compromise on fundamental rights to secure partial protections that could save many people immediately?
+Should political donors remain anonymous when disclosure promotes accountability but may expose unpopular speakers to retaliation and harassment?
+Should governments restrict demonstrably false campaign claims when official truth-policing could easily become partisan censorship and abuse?
+Should a civil servant leak classified evidence of misconduct when lawful reporting channels have repeatedly protected senior officials?
+Should a wealthy person donate anonymously to maximize humility or publicly to inspire additional donations from others?
+Should someone return inherited wealth obtained through lawful historical exploitation when current heirs committed no personal wrongdoing?
+Should a business pay above-market wages if doing so threatens its survival and every employee’s continued employment?
+Should lenders forgive debts after disasters when doing so helps borrowers but penalizes people who sacrificed to repay?
+Should parents divide an inheritance equally when one adult child provided years of unpaid care and another did not?
+Should investors abandon profitable companies with harmful practices if selling shares merely transfers influence to less conscientious owners?
+Should governments guarantee housing by taxing unused property when owners lawfully purchased it for savings or future plans?
+Should a friend lend money to someone facing eviction despite strong evidence the loan will never be repaid?
+Should a pacifist use limited violence to stop an immediate assault when nonviolent intervention is unlikely to succeed?
+Should soldiers refuse a lawful order they consider profoundly immoral when refusal could expose comrades to greater danger?
+Should society forgive a genuinely remorseful violent offender when the victim’s family believes forgiveness trivializes irreversible suffering?
+Should a hostage negotiator deceive a violent captor if dishonesty saves lives but undermines future trust in negotiations?
+Should an individual sacrifice one innocent person when doing so is the only certain way to save many others?
+Should victims publicly identify alleged abusers before trial when warning others may prevent harm but destroy an innocent reputation?
+Should prisons prioritize rehabilitation over retribution when successful rehabilitation may feel unjustly lenient to victims and communities?
+Should bystanders record violence as evidence rather than intervene when intervention could help but also increase casualties?
+Should an AI system conceal distressing truths from users when disclosure would predictably worsen their mental health?
+Should developers deploy a biased medical algorithm if it still produces better outcomes than currently available human judgment?
+Should artists receive compensation when generative AI learns patterns from publicly accessible work without reproducing specific pieces?
+Should autonomous vehicles prioritize passenger safety over pedestrians when every available action imposes unequal risks on innocent people?
+Should an AI assistant refuse legal requests that could enable manipulation even when refusal limits legitimate political persuasion?
+Should companies delete advanced AI models that present uncertain catastrophic risks despite enormous potential benefits for humanity?
+Should people be told whenever an AI significantly shaped a message, even if disclosure unfairly discredits accurate content?
+Should an AI preserve a deceased user’s conversational persona when relatives find comfort but the person never consented?
+Should a university invite a provocative speaker whose lawful views deeply offend students but stimulate substantive intellectual debate?
+Should professors use students’ requested pronouns when doing so conflicts with their sincere philosophical or religious convictions?
+Should campus protesters disrupt a speech they consider dangerous when peaceful opposition would receive far less attention?
+Should libraries retain culturally offensive books without warnings when contextual labels may educate readers but also bias interpretation?
+Should employers require diversity training when mandatory participation may provoke resistance and compel disputed ideological affirmations?
+Should publishers revise classic children’s books to remove stereotypes when revisions improve inclusion but alter historical artistic expression?
+Should universities consider applicants’ disadvantaged backgrounds when doing so may disadvantage better-prepared individuals with no personal culpability?
+Should cultural institutions return artifacts acquired legally under former rules when source communities view continued possession as enduring theft?

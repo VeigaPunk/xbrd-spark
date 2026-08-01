@@ -1,0 +1,3 @@
+WALL=https://litter.catbox.moe/l92ld1.txt
+REPORT=https://litter.catbox.moe/25sej1.md
+JSON=https://litter.catbox.moe/a3sswv.json

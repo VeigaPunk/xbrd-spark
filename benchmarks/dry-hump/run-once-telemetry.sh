@@ -25,7 +25,9 @@ for d in "${DOMAINS[@]}"; do
   mkdir -p "$ROOT/$d"
   (
     DS=$(date +%s.%N)
-    sekhmet swarm --direct --no-keep -j 8 --timeout 180 \
+    # Keep namespaces until after aggregation so result.json token parse works.
+    # ROOT is always rm -rf'd by the EXIT trap (tmpfs-safe).
+    sekhmet swarm --direct -j 8 --timeout 180 \
       --tasks-file "$HERE/domains/$d/tasks.txt" \
       --root "$ROOT/$d" \
       > "$ROOT/$d/ndjson.out" \
@@ -73,10 +75,17 @@ for d in "${DOMAINS[@]}"; do
   DTOK_N=0
   while IFS= read -r rf; do
     [[ -z "$rf" ]] && continue
-    text=$(jq -r '(.stderr // "") + "\n" + (.stdout // "")' "$rf" 2>/dev/null || true)
-    # shellcheck disable=SC2001
-    tok=$(printf '%s\n' "$text" | tr -d '\r' | sed -n 's/.*[Tt]okens used[^0-9]*\([0-9,][0-9,]*\).*/\1/p' | head -1 | tr -d ',')
-    if [[ -n "${tok:-}" ]]; then
+    # Prefer structured field from sekhmet finalize (usage_tokens), then log scrape.
+    tok=$(jq -r '.usage_tokens // empty' "$rf" 2>/dev/null || true)
+    if [[ -z "${tok:-}" || "$tok" == "null" ]]; then
+      text=$(jq -r '(.stderr // "") + "\n" + (.stdout // "")' "$rf" 2>/dev/null || true)
+      # shellcheck disable=SC2001
+      tok=$(printf '%s\n' "$text" | tr -d '\r' | sed -n \
+        -e 's/.*[Tt]okens used[^0-9]*\([0-9,][0-9,]*\).*/\1/p' \
+        -e 's/.*total_tokens[^0-9]*\([0-9,][0-9,]*\).*/\1/p' \
+        | head -1 | tr -d ',')
+    fi
+    if [[ -n "${tok:-}" && "$tok" != "null" ]]; then
       echo "$tok" >> "$TOKENS_FILE"
       DTOK_SUM=$((DTOK_SUM + tok))
       DTOK_N=$((DTOK_N + 1))

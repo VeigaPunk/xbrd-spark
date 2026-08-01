@@ -83,7 +83,7 @@ mkdir -p benchmarks/dry-hump/telemetry-12x/runs/rNN_label
   'provider/model-label'
 ```
 
-`run-once-telemetry.sh` is **bash + jq only** (no Python). It always `rm -rf` the temp `--root` tree on exit so large Titanium namespaces do not exhaust `/tmp` (disk quota / tmpfs fill will break `cargo test` and later swarms).
+`run-once-telemetry.sh` is **bash + jq only** (no Python). Swarms keep namespaces until token aggregation (reads `result.json` / `usage_tokens`), then the EXIT trap always `rm -rf`s the temp root so tmpfs is not exhausted.
 
 Recorded summaries live under `telemetry-12x/runs/*/summary.json` (compact; live codex homes stay off-tree).
 

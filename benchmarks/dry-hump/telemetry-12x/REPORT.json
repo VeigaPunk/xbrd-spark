@@ -1,7 +1,6 @@
 {
-  "campaign": "dry-hump-12x-opencode-models+deepseek-v4-redo",
-  "note": "Sekhmet substrate always fires gpt-5.3-codex-spark via Codex Titanium; OpenCode model is the orchestrator that shells the 8x8 swarm. Disk-quota failures re-run as *b with --no-keep cleanup.",
-  "runs": 12,
+  "campaign": "dry-hump-12x-opencode-models",
+  "runs": 18,
   "rows": [
     {
       "run_id": "r01_opencode_big-pickle",
@@ -13,7 +12,7 @@
       "sekhmet_tokens": 215835,
       "opencode_wall_s": 29.866,
       "opencode_tokens": 18531.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -26,7 +25,20 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 31.106,
       "opencode_tokens": 28980.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r02_opencode_deepseek-v4-flash-free",
+      "model": "opencode/deepseek-v4-flash-free",
+      "sekhmet_wall_s": 18.549,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 189486,
+      "opencode_wall_s": 29.362,
+      "opencode_tokens": 30008.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -39,20 +51,33 @@
       "sekhmet_tokens": 222500,
       "opencode_wall_s": 74.383,
       "opencode_tokens": 39911.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
       "run_id": "r04b_opencode_ling-3_0-flash-free",
       "model": "opencode/ling-3.0-flash-free",
-      "sekhmet_wall_s": 22.17,
+      "sekhmet_wall_s": 22.170,
       "ok": 64,
       "fail": 0,
       "timeout": 0,
       "sekhmet_tokens": 0,
       "opencode_wall_s": 28.02,
       "opencode_tokens": 30042.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r04_opencode_ling-3_0-flash-free",
+      "model": "opencode/ling-3.0-flash-free",
+      "sekhmet_wall_s": 0.014,
+      "ok": 0,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 6.986,
+      "opencode_tokens": 30263.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -65,7 +90,20 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 30.695,
       "opencode_tokens": 29913.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r05_opencode_mimo-v2_5-free",
+      "model": "opencode/mimo-v2.5-free",
+      "sekhmet_wall_s": 0.012,
+      "ok": 0,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 12.449,
+      "opencode_tokens": 40575.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -78,33 +116,72 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 33.664,
       "opencode_tokens": 30207.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r06_opencode_nemotron-3-ultra-free",
+      "model": "opencode/nemotron-3-ultra-free",
+      "sekhmet_wall_s": 0.012,
+      "ok": 0,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 24.13,
+      "opencode_tokens": 31246.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
       "run_id": "r07b_opencode_north-mini-code-free",
       "model": "opencode/north-mini-code-free",
-      "sekhmet_wall_s": 22.95,
+      "sekhmet_wall_s": 22.950,
       "ok": 64,
       "fail": 0,
       "timeout": 0,
       "sekhmet_tokens": 0,
       "opencode_wall_s": 39.684,
       "opencode_tokens": 24495.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r07_opencode_north-mini-code-free",
+      "model": "opencode/north-mini-code-free",
+      "sekhmet_wall_s": 0.011,
+      "ok": 0,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 23.383,
+      "opencode_tokens": 24875.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
       "run_id": "r08b_openai_gpt-5_3-codex-spark",
       "model": "openai/gpt-5.3-codex-spark",
-      "sekhmet_wall_s": 20.99,
+      "sekhmet_wall_s": 20.990,
       "ok": 64,
       "fail": 0,
       "timeout": 0,
       "sekhmet_tokens": 0,
       "opencode_wall_s": 24.591,
       "opencode_tokens": 15232.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
+      "opencode_exit": 0
+    },
+    {
+      "run_id": "r08_openai_gpt-5_3-codex-spark",
+      "model": "openai/gpt-5.3-codex-spark",
+      "sekhmet_wall_s": 22.090,
+      "ok": 64,
+      "fail": 0,
+      "timeout": 0,
+      "sekhmet_tokens": 0,
+      "opencode_wall_s": 10.766,
+      "opencode_tokens": 43136.0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -117,7 +194,7 @@
       "sekhmet_tokens": 219107,
       "opencode_wall_s": 57.951,
       "opencode_tokens": 101936.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -130,7 +207,7 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 34.607,
       "opencode_tokens": 23338.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -143,7 +220,7 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 49.305,
       "opencode_tokens": 59571.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     },
     {
@@ -156,16 +233,15 @@
       "sekhmet_tokens": 0,
       "opencode_wall_s": 41.633,
       "opencode_tokens": 30925.0,
-      "opencode_cost": 0,
+      "opencode_cost": 0.0,
       "opencode_exit": 0
     }
   ],
   "totals": {
-    "sekhmet_ok": 768,
-    "sekhmet_tokens": 657442,
-    "opencode_tokens": 433081.0,
+    "sekhmet_ok": 896,
+    "sekhmet_tokens": 846928,
+    "opencode_tokens": 633184,
     "opencode_cost": 0,
-    "sekhmet_wall_sum": 269.658,
-    "perfect_64": 12
+    "sekhmet_wall_sum": 310.34600000000006
   }
 }

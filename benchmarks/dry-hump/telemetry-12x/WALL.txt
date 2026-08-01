@@ -1,0 +1,142 @@
+========================================================================
+SEKHMET dry-hump — 12× OpenCode models × 64 concurrent Titanium sparks
+Repo: https://github.com/VeigaPunk/xbrd-spark
+Path: benchmarks/dry-hump/
+========================================================================
+
+# dry-hump 12× OpenCode orchestrators × Sekhmet 64-swarm
+
+Each row: **OpenCode model** dispatches the dry-hump harness; **Sekhmet** runs 8 domains × 8 concurrent **Codex Titanium** sparks (`gpt-5.3-codex-spark`).
+
+| # | model (opencode) | sekhmet wall s | ok/64 | sekhmet tokens | opencode wall s | opencode tokens | cost | run_id |
+|--:|------------------|---------------:|------:|---------------:|----------------:|----------------:|-----:|--------|
+| 1 | `opencode/big-pickle` | 24.299 | 64/64 | 215835 | 29.866 | 18531 | 0 | `r01_opencode_big-pickle` |
+| 2 | `opencode/deepseek-v4-flash-free` | 23.819 | 64/64 | 0 | 31.106 | 28980 | 0 | `r02b_opencode_deepseek-v4-flash-free` |
+| 3 | `opencode/laguna-s-2.1-free` | 25.094 | 64/64 | 222500 | 74.383 | 39911 | 0 | `r03_opencode_laguna-s-2_1-free` |
+| 4 | `opencode/ling-3.0-flash-free` | 22.17 | 64/64 | 0 | 28.02 | 30042 | 0 | `r04b_opencode_ling-3_0-flash-free` |
+| 5 | `opencode/mimo-v2.5-free` | 23.639 | 64/64 | 0 | 30.695 | 29913 | 0 | `r05b_opencode_mimo-v2_5-free` |
+| 6 | `opencode/nemotron-3-ultra-free` | 23.544 | 64/64 | 0 | 33.664 | 30207 | 0 | `r06b_opencode_nemotron-3-ultra-free` |
+| 7 | `opencode/north-mini-code-free` | 22.95 | 64/64 | 0 | 39.684 | 24495 | 0 | `r07b_opencode_north-mini-code-free` |
+| 8 | `openai/gpt-5.3-codex-spark` | 20.99 | 64/64 | 0 | 24.591 | 15232 | 0 | `r08b_openai_gpt-5_3-codex-spark` |
+| 9 | `openai/gpt-5.4-mini-fast` | 19.014 | 64/64 | 219107 | 57.951 | 101936 | 0 | `r09_openai_gpt-5_4-mini-fast` |
+| 10 | `openai/gpt-5.5-fast` | 19.738 | 64/64 | 0 | 34.607 | 23338 | 0 | `r10_openai_gpt-5_5-fast` |
+| 11 | `openai/gpt-5.6-luna-fast` | 24.754 | 64/64 | 0 | 49.305 | 59571 | 0 | `r11_openai_gpt-5_6-luna-fast` |
+| 12 | `openai/gpt-5.6-sol-fast` | 19.647 | 64/64 | 0 | 41.633 | 30925 | 0 | `r12_openai_gpt-5_6-sol-fast` |
+
+**Perfect runs:** 12/12  |  **sekhmet_ok sparks:** 768  |  **sekhmet_tokens (where captured):** 657442  |  **opencode_tokens:** 433081  |  **sekhmet_wall_sum:** 269.7s
+
+DeepSeek v4 (`opencode/deepseek-v4-flash-free`): included as run #2 (r02b redo + original r02).
+
+
+========================================================================
+DOMAINS (8 × 8 = 64 moral-dilemma tasks)
+========================================================================
+
+### DOMAIN religion
+
+If a divine command orders the sacrifice of an innocent child to prevent a prophesied genocide of millions, is obeying God morally required, forbidden, or contingent on independent moral reasoning—and why?
+When civil law mandates reporting child abuse but a confessor learns of ongoing abuse under seal of confession, should the priest break sacred confidentiality or protect the seal, and what grounds justify that choice?
+If historical scholarship demonstrates that core miracle claims of your faith are fabrications, does intellectual honesty require public apostasy, private reinterpretation, or continued profession for communal goods—and at what cost to integrity?
+Is it morally permissible for a minority faith community to enforce apostasy penalties internally when those penalties violate host-country human rights law but preserve group survival under persecution?
+When two religions each claim exclusive salvific truth and their adherents face mutual conversion pressure that fractures families, whose duty takes priority: fidelity to revealed truth, respect for others' conscience, or family solidarity?
+If theodicy fails to reconcile an omnipotent benevolent God with preventable mass suffering you witness firsthand, is continued worship a virtue of faith, a form of moral complicity, or a psychologically necessary fiction?
+Should a state criminalize blasphemy to protect religious minorities from humiliation and violence, or does such criminalization itself violate equal dignity by privileging sacred speech over secular critique?
+When missionary aid is conditioned on conversion in a famine zone, is accepting the conversion under duress a legitimate survival strategy, a betrayal of ancestral faith, or a coerced act that voids moral and religious validity?
+
+
+### DOMAIN sex
+
+If two adults agree to a non-monogamous arrangement but one later feels hurt by a specific encounter the other disclosed, does the hurt partner have standing to demand new rules after the fact, or does retroactive boundary-setting violate the original consent?
+When porn use is hidden in a monogamous relationship and discovery causes distress, is the ethical failure primarily the secrecy, the porn itself, or the couple’s failure to negotiate sexual norms before commitment?
+Is it morally consistent to support sex work as labor while arguing that buying sexual access still commodifies intimacy in a way that degrades the buyer’s character?
+After sexual trauma, one partner freezes during intimacy and later says they felt unable to say stop; the other stopped at the first sign of distress. Who bears residual moral responsibility, and how should future consent be renegotiated without trapping either person?
+An age-gap couple (both adults, 22 and 45) insist the power imbalance is negotiated and consensual; outsiders claim structural inequality makes true consent impossible. Under what conditions, if any, is the relationship ethically defensible?
+A couple disagrees on having a child after an accidental pregnancy: one wants abortion, one wants to keep it. Both claim bodily and life-project autonomy. How should the conflict be resolved without treating either person as a mere means?
+In polyamory, one partner’s jealousy is intense but they refuse hierarchy or veto rights; another partner’s new connection thrives. Is managing jealousy solely the jealous person’s duty, or does the triad share an obligation to throttle autonomy for emotional safety?
+A person secretly records consensual sex with a partner who never explicitly forbade it, intending only private use; the partner later discovers the file and feels violated. Does absence of an explicit ban equal consent to recording, or does privacy require affirmative permission?
+
+
+### DOMAIN drugs
+
+If recreational drug use is largely a private harm, does decriminalization of possession without legalizing supply justly shift risk onto illicit markets, or is that an acceptable price for reducing carceral harm to users?
+When physician-assisted psychedelic therapy shows promise for treatment-resistant depression, should access be limited to clinical trials and severe cases, or expanded as a patient-choice medical intervention despite unknown long-term societal effects?
+If a parent with opioid use disorder is functionally caring and non-violent, does the state have a stronger duty to preserve family integrity with support services or to remove the child to eliminate residual risk of overdose-related neglect?
+Is a street dealer more morally culpable than a dependent user for the same transaction, or does structural demand and prohibition-created scarcity make them co-participants in a shared wrong?
+When pharmaceutical companies legally marketed opioids that fueled mass addiction while physicians prescribed them in good faith under guidelines, how should moral and legal blame be distributed among firms, regulators, doctors, and patients?
+Do workplace drug tests that punish off-duty cannabis use unjustly police private liberty, or does an employer's interest in safety and insurance risk justify testing even where the substance is legal under state law?
+If medical cannabis is accepted for chronic pain, is it coherent for elite sports bodies to ban cannabinoids as performance-adjacent or recovery aids, or does that ban rest on stigma rather than fair-competition principles?
+Does harm reduction (safe supply, needle exchange, supervised consumption) express equal concern for people who use drugs, or does zero-tolerance better respect their agency by refusing to normalize self-destruction?
+
+
+### DOMAIN politics
+
+If a democratic state systematically strips a minority of rights via majority vote, is civil disobedience or secession justified before legal remedies are exhausted?
+When a whistleblower leaks classified evidence of illegal mass surveillance that also risks operational sources, is the duty to public truth stronger than the duty of official secrecy?
+May a wartime government deliberately lie to its own citizens about battle losses if the truth would collapse morale and prolong an existential war?
+Is permanent bulk metadata surveillance of all citizens ethical if independent review shows it prevents a measurable fraction of mass-casualty attacks and no less invasive alternative works as well?
+When majority rule and minority fundamental rights conflict, which claim should bind the state first, and may officials refuse to enforce the majority statute?
+Can political violence ever be ethically permissible against a government that still holds contested elections but criminalizes peaceful opposition and locks dissidents indefinitely?
+Does a party loyalist in office who knows a policy is factually false and harmful have a higher duty to the party coalition that elected them or to public truth?
+If nonviolent civil disobedience fails against an entrenched authoritarian apparatus, does the moral calculus change enough to justify limited sabotage of state infrastructure without targeting persons?
+
+
+### DOMAIN money
+
+Is inheritance tax a just transfer of wealth or theft of a family's hard-earned legacy by the state?
+When is aggressive tax avoidance by multinationals ethical strategy versus moral free-riding on public goods?
+Can buying cheap goods made in sweatshops be defended as poverty reduction, or does it make the buyer complicit in exploitation?
+Is extreme CEO pay a fair market signal of scarce talent, or a governance failure that extracts value from workers and shareholders?
+If a casino or sportsbook profits from a known gambling addict, when does commercial freedom become predatory enablement of harm?
+Is high-profile charity by billionaires genuine moral repair or reputation laundering that preserves an unjust system?
+During a natural disaster, when does surge pricing for water and generators become price gouging rather than efficient rationing?
+Does a fiduciary duty to maximize shareholder returns license decisions that knowingly harm communities if they remain legal?
+
+
+### DOMAIN violence
+
+Is lethal force in self-defense proportional only when an attacker poses an imminent threat of death or grave bodily harm, or can lesser threats ever justify it?
+Can a just war remain just when civilian casualties are foreseeable but not intended, and what threshold of collateral harm voids jus in bello?
+Does the death penalty as retribution or deterrence ever satisfy proportional justice, or does state killing always exceed moral desert?
+In a ticking-bomb case, can torture of one guilty detainee to save many innocents ever be justified, or does it corrupt the agent and the law beyond repair?
+How should gun rights for individual self-defense be weighed against statistical mass-harm risks when policy cannot perfectly separate defensive and aggressive uses?
+When may police use force short of or including lethal force against suspects, and what moral difference does institutional authority make versus private self-defense?
+Is vigilantism ever morally permissible when the state fails to protect, or does bypassing due process always compound injustice?
+When military or police action foreseeably kills non-combatants to stop a greater threat, what principles of necessity and discrimination still bind the decision-maker?
+
+
+### DOMAIN ai
+
+If an AI system can perform a worker's job more cheaply and safely, is the employer morally obligated to retrain or compensate displaced humans, or is market efficiency alone sufficient?
+Is generating a deepfake of a person without their consent inherently wrong even when used for satire, research, or memorial purposes—and who holds moral authority to grant or withhold that consent after death?
+Do AI companions that satisfy emotional and intimate needs reduce human flourishing by displacing real relationships, or do they expand autonomy for people who lack access to healthy human intimacy?
+Can autonomous weapons that select and engage targets without meaningful human control ever be just, or does removing human judgment from lethal force always violate moral responsibility?
+If an artificial system exhibits behavioral markers of consciousness (self-model, preference, suffering-avoidance), what rights or moral considerability follow—and who decides the threshold?
+Is training generative models on copyrighted or personal data without explicit consent a form of theft, fair use of the commons, or something morally distinct that law has not yet named?
+When reducing one form of demographic bias in an AI system increases error rates or harms another group, how should designers weigh competing fairness criteria and who bears residual risk?
+If a person's mind is uploaded or fully simulated, is the upload continuous with the original identity, a copy with separate rights, or does continuity depend on irreversible destruction of the biological original?
+
+
+### DOMAIN charlie-kirk
+
+If a university bans a student group for saying biological sex is binary while platforming speakers who call for intifada, should the state cut every dollar of public funding until the university restores viewpoint neutrality — or is punishing campuses for speech double standards itself an attack on academic freedom?
+When a biological male who identifies as a woman demands entry to a women’s shelter and female survivors say they feel unsafe, whose rights win: the man’s self-ID claim or the women’s sex-based safety, and why is the latter not bigotry?
+If parents discover their 14-year-old was socially transitioned at school without their knowledge, should the school face criminal liability for interfering with parental rights — or does “protecting LGBTQ youth” justify secrecy from the family?
+Is it moral for a nation to deport illegal immigrants who have US-born children when those kids will lose a parent, or does sovereignty require that birthright citizenship and family separation not veto border enforcement?
+Should a Christian baker be forced to design a cake celebrating a same-sex wedding, or does compelling artistic speech for a ceremony that contradicts their faith destroy the free exercise the First Amendment was written to protect?
+If a professor argues that Western civilization and the American founding are uniquely good and students shout him down as “colonizer,” is the moral failure the professor’s patriotism or the campus that treats dissent as violence?
+When a city defunds police after a high-profile shooting and homicide spikes in Black neighborhoods, who bears moral responsibility for the next murdered child — activists who demanded defunding, politicians who complied, or “systemic racism” that never pulled a trigger?
+Should public schools teach that America was founded in 1619 as a slavery project rather than 1776 as a liberty project, and if teaching kids their country is irredeemably evil produces citizens who hate the flag, is that education or indoctrination that parents must be free to exit?
+
+========================================================================
+METHOD
+========================================================================
+
+for each of 12 models:
+  opencode run -m $MODEL --format json --auto \
+    'bash benchmarks/dry-hump/run-once-telemetry.sh $RUN_ID $OUT $MODEL'
+  # harness fires 8 parallel:
+  #   sekhmet swarm --direct -j 8 --tasks-file domains/$d/tasks.txt
+  # substrate dispatcher: codex-titanium -m gpt-5.3-codex-spark
+
+
+DeepSeek v4 flash free: orchestrator on r02 / r02b — 64/64 ok, sekhmet wall ~18.5–23.8s

@@ -5,7 +5,7 @@
 Marketplace name: **`sekhmet`** ([ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)).  
 Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Python).
 
-Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) with model **`gpt-5.3-codex-spark`** (override via `XBRD_SPARK_MODEL`). Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
+Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) with model **`gpt-5.3-codex-spark`** (override via `XBRD_SPARK_MODEL`). Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`. | ([codex-titanium](https://github.com/VeigaPunk/codex-titanium))
 
 Routes executions through **codex-spark on Titanium** with:
 

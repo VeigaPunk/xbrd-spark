@@ -1,52 +1,54 @@
 # Sekhmet — Lore Reference
 
-**sḫmt** — “the Powerful One.”
+**Source-critical distillation** of the research dossier *Sekhmet: Power, Plague, Protection, and Healing in Ancient Egyptian Religion* (August 2026).
+
+## Thesis
 
 Sekhmet is dangerous solar power made present and governable: the force that can destroy enemies or send disease, and the same force that can protect, avert harm, and restore life when pacified within *maat*.
 
-## Core identity
+Her Egyptian name *sḫmt* means approximately “the Powerful One.” She is a major form of the **Eye of Ra** — the radiant, mobile, potentially violent force through which the sun god acts at a distance. That force protects the king and destroys enemies, but it can also escape control. Ritual does not abolish this power; it names, redirects, multiplies, and pacifies it.
 
-- **Name**: Egyptian *sḫmt* (feminine of *sḫm* = power, might, effectiveness).
-- **Form**: Lioness-headed woman; solar disk + uraeus (Eye of Ra).
-- **Role**: Not a narrow “war goddess” or “healing goddess.” Concentrated divine effectiveness — Eye of Ra made mobile and addressable.
-- **Eye of Ra**: Radiance, agency, defender. The role can be occupied by Sekhmet, Hathor, Tefnut, Mut, Bastet and others; identities are relational and local, not mutually exclusive.
+## Core axes
 
-## Power system
+| Axis | Meaning |
+|------|---------|
+| **Power, not a narrow portfolio** | “War goddess” and “healing goddess” are useful labels, but her deeper identity is concentrated divine effectiveness. |
+| **The Eye of Ra is a role** | Sekhmet overlaps with Hathor, Tefnut, Mut, Bastet and others without becoming permanently identical to them. |
+| **Disease and healing form one system** | The controller of dangerous arrows and messengers is uniquely able to restrain or redirect them. |
+| **Hundreds of statues, no proven exact total** | Amenhotep III’s corpus is secure; the elegant 730-statue calendar remains a contested reconstruction. |
 
-One power, two outcomes. The controller of dangerous arrows and messengers is uniquely able to restrain or redirect them.
+## Software mapping (xbrd-spark / sekhmet)
 
-| Released | Pacified |
-| --- | --- |
-| Wrath, arrows, messengers, epidemic | Protection, breath, vitality, healing |
-| Uncontrolled heat / distance | Force returned to order (*maat*) |
+- **Always present** → always-callable L3 surface (`sekhmet` / `xbrd-spark`)
+- **Arrows / messengers of danger** → concurrent sparks (double-work intentional and cheap)
+- **Pacification by higher order** → judge / distill layers above this substrate
+- **Serial statues (Amenhotep III)** → repetition creates controlled presence; one form, many invocations
+- **Power made governable** → namespaced ephemeral runners, content-addressed artifacts, NDJSON provenance
 
-Ritual does not abolish the power; it names, multiplies, directs, and cools it.
+## High-confidence facts only
 
-## Mythic cycles (models, not biography)
+- Name derives from the word-field of power / might.
+- Lioness-headed form of the solar Eye; daughter of Ra (theological relation).
+- At Memphis: local triad with Ptah and Nefertem.
+- At Thebes: situational overlap with Mut (Mut precinct, Isheru lake).
+- Priests of Sekhmet (*wab*-priests) participated in ritual-medical protection networks; not identical to the *swnw* physician title.
+- Protective texts speak of “arrows” and “messengers” of Sekhmet associated with epidemic danger and calendar thresholds.
+- No reliable evidence of routine human sacrifice in her cult.
 
-- **Destruction of Humankind / red-beer**: Eye sent to punish rebels; violence exceeds the target; beer dyed red with mineral pigment is poured; the goddess drinks, is intoxicated, and ceases slaughter. (Primary surviving narrative names Hathor in key passages; Sekhmet is the intelligible violent lioness form.)
-- **Distant Goddess**: Eye leaves for the south / Nubia as a dangerous lioness; is persuaded to return; homecoming brings moisture, music, fertility, restored order.
+## Contested / avoid as fact
 
-These are recurring ritual logics: how volatile force begins, exceeds, is pacified, and is made productive again.
+- Exact total of 365 or 730 Amenhotep III statues (plausible calendrical model, unproven inventory).
+- Monocausal “statues built only to stop a plague.”
+- Bastet as simply “Sekhmet’s gentle side.”
+- Fixed sacred color or modern zodiac / chakra assignments.
 
-## Cult and material presence
+## Concise definition
 
-- **Memphis**: Local triad with Ptah and Nefertem (valid local theology, not universal).
-- **Thebes / Mut precinct + Kom el-Hetan**: Major findspots for Amenhotep III’s statue program.
-- **Amenhotep III (14th c. BCE)**: Hundreds of seated and standing hard-stone statues. Exact total (popular 365 / 730 calendrical reconstruction) remains **contested** — no complete ancient inventory. Corpus functions as serial presence: repetition multiplies the goddess; varied epithets organize the invocations.
-
-## Mapping to this substrate
-
-| Goddess | Substrate |
-| --- | --- |
-| Always-present force | Always-callable L3 dispatch |
-| Arrows / messengers | Concurrent sparks (double-work tolerant) |
-| Pacification by higher order | Judge / distill / content-hash dedup above this layer |
-| Serial statues | Namespaced ephemeral bodies; many invocations, one form |
-| Not made harmless — made governable | Pure execution; coordination stays above |
-
-> Sekhmet embodies power at the threshold between protection and catastrophe. Ancient ritual seeks not to make her harmless, but to make her force present, directed, and pacified within *maat*.
+> Sekhmet is an ancient Egyptian lioness goddess whose name means “the Powerful One.” As a major form of the Eye of Ra, she personifies dangerous solar and royal force — the power to destroy enemies and send disease, but also to avert harm, protect the king and community, and restore life when that force is pacified within cosmic order.
 
 ---
 
-*Source-critical distillation from the August 2026 research dossier (Pyramid Texts → New Kingdom statue program → Late Period Eye theology). High-confidence claims only; contested numerical reconstructions and modern binaries flagged. Full dossier hosted separately.*
+*Power made present · Danger brought into order*
+
+Full dossier: research attachment / site (when published).  
+Primary technical surface: [xbrd-spark](https://github.com/VeigaPunk/xbrd-spark) · marketplace plugin `sekhmet`.

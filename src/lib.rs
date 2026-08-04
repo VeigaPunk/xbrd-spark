@@ -15,6 +15,7 @@ use std::fs;
 use std::io::{self, BufRead, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
@@ -22,6 +23,17 @@ use uuid::Uuid;
 
 /// Hard ceiling for concurrent swarm runners (always-available L3 pool size).
 pub const MAX_SWARM_CONCURRENCY: usize = 64;
+
+/// Default Titanium model for pure L3 sparks (override: `XBRD_SPARK_MODEL`).
+pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
+
+/// Fallback when primary hits usage_limit / quota (override: `XBRD_SPARK_FALLBACK_MODEL`).
+/// Set env to empty / `none` / `off` to disable automatic fallback.
+pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna-fast";
+
+/// Process-wide sticky latch: after primary `usage_limit`, later sparks in this
+/// process start on the fallback model (swarm efficiency). Reset only on process exit.
+static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
 
 #[derive(Parser, Debug)]
 #[command(
@@ -192,6 +204,9 @@ struct Meta {
     /// Known provider failure class (usage_limit, rate_limit, auth, …).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     fail_reason: Option<String>,
+    /// When set, this run used the fallback model; value is the primary that failed/skipped.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    model_fallback_from: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -525,9 +540,73 @@ fn resolve_task(task: Option<String>, task_file: Option<PathBuf>) -> Result<Stri
     Ok(buf)
 }
 
-/// Default model for Titanium spark runs (override with `XBRD_SPARK_MODEL`).
-fn spark_model() -> String {
-    env::var("XBRD_SPARK_MODEL").unwrap_or_else(|_| "gpt-5.3-codex-spark".into())
+/// Primary model for Titanium spark runs (override with `XBRD_SPARK_MODEL`).
+pub fn primary_spark_model() -> String {
+    env::var("XBRD_SPARK_MODEL").unwrap_or_else(|_| DEFAULT_SPARK_MODEL.into())
+}
+
+/// Fallback model when primary is quota-blocked. `None` disables automatic fallback.
+///
+/// Override with `XBRD_SPARK_FALLBACK_MODEL` (default `gpt-5.6-luna-fast`).
+/// Disable: empty string, `none`, `off`, or `0`.
+pub fn fallback_spark_model() -> Option<String> {
+    match env::var("XBRD_SPARK_FALLBACK_MODEL") {
+        Ok(s) => {
+            let t = s.trim();
+            if t.is_empty() || t.eq_ignore_ascii_case("none") || t.eq_ignore_ascii_case("off") || t == "0"
+            {
+                None
+            } else {
+                Some(t.to_string())
+            }
+        }
+        Err(_) => Some(DEFAULT_FALLBACK_MODEL.into()),
+    }
+}
+
+/// Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1|true|yes`.
+fn force_fallback_env() -> bool {
+    match env::var("XBRD_SPARK_USE_FALLBACK") {
+        Ok(s) => {
+            let t = s.trim();
+            t == "1" || t.eq_ignore_ascii_case("true") || t.eq_ignore_ascii_case("yes")
+        }
+        Err(_) => false,
+    }
+}
+
+/// Model chosen for the next attempt (sticky latch + env force respected).
+///
+/// Returns `(model, fallback_from)` where `fallback_from` is `Some(primary)` when
+/// starting on the fallback path without a live primary attempt this process turn.
+pub fn resolve_run_model() -> (String, Option<String>) {
+    let primary = primary_spark_model();
+    let fallback = fallback_spark_model();
+    let use_fb = force_fallback_env() || FALLBACK_LATCHED.load(Ordering::Relaxed);
+    if use_fb {
+        if let Some(fb) = fallback {
+            if fb != primary {
+                return (fb, Some(primary));
+            }
+        }
+    }
+    (primary, None)
+}
+
+/// Latch process-wide fallback after primary usage_limit (swarm efficiency).
+pub fn latch_fallback_model() {
+    FALLBACK_LATCHED.store(true, Ordering::Relaxed);
+}
+
+/// Test/helper: clear sticky latch.
+#[cfg(test)]
+pub fn clear_fallback_latch() {
+    FALLBACK_LATCHED.store(false, Ordering::Relaxed);
+}
+
+/// Whether a fail_reason warrants automatic model fallback.
+fn should_fallback_on_fail_reason(reason: Option<&str>) -> bool {
+    matches!(reason, Some("usage_limit"))
 }
 
 /// Resolve Codex Titanium binary: `CODEX_BIN` → `codex-titanium` → `codex`.
@@ -550,11 +629,16 @@ fn resolve_codex_bin() -> Result<PathBuf> {
     })
 }
 
-fn find_dispatcher(direct: bool, ro: bool) -> Result<(String, Vec<String>)> {
+/// Build dispatcher cmdline for `model`.
+///
+/// When `force_codex` is true (fallback retry), always use Titanium codex so `-m`
+/// is applied; xask has no model flag.
+fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Result<(String, Vec<String>)> {
     // Prefer pure Titanium codex for L3 substrate (single source of flags).
     // xask is optional convenience for migration / loadout continuity.
     // --ro forces codex so `--sandbox read-only` is actually applied (xask has no sandbox flags).
-    if !direct && !ro {
+    // Fallback retries also force codex so the alternate model is actually selected.
+    if !force_codex && !direct && !ro {
         if let Ok(p) = which::which("xask") {
             return Ok((
                 p.to_string_lossy().into_owned(),
@@ -570,19 +654,18 @@ fn find_dispatcher(direct: bool, ro: bool) -> Result<(String, Vec<String>)> {
     let p = resolve_codex_bin().with_context(|| {
         if ro {
             "codex-titanium/codex not found on PATH (--ro forces titanium sandbox; xask skipped)"
-        } else if direct {
-            "codex-titanium/codex not found on PATH (--direct)"
+        } else if direct || force_codex {
+            "codex-titanium/codex not found on PATH (--direct / model fallback)"
         } else {
             "neither xask nor codex-titanium/codex found on PATH"
         }
     })?;
-    let model = spark_model();
     Ok((
         p.to_string_lossy().into_owned(),
         vec![
             "exec".into(),
             "-m".into(),
-            model,
+            model.to_string(),
             "-c".into(),
             "model_reasoning_effort=low".into(),
             "--ephemeral".into(),
@@ -1028,13 +1111,16 @@ fn run_spark(
 
     let task_hash = hash_str(task);
 
+    let (model, model_fallback_from) = resolve_run_model();
+    let fallback_model = fallback_spark_model();
+
     if dry_run {
         let mut meta = Meta {
             spark_id: id.to_string(),
             started_at: chrono::Utc::now().to_rfc3339(),
             finished_at: None,
             duration_ms: None,
-            model: spark_model(),
+            model: model.clone(),
             cmdline: vec!["dry-run".into()],
             status: "running".into(),
             exit_code: None,
@@ -1048,6 +1134,7 @@ fn run_spark(
             dry_run: true,
             usage_tokens: None,
             fail_reason: None,
+            model_fallback_from: model_fallback_from.clone(),
             root: base.display().to_string(),
         };
         write_meta_atomic(&base, &meta)?;
@@ -1063,7 +1150,9 @@ fn run_spark(
 
     // Resolve dispatcher before initial meta when possible; on failure after dirs exist,
     // still emit a structured error record if we can attach meta.
-    let dispatcher = find_dispatcher(direct, ro);
+    // force_codex when already on fallback path so -m is applied (xask has no model flag).
+    let force_codex = model_fallback_from.is_some();
+    let dispatcher = find_dispatcher(direct, ro, &model, force_codex);
     let (bin, mut args) = match &dispatcher {
         Ok((b, a)) => (b.clone(), a.clone()),
         Err(_) => (String::new(), Vec::new()),
@@ -1077,7 +1166,7 @@ fn run_spark(
         started_at: chrono::Utc::now().to_rfc3339(),
         finished_at: None,
         duration_ms: None,
-        model: spark_model(),
+        model: model.clone(),
         cmdline: if dispatcher.is_ok() {
             std::iter::once(bin.clone())
                 .chain(args.iter().cloned())
@@ -1097,6 +1186,7 @@ fn run_spark(
         dry_run: false,
         usage_tokens: None,
         fail_reason: None,
+        model_fallback_from: model_fallback_from.clone(),
         root: base.display().to_string(),
     };
     write_meta_atomic(&base, &meta)?;
@@ -1120,22 +1210,46 @@ fn run_spark(
     }
 
     let envm = build_env(&base);
+    let cwd = if scope.is_some() {
+        base.join("workspace")
+    } else {
+        base.join("in")
+    };
     let start = Instant::now();
 
-    let mut cmd = Command::new(&bin);
-    cmd.args(&args)
-        .current_dir(if scope.is_some() {
-            base.join("workspace")
-        } else {
-            base.join("in")
-        })
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .env_clear()
-        .envs(&envm);
+    // (stdout, stderr, exit, success, timed_out)
+    let spawn_once =
+        |bin: &str, args: &[String]| -> Result<(String, String, Option<i32>, bool, bool)> {
+            let mut cmd = Command::new(bin);
+            cmd.args(args)
+                .current_dir(&cwd)
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .env_clear()
+                .envs(&envm);
+            let timed = run_with_timeout(cmd, timeout)?;
+            let stdout = String::from_utf8_lossy(&timed.output.stdout).into_owned();
+            let mut stderr = String::from_utf8_lossy(&timed.output.stderr).into_owned();
+            if timed.timed_out {
+                if !stderr.is_empty() {
+                    stderr.push('\n');
+                }
+                stderr.push_str(&format!(
+                    "xbrd-spark: killed after timeout ({}s)",
+                    timeout
+                ));
+            }
+            let exit = if timed.timed_out {
+                Some(1)
+            } else {
+                timed.output.status.code()
+            };
+            let success = !timed.timed_out && timed.output.status.success();
+            Ok((stdout, stderr, exit, success, timed.timed_out))
+        };
 
-    let timed = match run_with_timeout(cmd, timeout) {
+    let mut attempt = match spawn_once(&bin, &args) {
         Ok(t) => t,
         Err(e) => {
             let msg = format!("{:#}", e);
@@ -1157,25 +1271,89 @@ fn run_spark(
         }
     };
 
-    let duration_ms = start.elapsed().as_millis() as u64;
-    let output = timed.output;
-    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
-    let mut stderr = String::from_utf8_lossy(&output.stderr).into_owned();
-    let exit = if timed.timed_out {
-        Some(1)
-    } else {
-        output.status.code()
-    };
-    let status = if timed.timed_out {
-        if !stderr.is_empty() {
-            stderr.push('\n');
+    // Automatic model fallback: usage_limit on current model → fallback (once), sticky for process.
+    // Skip if already on fallback path or fallback disabled / same as current.
+    let attempted_model = meta.model.clone();
+    let can_try_fallback = meta.model_fallback_from.is_none()
+        && fallback_model
+            .as_ref()
+            .is_some_and(|f| f != &attempted_model);
+    if !attempt.3 && !attempt.4 && can_try_fallback {
+        let reason = classify_provider_error(&attempt.0, &attempt.1);
+        if should_fallback_on_fail_reason(reason) {
+            let fb_model = fallback_model.as_ref().expect("checked above").clone();
+            latch_fallback_model();
+            eprintln!(
+                "sekhmet: model {attempted_model} hit {}; falling back to {fb_model}",
+                reason.unwrap_or("usage_limit")
+            );
+            match find_dispatcher(direct, ro, &fb_model, true) {
+                Ok((fb_bin, mut fb_args)) => {
+                    fb_args.push(task.to_string());
+                    meta.model_fallback_from = Some(attempted_model.clone());
+                    meta.model = fb_model.clone();
+                    meta.cmdline = std::iter::once(fb_bin.clone())
+                        .chain(fb_args.iter().cloned())
+                        .collect();
+                    let _ = write_meta_atomic(&base, &meta);
+                    match spawn_once(&fb_bin, &fb_args) {
+                        Ok((s_out, mut s_err, s_exit, s_ok, s_to)) => {
+                            if !s_err.is_empty() {
+                                s_err.push('\n');
+                            }
+                            s_err.push_str(&format!(
+                                "xbrd-spark: retried after {} on {}; now using {}",
+                                reason.unwrap_or("usage_limit"),
+                                attempted_model,
+                                fb_model
+                            ));
+                            if !s_ok {
+                                if !s_err.is_empty() {
+                                    s_err.push('\n');
+                                }
+                                s_err.push_str("--- primary attempt stderr ---\n");
+                                s_err.push_str(&attempt.1);
+                            }
+                            attempt = (s_out, s_err, s_exit, s_ok, s_to);
+                        }
+                        Err(e) => {
+                            let msg = format!(
+                                "fallback spawn failed after {}: {:#}\n--- primary stderr ---\n{}",
+                                reason.unwrap_or("usage_limit"),
+                                e,
+                                attempt.1
+                            );
+                            let duration_ms = start.elapsed().as_millis() as u64;
+                            let (_, record) = finalize_result(
+                                &base,
+                                &mut meta,
+                                "error",
+                                &attempt.0,
+                                &msg,
+                                Some(1),
+                                duration_ms,
+                            )?;
+                            emit_ndjson(&record)?;
+                            if !keep {
+                                let _ = fs::remove_dir_all(&base);
+                            }
+                            return Ok(1);
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("sekhmet: fallback dispatcher resolve failed: {e:#}");
+                    // keep primary attempt result
+                }
+            }
         }
-        stderr.push_str(&format!(
-            "xbrd-spark: killed after timeout ({}s)",
-            timeout
-        ));
+    }
+
+    let duration_ms = start.elapsed().as_millis() as u64;
+    let (stdout, stderr, exit, success, timed_out) = attempt;
+    let status = if timed_out {
         "timeout"
-    } else if output.status.success() {
+    } else if success {
         "ok"
     } else {
         "fail"
@@ -1412,6 +1590,7 @@ mod tests {
             dry_run: true,
             usage_tokens: None,
             fail_reason: None,
+            model_fallback_from: None,
             root: base.display().to_string(),
         };
         fs::write(
@@ -1678,6 +1857,7 @@ mod tests {
             dry_run: true,
             usage_tokens: None,
             fail_reason: None,
+            model_fallback_from: None,
             root: "/tmp".into(),
         };
         assert!(!gc_should_delete(Some(&meta_running_young), None, cutoff));
@@ -1824,14 +2004,14 @@ mod tests {
             assert_eq!(sandbox_rw, "danger-full-access");
             return;
         }
-        let (_, args_rw) = find_dispatcher(true, false).unwrap();
+        let (_, args_rw) = find_dispatcher(true, false, DEFAULT_SPARK_MODEL, false).unwrap();
         assert!(args_rw.iter().any(|a| a == "exec"));
         assert!(args_rw.windows(2).any(|w| w[0] == "-m" && w[1].contains("codex")));
         assert!(args_rw
             .windows(2)
             .any(|w| w[0] == "--sandbox" && w[1] == "danger-full-access"));
 
-        let (_, args_ro) = find_dispatcher(true, true).unwrap();
+        let (_, args_ro) = find_dispatcher(true, true, DEFAULT_SPARK_MODEL, false).unwrap();
         assert!(args_ro
             .windows(2)
             .any(|w| w[0] == "--sandbox" && w[1] == "read-only"));
@@ -1842,8 +2022,8 @@ mod tests {
         if which::which("codex").is_err() {
             return;
         }
-        let (_, a) = find_dispatcher(true, false).unwrap();
-        let (_, b) = find_dispatcher(true, true).unwrap();
+        let (_, a) = find_dispatcher(true, false, DEFAULT_SPARK_MODEL, false).unwrap();
+        let (_, b) = find_dispatcher(true, true, DEFAULT_SPARK_MODEL, false).unwrap();
         let sb = |args: &[String]| {
             args.windows(2)
                 .find(|w| w[0] == "--sandbox")
@@ -1928,7 +2108,7 @@ mod tests {
         if which::which("codex").is_err() {
             return;
         }
-        let (bin, args) = find_dispatcher(false, true).unwrap();
+        let (bin, args) = find_dispatcher(false, true, DEFAULT_SPARK_MODEL, false).unwrap();
         assert!(
             !bin.ends_with("xask") && !bin.contains("/xask"),
             "ro must not use xask: {bin}"
@@ -2153,7 +2333,7 @@ mod tests {
         if which::which("codex-titanium").is_err() && which::which("codex").is_err() {
             return;
         }
-        let (bin, args) = find_dispatcher(true, false).unwrap();
+        let (bin, args) = find_dispatcher(true, false, DEFAULT_SPARK_MODEL, false).unwrap();
         assert!(
             bin.contains("codex"),
             "expected codex/titanium path, got {bin}"
@@ -2161,8 +2341,99 @@ mod tests {
         assert!(args.windows(2).any(|w| w[0] == "-m" && w[1].contains("codex")));
     }
 
+    #[test]
+    fn find_dispatcher_passes_explicit_model() {
+        if which::which("codex").is_err() && which::which("codex-titanium").is_err() {
+            return;
+        }
+        let (_, args) =
+            find_dispatcher(true, false, DEFAULT_FALLBACK_MODEL, true).unwrap();
+        assert!(args
+            .windows(2)
+            .any(|w| w[0] == "-m" && w[1] == DEFAULT_FALLBACK_MODEL));
+    }
 
+    #[test]
+    fn model_defaults_and_fallback_env() {
+        clear_fallback_latch();
+        let prev_m = env::var_os("XBRD_SPARK_MODEL");
+        let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
+        let prev_u = env::var_os("XBRD_SPARK_USE_FALLBACK");
+        env::remove_var("XBRD_SPARK_MODEL");
+        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
+        env::remove_var("XBRD_SPARK_USE_FALLBACK");
 
+        assert_eq!(primary_spark_model(), DEFAULT_SPARK_MODEL);
+        assert_eq!(
+            fallback_spark_model().as_deref(),
+            Some(DEFAULT_FALLBACK_MODEL)
+        );
+        let (m, from) = resolve_run_model();
+        assert_eq!(m, DEFAULT_SPARK_MODEL);
+        assert!(from.is_none());
+
+        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "none");
+        assert!(fallback_spark_model().is_none());
+        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
+
+        env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
+        let (m2, from2) = resolve_run_model();
+        assert_eq!(m2, DEFAULT_FALLBACK_MODEL);
+        assert_eq!(from2.as_deref(), Some(DEFAULT_SPARK_MODEL));
+        env::remove_var("XBRD_SPARK_USE_FALLBACK");
+
+        latch_fallback_model();
+        let (m3, from3) = resolve_run_model();
+        assert_eq!(m3, DEFAULT_FALLBACK_MODEL);
+        assert_eq!(from3.as_deref(), Some(DEFAULT_SPARK_MODEL));
+        clear_fallback_latch();
+
+        match prev_m {
+            Some(v) => env::set_var("XBRD_SPARK_MODEL", v),
+            None => env::remove_var("XBRD_SPARK_MODEL"),
+        }
+        match prev_f {
+            Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
+            None => env::remove_var("XBRD_SPARK_FALLBACK_MODEL"),
+        }
+        match prev_u {
+            Some(v) => env::set_var("XBRD_SPARK_USE_FALLBACK", v),
+            None => env::remove_var("XBRD_SPARK_USE_FALLBACK"),
+        }
+    }
+
+    #[test]
+    fn should_fallback_only_on_usage_limit() {
+        assert!(should_fallback_on_fail_reason(Some("usage_limit")));
+        assert!(!should_fallback_on_fail_reason(Some("rate_limit")));
+        assert!(!should_fallback_on_fail_reason(None));
+    }
+
+    #[test]
+    fn dry_run_records_model_and_optional_fallback_from() {
+        clear_fallback_latch();
+        let prev_u = env::var_os("XBRD_SPARK_USE_FALLBACK");
+        env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
+        let tmp = TempDir::new().unwrap();
+        let root = tmp.path();
+        let id = "sp-model-fb-dry";
+        let code = run_spark(id, "probe", None, false, 0, true, root, true, true).unwrap();
+        assert_eq!(code, 0);
+        let meta: Meta = serde_json::from_str(
+            &fs::read_to_string(root.join(id).join("meta.json")).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(meta.model, DEFAULT_FALLBACK_MODEL);
+        assert_eq!(
+            meta.model_fallback_from.as_deref(),
+            Some(DEFAULT_SPARK_MODEL)
+        );
+        match prev_u {
+            Some(v) => env::set_var("XBRD_SPARK_USE_FALLBACK", v),
+            None => env::remove_var("XBRD_SPARK_USE_FALLBACK"),
+        }
+        clear_fallback_latch();
+    }
 
     #[test]
     fn extract_usage_tokens_multiline_tokens_used() {
@@ -2228,6 +2499,7 @@ mod tests {
             root: base.display().to_string(),
             usage_tokens: None,
             fail_reason: None,
+            model_fallback_from: None,
         };
         let (_, rec) = finalize_result(
             &base,
@@ -2268,6 +2540,7 @@ mod tests {
             root: base.display().to_string(),
             usage_tokens: None,
             fail_reason: None,
+            model_fallback_from: None,
         };
         let (_, rec) = finalize_result(
             &base,

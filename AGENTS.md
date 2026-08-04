@@ -2,7 +2,14 @@
 
 Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no distiller, no coordination logic lives here.
 
-**Runtime target:** Codex Titanium (`codex-titanium` / `CODEX_BIN`). Model: `gpt-5.3-codex-spark` (`XBRD_SPARK_MODEL`).
+**Runtime target:** Codex Titanium (`codex-titanium` / `CODEX_BIN`).
+
+**Models (xbgst L3 workers — same isolation/swarm surface):**
+- Primary: `gpt-5.3-codex-spark` (`XBRD_SPARK_MODEL`)
+- Fallback when primary hits `usage_limit`: `gpt-5.6-luna-fast` (`XBRD_SPARK_FALLBACK_MODEL`)
+- Force fallback without probing spark: `XBRD_SPARK_USE_FALLBACK=1`
+- Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none` (or empty / `off` / `0`)
+- After the first `usage_limit` on primary, later sparks in the same process stick to the fallback model (swarm efficiency). Meta records `model` (actual) and optional `model_fallback_from`.
 
 Agents that should call it:
 - labrat (default channel for cheap probes / swarms)
@@ -79,13 +86,14 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 
 ## Provider quota
 
-If Titanium returns usage-limit / 403 websocket / 429 model refresh, stop live swarms. Prefer dry-run gates. Resume live after the provider window (see e2e `qa/STATUS.md`).
+If Titanium returns **usage_limit** on the primary spark model, sekhmet **automatically retries once** on `gpt-5.6-luna-fast` (or `XBRD_SPARK_FALLBACK_MODEL`) and latches that model for the rest of the process. All other surface (namespace, swarm, NDJSON, xbgst roles) stays equal.
+
+For 403 websocket / 429 rate_limit / auth failures: no model fallback — stop or lower `-j`, prefer dry-run gates.
 
 Short swarm counts (in-session): `./scripts/swarm-summary.sh /tmp/swarm.ndjson` then `./scripts/paste-out.sh /tmp/swarm.ndjson`.
 
-## Offline / Titanium quota mode
+## Offline / no Titanium mode
 
-Until provider quota reopens (see e2e `qa/STATUS.md`, currently **2026-08-08**):
-- **Do not** run live sekhmet/Titanium rebuilds.
+When neither spark nor fallback can run (missing dispatcher / full auth outage):
 - Run network-free gates: `./scripts/dry-gates.sh`
 - Pastebin: requires `PASTEBIN_API_DEV_KEY`; if missing, report blocker — **no alternate hosts**.

@@ -5,9 +5,21 @@
 Marketplace name: **`sekhmet`** ([ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)).  
 Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Python).
 
-Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) with model **`gpt-5.3-codex-spark`** (override via `XBRD_SPARK_MODEL`). Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`. | ([codex-titanium](https://github.com/VeigaPunk/codex-titanium))
+Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex-titanium](https://github.com/VeigaPunk/codex-titanium).
 
-Routes executions through **codex-spark on Titanium** with:
+**Model routing (everything else equal — same namespace, swarm, NDJSON for xbgst):**
+| | Model | Env |
+|---|---|---|
+| Primary | `gpt-5.3-codex-spark` | `XBRD_SPARK_MODEL` |
+| Fallback on `usage_limit` | `gpt-5.6-luna-fast` | `XBRD_SPARK_FALLBACK_MODEL` |
+| Force fallback | (skip primary) | `XBRD_SPARK_USE_FALLBACK=1` |
+| Disable fallback | — | `XBRD_SPARK_FALLBACK_MODEL=none` |
+
+On primary `usage_limit`, sekhmet retries once with the fallback model and **sticks** to it for subsequent sparks in the same process (so swarms do not re-burn the exhausted quota). Recorded in meta as `model` + optional `model_fallback_from`.
+
+Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
+
+Routes executions through **Titanium** (primary codex-spark, luna-fast when sparks are out) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
 - **Up to 64 concurrent runners** — `sekhmet swarm -j N` (hard cap 64)

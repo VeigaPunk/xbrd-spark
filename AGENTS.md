@@ -2,16 +2,17 @@
 
 Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no distiller, no coordination logic lives here.
 
-**Runtime target:** Codex Titanium (`codex-titanium` / `CODEX_BIN`).
+**Runtime target:** Codex Titanium (`codex-titanium` / `CODEX_BIN`) on **ChatGPT OAuth** (not platform API key).
 
 **Models (xbgst L3 workers — same isolation/swarm surface):**
 - Primary: `gpt-5.3-codex-spark` (`XBRD_SPARK_MODEL`)
-- Fallback chain (comma-separated `XBRD_SPARK_FALLBACK_MODEL`): **`gpt-5.6-luna-fast` → `gpt-5.6-luna`**
-  - Always dispatched with `model_reasoning_effort=low` (luna fast **low**).
-  - ChatGPT-auth Codex rejects the exact slug `gpt-5.6-luna-fast`; sekhmet auto-continues to `gpt-5.6-luna` (same family, low effort) and sticks there for the process.
+- Fallback (OAuth): **`gpt-5.6-luna`** (`XBRD_SPARK_FALLBACK_MODEL`)
+- Always on Titanium path:
+  - `-c model_reasoning_effort=low`
+  - `-c service_tier=fast` (Fast mode; Codex maps to priority processing — see [Codex config](https://developers.openai.com/codex/config-reference); override `XBRD_SPARK_SERVICE_TIER`)
 - Force fallback without probing spark: `XBRD_SPARK_USE_FALLBACK=1`
-- Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none` (or empty / `off` / `0`)
-- Meta records `model` (actual) and optional `model_fallback_from`.
+- Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none`
+- Meta: `model` + optional `model_fallback_from`
 
 Agents that should call it:
 - labrat (default channel for cheap probes / swarms)
@@ -88,7 +89,7 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 
 ## Provider quota
 
-If Titanium returns **usage_limit** on the primary spark model, sekhmet **automatically retries once** on `gpt-5.6-luna-fast` (or `XBRD_SPARK_FALLBACK_MODEL`) and latches that model for the rest of the process. All other surface (namespace, swarm, NDJSON, xbgst roles) stays equal.
+If Titanium returns **usage_limit** on the primary spark model, sekhmet **automatically retries** on `gpt-5.6-luna` with `service_tier=fast` + effort low (or `XBRD_SPARK_FALLBACK_MODEL`) and latches that model for the rest of the process.
 
 For 403 websocket / 429 rate_limit / auth failures: no model fallback — stop or lower `-j`, prefer dry-run gates.
 

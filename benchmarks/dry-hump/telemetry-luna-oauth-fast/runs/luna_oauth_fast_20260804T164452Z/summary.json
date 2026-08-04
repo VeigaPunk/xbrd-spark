@@ -1,0 +1,98 @@
+{
+  "run_id": "luna_oauth_fast_20260804T164452Z",
+  "model_label": "oauth/gpt-5.6-luna+service_tier=fast",
+  "wall_seconds": 44.577,
+  "start_iso": "2026-08-04T16:44:57+00:00",
+  "end_iso": "2026-08-04T16:45:41+00:00",
+  "start_epoch": "1785861897.039199825",
+  "end_epoch": "1785861941.615975930",
+  "host": "plazir27",
+  "sekhmet_bin": "/home/vgpnk1337/.cargo/bin/sekhmet",
+  "codex_bin": "/home/vgpnk1337/.local/bin/codex-titanium",
+  "codex_version": "codex-cli 0.146.0-alpha.10.1+titanium.1",
+  "root": "/tmp/sekhmet-12x-luna_oauth_fast_20260804T164452Z-lCxanC",
+  "sparks_expected": 64,
+  "sparks_ok": 64,
+  "sparks_fail": 0,
+  "sparks_timeout": 0,
+  "ndjson_lines": 64,
+  "tokens_total": 514610,
+  "tokens_n": 64,
+  "tokens_min": 4853,
+  "tokens_max": 15316,
+  "tokens_avg": 8040.8,
+  "domains": {
+    "religion": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 76546,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.045222720 end=1785861929.990326734"
+    },
+    "sex": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 67251,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.045477439 end=1785861934.697475207"
+    },
+    "drugs": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 62484,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.045889329 end=1785861929.738840041"
+    },
+    "politics": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 54633,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.046345419 end=1785861941.615292271"
+    },
+    "money": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 68225,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.046778248 end=1785861935.848871152"
+    },
+    "violence": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 57897,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.047296758 end=1785861921.138837282"
+    },
+    "ai": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 55416,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.047936307 end=1785861921.234292183"
+    },
+    "charlie-kirk": {
+      "ok": 8,
+      "fail": 0,
+      "timeout": 0,
+      "lines": 8,
+      "tokens_sum": 72158,
+      "tokens_n": 8,
+      "timing": "exit=0 start=1785861897.048568737 end=1785861934.450929939"
+    }
+  }
+}

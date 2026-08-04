@@ -7,19 +7,22 @@ Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Pyt
 
 Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex-titanium](https://github.com/VeigaPunk/codex-titanium).
 
+**Auth path:** ChatGPT **OAuth** via seeded `~/.codex` (not platform API key).
+
 **Model routing (everything else equal — same namespace, swarm, NDJSON for xbgst):**
-| | Model | Env |
+| | Value | Env / flag |
 |---|---|---|
 | Primary | `gpt-5.3-codex-spark` | `XBRD_SPARK_MODEL` |
-| Fallback chain | `gpt-5.6-luna-fast` → `gpt-5.6-luna` (effort **low**) | `XBRD_SPARK_FALLBACK_MODEL` (comma list) |
-| Force fallback | (skip primary) | `XBRD_SPARK_USE_FALLBACK=1` |
-| Disable fallback | — | `XBRD_SPARK_FALLBACK_MODEL=none` |
+| Fallback (OAuth) | `gpt-5.6-luna` | `XBRD_SPARK_FALLBACK_MODEL` |
+| Reasoning | `low` | `-c model_reasoning_effort=low` |
+| Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
+| Force fallback | skip primary | `XBRD_SPARK_USE_FALLBACK=1` |
 
-On primary `usage_limit` (or model-unsupported), sekhmet walks the fallback chain with `model_reasoning_effort=low`. ChatGPT-auth Codex blocks the `*-luna-fast` slug; the next entry `gpt-5.6-luna` is used and **sticky** for the process. Recorded in meta as `model` + optional `model_fallback_from`.
+On primary `usage_limit`, sekhmet retries on **luna** with effort **low** + **service_tier=fast**, then sticks for the process. Recorded in meta as `model` + optional `model_fallback_from`.
 
 Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
 
-Routes executions through **Titanium** (primary codex-spark, luna-fast when sparks are out) with:
+Routes executions through **Titanium OAuth** (codex-spark primary, luna + Fast tier when sparks are out) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
 - **Up to 64 concurrent runners** — `sekhmet swarm -j N` (hard cap 64)

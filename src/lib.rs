@@ -27,21 +27,20 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 /// Default Titanium model for pure L3 sparks (override: `XBRD_SPARK_MODEL`).
 pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
 
-/// Preferred fallback when sparks are out: Luna Fast (low effort via `-c model_reasoning_effort=low`).
+/// Default fallback when sparks are out — **OAuth / ChatGPT-account Codex path**.
 ///
-/// Note: Codex on **ChatGPT-account** auth rejects the exact slug `gpt-5.6-luna-fast`
-/// (`model_chatgpt_unsupported`). The next chain entry `gpt-5.6-luna` is the same family
-/// that works on that path with reasoning effort **low**. Platform API keys often lack
-/// both slugs (`model_not_found`).
-pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna-fast";
+/// Codex OAuth rejects the slug `gpt-5.6-luna-fast`. The working model is `gpt-5.6-luna`
+/// with `model_reasoning_effort=low` and `service_tier=fast` (Fast mode; wire value maps
+/// to priority processing per Codex config docs).
+pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna";
 
-/// Luna family slug that works under ChatGPT-auth Codex (effort still forced low).
-pub const DEFAULT_FALLBACK_MODEL_LUNA: &str = "gpt-5.6-luna";
+/// Default service tier for Titanium exec (Fast mode). Override: `XBRD_SPARK_SERVICE_TIER`.
+/// Codex config key `service_tier`; values `fast` or `priority` are equivalent for GPT-5.6.
+pub const DEFAULT_SERVICE_TIER: &str = "fast";
 
-/// Default fallback chain: luna-fast first, then luna (ChatGPT-auth compatible).
-/// Override with comma-separated `XBRD_SPARK_FALLBACK_MODEL`.
+/// Default fallback chain (OAuth): luna only. Comma-separated override via env.
 /// Disable: empty / `none` / `off` / `0`.
-pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[DEFAULT_FALLBACK_MODEL, DEFAULT_FALLBACK_MODEL_LUNA];
+pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[DEFAULT_FALLBACK_MODEL];
 
 /// Process-wide: skip primary after usage_limit (swarm efficiency).
 static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
@@ -573,7 +572,7 @@ pub fn primary_spark_model() -> String {
 /// Fallback chain when primary is quota-blocked / model rejected. Empty disables.
 ///
 /// `XBRD_SPARK_FALLBACK_MODEL` may be a single model or a comma-separated chain.
-/// Default: `gpt-5.6-luna-fast,gpt-5.6-luna` (fast slug first; plain luna for ChatGPT-auth Codex).
+/// Default (OAuth): `gpt-5.6-luna`.
 pub fn fallback_spark_models() -> Vec<String> {
     match env::var("XBRD_SPARK_FALLBACK_MODEL") {
         Ok(s) => {
@@ -693,10 +692,29 @@ fn resolve_codex_bin() -> Result<PathBuf> {
     })
 }
 
+/// Service tier for Titanium (`service_tier` config). Default `fast` (Fast mode / priority).
+pub fn spark_service_tier() -> String {
+    match env::var("XBRD_SPARK_SERVICE_TIER") {
+        Ok(s) => {
+            let t = s.trim();
+            if t.is_empty() {
+                DEFAULT_SERVICE_TIER.into()
+            } else {
+                t.to_string()
+            }
+        }
+        Err(_) => DEFAULT_SERVICE_TIER.into(),
+    }
+}
+
 /// Build dispatcher cmdline for `model`.
 ///
 /// When `force_codex` is true (fallback retry), always use Titanium codex so `-m`
 /// is applied; xask has no model flag.
+///
+/// Always forces (Titanium path):
+/// - `model_reasoning_effort=low`
+/// - `service_tier=<XBRD_SPARK_SERVICE_TIER|fast>` — Fast mode (priority processing)
 fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Result<(String, Vec<String>)> {
     // Prefer pure Titanium codex for L3 substrate (single source of flags).
     // xask is optional convenience for migration / loadout continuity.
@@ -715,6 +733,7 @@ fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Re
     } else {
         "danger-full-access"
     };
+    let tier = spark_service_tier();
     let p = resolve_codex_bin().with_context(|| {
         if ro {
             "codex-titanium/codex not found on PATH (--ro forces titanium sandbox; xask skipped)"
@@ -732,6 +751,8 @@ fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Re
             model.to_string(),
             "-c".into(),
             "model_reasoning_effort=low".into(),
+            "-c".into(),
+            format!("service_tier={tier}"),
             "--ephemeral".into(),
             "--skip-git-repo-check".into(),
             "--color".into(),
@@ -1336,7 +1357,7 @@ fn run_spark(
     };
 
     // Automatic model fallback chain: usage_limit / model_unsupported → next model.
-    // Default chain: gpt-5.6-luna-fast → gpt-5.6-luna (low effort always). Sticky for swarm.
+    // Default OAuth chain: gpt-5.6-luna (effort low + service_tier=fast). Sticky for swarm.
     let origin_model = meta.model.clone();
     let mut tried: Vec<String> = vec![meta.model.clone()];
     let mut prior_stderr = attempt.1.clone();
@@ -2439,6 +2460,27 @@ mod tests {
         assert!(args
             .windows(2)
             .any(|w| w[0] == "-m" && w[1] == DEFAULT_FALLBACK_MODEL));
+        assert!(
+            args.windows(2)
+                .any(|w| w[0] == "-c" && w[1] == "service_tier=fast"),
+            "expected service_tier=fast in args: {args:?}"
+        );
+        assert!(args
+            .windows(2)
+            .any(|w| w[0] == "-c" && w[1] == "model_reasoning_effort=low"));
+    }
+
+    #[test]
+    fn spark_service_tier_env_override() {
+        let prev = env::var_os("XBRD_SPARK_SERVICE_TIER");
+        env::remove_var("XBRD_SPARK_SERVICE_TIER");
+        assert_eq!(spark_service_tier(), DEFAULT_SERVICE_TIER);
+        env::set_var("XBRD_SPARK_SERVICE_TIER", "priority");
+        assert_eq!(spark_service_tier(), "priority");
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_SERVICE_TIER", v),
+            None => env::remove_var("XBRD_SPARK_SERVICE_TIER"),
+        }
     }
 
     #[test]
@@ -2509,17 +2551,15 @@ mod tests {
     }
 
     #[test]
-    fn default_fallback_chain_is_luna_fast_then_luna() {
+    fn default_fallback_chain_is_luna_oauth() {
         clear_fallback_latch();
         let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
         assert_eq!(
             fallback_spark_models(),
-            vec![
-                DEFAULT_FALLBACK_MODEL.to_string(),
-                DEFAULT_FALLBACK_MODEL_LUNA.to_string()
-            ]
+            vec![DEFAULT_FALLBACK_MODEL.to_string()]
         );
+        assert_eq!(DEFAULT_FALLBACK_MODEL, "gpt-5.6-luna");
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
             None => env::remove_var("XBRD_SPARK_FALLBACK_MODEL"),

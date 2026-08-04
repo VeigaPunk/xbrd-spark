@@ -11,11 +11,11 @@ Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex
 | | Model | Env |
 |---|---|---|
 | Primary | `gpt-5.3-codex-spark` | `XBRD_SPARK_MODEL` |
-| Fallback on `usage_limit` | `gpt-5.6-luna-fast` | `XBRD_SPARK_FALLBACK_MODEL` |
+| Fallback chain | `gpt-5.6-luna-fast` → `gpt-5.6-luna` (effort **low**) | `XBRD_SPARK_FALLBACK_MODEL` (comma list) |
 | Force fallback | (skip primary) | `XBRD_SPARK_USE_FALLBACK=1` |
 | Disable fallback | — | `XBRD_SPARK_FALLBACK_MODEL=none` |
 
-On primary `usage_limit`, sekhmet retries once with the fallback model and **sticks** to it for subsequent sparks in the same process (so swarms do not re-burn the exhausted quota). Recorded in meta as `model` + optional `model_fallback_from`.
+On primary `usage_limit` (or model-unsupported), sekhmet walks the fallback chain with `model_reasoning_effort=low`. ChatGPT-auth Codex blocks the `*-luna-fast` slug; the next entry `gpt-5.6-luna` is used and **sticky** for the process. Recorded in meta as `model` + optional `model_fallback_from`.
 
 Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
 

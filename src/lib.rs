@@ -27,13 +27,27 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 /// Default Titanium model for pure L3 sparks (override: `XBRD_SPARK_MODEL`).
 pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
 
-/// Fallback when primary hits usage_limit / quota (override: `XBRD_SPARK_FALLBACK_MODEL`).
-/// Set env to empty / `none` / `off` to disable automatic fallback.
+/// Preferred fallback when sparks are out: Luna Fast (low effort via `-c model_reasoning_effort=low`).
+///
+/// Note: Codex on **ChatGPT-account** auth rejects the exact slug `gpt-5.6-luna-fast`
+/// (`model_chatgpt_unsupported`). The next chain entry `gpt-5.6-luna` is the same family
+/// that works on that path with reasoning effort **low**. Platform API keys often lack
+/// both slugs (`model_not_found`).
 pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna-fast";
 
-/// Process-wide sticky latch: after primary `usage_limit`, later sparks in this
-/// process start on the fallback model (swarm efficiency). Reset only on process exit.
+/// Luna family slug that works under ChatGPT-auth Codex (effort still forced low).
+pub const DEFAULT_FALLBACK_MODEL_LUNA: &str = "gpt-5.6-luna";
+
+/// Default fallback chain: luna-fast first, then luna (ChatGPT-auth compatible).
+/// Override with comma-separated `XBRD_SPARK_FALLBACK_MODEL`.
+/// Disable: empty / `none` / `off` / `0`.
+pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[DEFAULT_FALLBACK_MODEL, DEFAULT_FALLBACK_MODEL_LUNA];
+
+/// Process-wide: skip primary after usage_limit (swarm efficiency).
 static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
+
+/// Process-wide sticky model once a working fallback is selected (or next candidate after reject).
+static STICKY_MODEL: Mutex<Option<String>> = Mutex::new(None);
 
 #[derive(Parser, Debug)]
 #[command(
@@ -292,6 +306,17 @@ pub fn classify_provider_error(stdout: &str, stderr: &str) -> Option<&'static st
     if blob.contains("usage limit") || blob.contains("hit your usage limit") {
         return Some("usage_limit");
     }
+    // Codex + ChatGPT account rejects many `*-fast` / non-Codex models (400).
+    if blob.contains("not supported when using codex with a chatgpt account") {
+        return Some("model_chatgpt_unsupported");
+    }
+    if blob.contains("model_not_found")
+        || blob.contains("does not exist")
+        || blob.contains("model is not supported")
+        || blob.contains("unsupported model")
+    {
+        return Some("model_unsupported");
+    }
     if blob.contains("429 too many requests") || blob.contains("rate limit") {
         return Some("rate_limit");
     }
@@ -545,23 +570,36 @@ pub fn primary_spark_model() -> String {
     env::var("XBRD_SPARK_MODEL").unwrap_or_else(|_| DEFAULT_SPARK_MODEL.into())
 }
 
-/// Fallback model when primary is quota-blocked. `None` disables automatic fallback.
+/// Fallback chain when primary is quota-blocked / model rejected. Empty disables.
 ///
-/// Override with `XBRD_SPARK_FALLBACK_MODEL` (default `gpt-5.6-luna-fast`).
-/// Disable: empty string, `none`, `off`, or `0`.
-pub fn fallback_spark_model() -> Option<String> {
+/// `XBRD_SPARK_FALLBACK_MODEL` may be a single model or a comma-separated chain.
+/// Default: `gpt-5.6-luna-fast,gpt-5.6-luna` (fast slug first; plain luna for ChatGPT-auth Codex).
+pub fn fallback_spark_models() -> Vec<String> {
     match env::var("XBRD_SPARK_FALLBACK_MODEL") {
         Ok(s) => {
             let t = s.trim();
-            if t.is_empty() || t.eq_ignore_ascii_case("none") || t.eq_ignore_ascii_case("off") || t == "0"
+            if t.is_empty()
+                || t.eq_ignore_ascii_case("none")
+                || t.eq_ignore_ascii_case("off")
+                || t == "0"
             {
-                None
-            } else {
-                Some(t.to_string())
+                return Vec::new();
             }
+            t.split(',')
+                .map(|p| p.trim().to_string())
+                .filter(|p| !p.is_empty())
+                .collect()
         }
-        Err(_) => Some(DEFAULT_FALLBACK_MODEL.into()),
+        Err(_) => DEFAULT_FALLBACK_CHAIN
+            .iter()
+            .map(|s| (*s).to_string())
+            .collect(),
     }
+}
+
+/// First fallback model only (compat). `None` if chain empty.
+pub fn fallback_spark_model() -> Option<String> {
+    fallback_spark_models().into_iter().next()
 }
 
 /// Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1|true|yes`.
@@ -575,38 +613,64 @@ fn force_fallback_env() -> bool {
     }
 }
 
+fn sticky_model_get() -> Option<String> {
+    STICKY_MODEL
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .clone()
+}
+
+fn sticky_model_set(model: &str) {
+    let mut g = STICKY_MODEL.lock().unwrap_or_else(|e| e.into_inner());
+    *g = Some(model.to_string());
+}
+
 /// Model chosen for the next attempt (sticky latch + env force respected).
 ///
 /// Returns `(model, fallback_from)` where `fallback_from` is `Some(primary)` when
 /// starting on the fallback path without a live primary attempt this process turn.
 pub fn resolve_run_model() -> (String, Option<String>) {
     let primary = primary_spark_model();
-    let fallback = fallback_spark_model();
+    let chain = fallback_spark_models();
     let use_fb = force_fallback_env() || FALLBACK_LATCHED.load(Ordering::Relaxed);
     if use_fb {
-        if let Some(fb) = fallback {
-            if fb != primary {
-                return (fb, Some(primary));
+        if let Some(sticky) = sticky_model_get() {
+            if sticky != primary {
+                return (sticky, Some(primary));
             }
+        }
+        if let Some(fb) = chain.into_iter().find(|m| m != &primary) {
+            return (fb, Some(primary));
         }
     }
     (primary, None)
 }
 
-/// Latch process-wide fallback after primary usage_limit (swarm efficiency).
+/// Latch process-wide: skip primary on subsequent sparks.
 pub fn latch_fallback_model() {
     FALLBACK_LATCHED.store(true, Ordering::Relaxed);
 }
 
-/// Test/helper: clear sticky latch.
+/// Latch and pin sticky model (swarm uses this without re-probing dead models).
+pub fn latch_fallback_to(model: &str) {
+    latch_fallback_model();
+    sticky_model_set(model);
+}
+
+/// Test/helper: clear sticky latch + sticky model.
 #[cfg(test)]
 pub fn clear_fallback_latch() {
     FALLBACK_LATCHED.store(false, Ordering::Relaxed);
+    let mut g = STICKY_MODEL.lock().unwrap_or_else(|e| e.into_inner());
+    *g = None;
 }
 
-/// Whether a fail_reason warrants automatic model fallback.
+/// Whether a fail_reason warrants trying the next model in the chain.
 fn should_fallback_on_fail_reason(reason: Option<&str>) -> bool {
-    matches!(reason, Some("usage_limit"))
+    matches!(
+        reason,
+        Some("usage_limit") | Some("model_unsupported") | Some("model_chatgpt_unsupported")
+    )
 }
 
 /// Resolve Codex Titanium binary: `CODEX_BIN` → `codex-titanium` → `codex`.
@@ -1112,7 +1176,7 @@ fn run_spark(
     let task_hash = hash_str(task);
 
     let (model, model_fallback_from) = resolve_run_model();
-    let fallback_model = fallback_spark_model();
+    let fallback_chain = fallback_spark_models();
 
     if dry_run {
         let mut meta = Meta {
@@ -1271,80 +1335,104 @@ fn run_spark(
         }
     };
 
-    // Automatic model fallback: usage_limit on current model → fallback (once), sticky for process.
-    // Skip if already on fallback path or fallback disabled / same as current.
-    let attempted_model = meta.model.clone();
-    let can_try_fallback = meta.model_fallback_from.is_none()
-        && fallback_model
-            .as_ref()
-            .is_some_and(|f| f != &attempted_model);
-    if !attempt.3 && !attempt.4 && can_try_fallback {
+    // Automatic model fallback chain: usage_limit / model_unsupported → next model.
+    // Default chain: gpt-5.6-luna-fast → gpt-5.6-luna (low effort always). Sticky for swarm.
+    let origin_model = meta.model.clone();
+    let mut tried: Vec<String> = vec![meta.model.clone()];
+    let mut prior_stderr = attempt.1.clone();
+    while !attempt.3 && !attempt.4 {
         let reason = classify_provider_error(&attempt.0, &attempt.1);
-        if should_fallback_on_fail_reason(reason) {
-            let fb_model = fallback_model.as_ref().expect("checked above").clone();
-            latch_fallback_model();
-            eprintln!(
-                "sekhmet: model {attempted_model} hit {}; falling back to {fb_model}",
-                reason.unwrap_or("usage_limit")
-            );
-            match find_dispatcher(direct, ro, &fb_model, true) {
-                Ok((fb_bin, mut fb_args)) => {
-                    fb_args.push(task.to_string());
-                    meta.model_fallback_from = Some(attempted_model.clone());
-                    meta.model = fb_model.clone();
-                    meta.cmdline = std::iter::once(fb_bin.clone())
-                        .chain(fb_args.iter().cloned())
-                        .collect();
-                    let _ = write_meta_atomic(&base, &meta);
-                    match spawn_once(&fb_bin, &fb_args) {
-                        Ok((s_out, mut s_err, s_exit, s_ok, s_to)) => {
+        if !should_fallback_on_fail_reason(reason) {
+            break;
+        }
+        let next = fallback_chain
+            .iter()
+            .find(|m| !tried.iter().any(|t| t == *m))
+            .cloned();
+        let Some(fb_model) = next else {
+            break;
+        };
+        // Skip primary on later sparks; only pin sticky after a *successful* fallback.
+        latch_fallback_model();
+        eprintln!(
+            "sekhmet: model {} hit {}; falling back to {fb_model} (reasoning_effort=low)",
+            tried.last().map(|s| s.as_str()).unwrap_or("?"),
+            reason.unwrap_or("usage_limit")
+        );
+        match find_dispatcher(direct, ro, &fb_model, true) {
+            Ok((fb_bin, mut fb_args)) => {
+                fb_args.push(task.to_string());
+                meta.model_fallback_from = Some(origin_model.clone());
+                meta.model = fb_model.clone();
+                meta.cmdline = std::iter::once(fb_bin.clone())
+                    .chain(fb_args.iter().cloned())
+                    .collect();
+                let _ = write_meta_atomic(&base, &meta);
+                match spawn_once(&fb_bin, &fb_args) {
+                    Ok((s_out, mut s_err, s_exit, s_ok, s_to)) => {
+                        if !s_err.is_empty() {
+                            s_err.push('\n');
+                        }
+                        s_err.push_str(&format!(
+                            "xbrd-spark: retried after {} on {}; now using {} (low)",
+                            reason.unwrap_or("usage_limit"),
+                            tried.last().map(|s| s.as_str()).unwrap_or("?"),
+                            fb_model
+                        ));
+                        if !s_ok {
                             if !s_err.is_empty() {
                                 s_err.push('\n');
                             }
-                            s_err.push_str(&format!(
-                                "xbrd-spark: retried after {} on {}; now using {}",
-                                reason.unwrap_or("usage_limit"),
-                                attempted_model,
-                                fb_model
-                            ));
-                            if !s_ok {
-                                if !s_err.is_empty() {
-                                    s_err.push('\n');
+                            s_err.push_str("--- prior attempt stderr ---\n");
+                            s_err.push_str(&prior_stderr);
+                            // If this candidate is also dead, advance sticky past it so swarms
+                            // do not re-probe a ChatGPT-blocked slug every job.
+                            let r2 = classify_provider_error(&s_out, &s_err);
+                            if should_fallback_on_fail_reason(r2) {
+                                if let Some(after) = fallback_chain
+                                    .iter()
+                                    .find(|m| !tried.iter().any(|t| t == *m) && *m != &fb_model)
+                                {
+                                    sticky_model_set(after);
                                 }
-                                s_err.push_str("--- primary attempt stderr ---\n");
-                                s_err.push_str(&attempt.1);
                             }
-                            attempt = (s_out, s_err, s_exit, s_ok, s_to);
+                        } else {
+                            // Working model: pin for process.
+                            latch_fallback_to(&fb_model);
                         }
-                        Err(e) => {
-                            let msg = format!(
-                                "fallback spawn failed after {}: {:#}\n--- primary stderr ---\n{}",
-                                reason.unwrap_or("usage_limit"),
-                                e,
-                                attempt.1
-                            );
-                            let duration_ms = start.elapsed().as_millis() as u64;
-                            let (_, record) = finalize_result(
-                                &base,
-                                &mut meta,
-                                "error",
-                                &attempt.0,
-                                &msg,
-                                Some(1),
-                                duration_ms,
-                            )?;
-                            emit_ndjson(&record)?;
-                            if !keep {
-                                let _ = fs::remove_dir_all(&base);
-                            }
-                            return Ok(1);
+                        prior_stderr = s_err.clone();
+                        tried.push(fb_model);
+                        attempt = (s_out, s_err, s_exit, s_ok, s_to);
+                    }
+                    Err(e) => {
+                        let msg = format!(
+                            "fallback spawn failed after {}: {:#}\n--- prior stderr ---\n{}",
+                            reason.unwrap_or("usage_limit"),
+                            e,
+                            prior_stderr
+                        );
+                        let duration_ms = start.elapsed().as_millis() as u64;
+                        let (_, record) = finalize_result(
+                            &base,
+                            &mut meta,
+                            "error",
+                            &attempt.0,
+                            &msg,
+                            Some(1),
+                            duration_ms,
+                        )?;
+                        emit_ndjson(&record)?;
+                        if !keep {
+                            let _ = fs::remove_dir_all(&base);
                         }
+                        return Ok(1);
                     }
                 }
-                Err(e) => {
-                    eprintln!("sekhmet: fallback dispatcher resolve failed: {e:#}");
-                    // keep primary attempt result
-                }
+            }
+            Err(e) => {
+                eprintln!("sekhmet: fallback dispatcher resolve failed for {fb_model}: {e:#}");
+                tried.push(fb_model);
+                // try next in chain
             }
         }
     }
@@ -2403,10 +2491,39 @@ mod tests {
     }
 
     #[test]
-    fn should_fallback_only_on_usage_limit() {
+    fn should_fallback_on_quota_and_unsupported() {
         assert!(should_fallback_on_fail_reason(Some("usage_limit")));
+        assert!(should_fallback_on_fail_reason(Some("model_chatgpt_unsupported")));
+        assert!(should_fallback_on_fail_reason(Some("model_unsupported")));
         assert!(!should_fallback_on_fail_reason(Some("rate_limit")));
         assert!(!should_fallback_on_fail_reason(None));
+    }
+
+    #[test]
+    fn classify_chatgpt_unsupported_luna_fast() {
+        let err = r#"ERROR: {"message":"The 'gpt-5.6-luna-fast' model is not supported when using Codex with a ChatGPT account."}"#;
+        assert_eq!(
+            classify_provider_error("", err),
+            Some("model_chatgpt_unsupported")
+        );
+    }
+
+    #[test]
+    fn default_fallback_chain_is_luna_fast_then_luna() {
+        clear_fallback_latch();
+        let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
+        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
+        assert_eq!(
+            fallback_spark_models(),
+            vec![
+                DEFAULT_FALLBACK_MODEL.to_string(),
+                DEFAULT_FALLBACK_MODEL_LUNA.to_string()
+            ]
+        );
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
+            None => env::remove_var("XBRD_SPARK_FALLBACK_MODEL"),
+        }
     }
 
     #[test]

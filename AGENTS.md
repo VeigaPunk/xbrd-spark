@@ -6,10 +6,12 @@ Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no
 
 **Models (xbgst L3 workers — same isolation/swarm surface):**
 - Primary: `gpt-5.3-codex-spark` (`XBRD_SPARK_MODEL`)
-- Fallback when primary hits `usage_limit`: `gpt-5.6-luna-fast` (`XBRD_SPARK_FALLBACK_MODEL`)
+- Fallback chain (comma-separated `XBRD_SPARK_FALLBACK_MODEL`): **`gpt-5.6-luna-fast` → `gpt-5.6-luna`**
+  - Always dispatched with `model_reasoning_effort=low` (luna fast **low**).
+  - ChatGPT-auth Codex rejects the exact slug `gpt-5.6-luna-fast`; sekhmet auto-continues to `gpt-5.6-luna` (same family, low effort) and sticks there for the process.
 - Force fallback without probing spark: `XBRD_SPARK_USE_FALLBACK=1`
 - Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none` (or empty / `off` / `0`)
-- After the first `usage_limit` on primary, later sparks in the same process stick to the fallback model (swarm efficiency). Meta records `model` (actual) and optional `model_fallback_from`.
+- Meta records `model` (actual) and optional `model_fallback_from`.
 
 Agents that should call it:
 - labrat (default channel for cheap probes / swarms)

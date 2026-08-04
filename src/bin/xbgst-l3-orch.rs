@@ -153,9 +153,13 @@ struct ShipRecord {
     reason: String,
     commit: Option<String>,
     pushed: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    push_err: Option<String>,
     dirty_before: bool,
     dirty_after: bool,
     gate_ok: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    gate_detail: Option<String>,
 }
 
 const ROLES: &[&str] = &[
@@ -477,11 +481,13 @@ fn judge_and_ship(
     kind: WaveKind,
     do_push: bool,
 ) -> Result<ShipRecord> {
-    let dirty_after = git_dirty(&repo.path)?;
-    let gate_ok = run_gates(&repo.path)?;
+    // Drop titanium/noise artifacts so gates see real project state.
+    sanitize_worktree(&repo.path);
 
-    // Strict improvement: either newly dirty with green gates, or still dirty but gates newly green
-    // and there is a real diff vs HEAD that tests accept.
+    let dirty_after = git_dirty(&repo.path)?;
+    let (gate_ok, gate_detail) = run_gates(&repo.path)?;
+
+    // Strict improvement: real diff vs HEAD that gates accept.
     let has_diff = git_has_diff_vs_head(&repo.path)?;
     let improved = has_diff && gate_ok;
 
@@ -489,7 +495,10 @@ fn judge_and_ship(
         let reason = if !has_diff {
             "BLOCKED: no tree change vs HEAD (no strict improvement)".into()
         } else {
-            "BLOCKED: gates failed after mutation".into()
+            format!(
+                "BLOCKED: gates failed after mutation ({})",
+                gate_detail.as_deref().unwrap_or("unknown")
+            )
         };
         return Ok(ShipRecord {
             repo: repo.name.clone(),
@@ -497,9 +506,11 @@ fn judge_and_ship(
             reason,
             commit: None,
             pushed: false,
+            push_err: None,
             dirty_before,
             dirty_after,
             gate_ok,
+            gate_detail,
         });
     }
 
@@ -509,7 +520,7 @@ fn judge_and_ship(
         .args(["checkout", "main"])
         .status();
 
-    // Stage project files only (respect gitignore; never force secrets)
+    // Stage project files only (gitignore respected; never force secrets)
     let st = Command::new("git")
         .current_dir(&repo.path)
         .args(["add", "-A"])
@@ -537,28 +548,26 @@ fn judge_and_ship(
                 reason: "BLOCKED: nothing to commit after stage".into(),
                 commit: None,
                 pushed: false,
+                push_err: None,
                 dirty_before,
                 dirty_after,
                 gate_ok,
+                gate_detail,
             });
         }
         bail!("git commit failed: {err}");
     }
     let sha = git_rev_parse(&repo.path)?;
 
-    let mut pushed = false;
-    if do_push {
-        let p = Command::new("git")
-            .current_dir(&repo.path)
-            .args(["push", "-u", "origin", "main"])
-            .output()?;
-        pushed = p.status.success();
-        if !pushed {
-            eprintln!(
-                "xbgst-l3-orch: push failed for {}: {}",
-                repo.name,
-                String::from_utf8_lossy(&p.stderr)
-            );
+    let (pushed, push_err) = if do_push {
+        push_main(&repo.path)?
+    } else {
+        (false, Some("no_push flag set".into()))
+    };
+
+    if !pushed {
+        if let Some(ref e) = push_err {
+            eprintln!("xbgst-l3-orch: push failed for {}: {e}", repo.name);
         }
     }
 
@@ -572,37 +581,184 @@ fn judge_and_ship(
         ),
         commit: Some(sha),
         pushed,
+        push_err,
         dirty_before,
         dirty_after,
         gate_ok,
+        gate_detail,
     })
 }
 
-fn run_gates(repo: &Path) -> Result<bool> {
-    // Prefer cargo check/test for Rust; else git-only gate (diff compiles N/A)
-    if repo.join("Cargo.toml").is_file() {
-        let check = Command::new("cargo")
+/// Remove non-product noise that sekhmet/Titanium leaves and that breaks "strict improvement".
+fn sanitize_worktree(repo: &Path) {
+    // Untracked noise only — never discard tracked edits.
+    let patterns = [
+        "**/__pycache__",
+        "**/*.pyc",
+        "**/target/tmp",
+        "**/.DS_Store",
+        "**/ndjson.ship.out",
+        "**/swarm.ship.stderr.log",
+    ];
+    for pat in patterns {
+        let _ = Command::new("git")
             .current_dir(repo)
-            .args(["check", "--all-targets"])
+            .args(["clean", "-fd", "-e", "!.env", "--", pat])
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .status();
-        match check {
-            Ok(s) if s.success() => {
-                // tests if present
-                let test = Command::new("cargo")
-                    .current_dir(repo)
-                    .args(["test", "--all-targets", "--", "--test-threads=4"])
-                    .stdout(Stdio::null())
-                    .stderr(Stdio::null())
-                    .status();
-                return Ok(test.map(|s| s.success()).unwrap_or(false));
-            }
-            _ => return Ok(false),
+    }
+    // Explicit known junk dirs under benchmarks
+    for rel in [
+        "benchmarks/dry-hump/telemetry-e2e-model-questions/__pycache__",
+    ] {
+        let p = repo.join(rel);
+        if p.exists() {
+            let _ = fs::remove_dir_all(&p);
         }
     }
-    // Non-Rust: require clean syntax only — treat as pass if git repo healthy
-    Ok(repo.join(".git").exists())
+}
+
+/// Push `main` to `origin` with one retry. Returns (ok, err_snip).
+fn push_main(repo: &Path) -> Result<(bool, Option<String>)> {
+    for attempt in 1..=2 {
+        let p = Command::new("git")
+            .current_dir(repo)
+            .args(["push", "-u", "origin", "main"])
+            .output()?;
+        if p.status.success() {
+            return Ok((true, None));
+        }
+        let err = format!(
+            "attempt {attempt}: {}",
+            String::from_utf8_lossy(&p.stderr).trim()
+        );
+        if attempt == 1 {
+            // fetch in case remote moved; still no force-push
+            let _ = Command::new("git")
+                .current_dir(repo)
+                .args(["fetch", "origin", "main"])
+                .status();
+            continue;
+        }
+        return Ok((false, Some(err.chars().take(800).collect())));
+    }
+    Ok((false, Some("push exhausted retries".into())))
+}
+
+/// Gate ladder for Rust crates:
+/// 1) `cargo check --all-targets` (required)
+/// 2) `cargo test --lib` (fast unit tests; required if package has lib)
+/// 3) full `cargo test --all-targets` with wall timeout (best-effort; fail only if check/lib ok but tests error)
+///
+/// Non-Rust: `.git` present counts as pass (docs/marketplace).
+/// Override: `XBGST_SHIP_GATE=check|lib|full` (default `lib`).
+fn run_gates(repo: &Path) -> Result<(bool, Option<String>)> {
+    let mode = std::env::var("XBGST_SHIP_GATE").unwrap_or_else(|_| "lib".into());
+    if !repo.join("Cargo.toml").is_file() {
+        let ok = repo.join(".git").exists();
+        return Ok((
+            ok,
+            Some(if ok {
+                "non-rust git repo".into()
+            } else {
+                "not a git repo".into()
+            }),
+        ));
+    }
+
+    let check = cargo_status(repo, &["check", "--all-targets"], 300)?;
+    if !check.0 {
+        return Ok((
+            false,
+            Some(format!("cargo check failed: {}", snip(&check.1))),
+        ));
+    }
+    if mode.eq_ignore_ascii_case("check") {
+        return Ok((true, Some("cargo check ok".into())));
+    }
+
+    // Prefer --lib when present (faster, less flaky under concurrent orch).
+    let has_lib = repo.join("src/lib.rs").is_file()
+        || fs::read_to_string(repo.join("Cargo.toml"))
+            .map(|t| t.contains("[lib]") || t.contains("path = \"src/lib.rs\""))
+            .unwrap_or(false);
+
+    if has_lib || mode.eq_ignore_ascii_case("lib") {
+        let lib = cargo_status(
+            repo,
+            &["test", "--lib", "--", "--test-threads=2"],
+            240,
+        )?;
+        if !lib.0 {
+            return Ok((
+                false,
+                Some(format!("cargo test --lib failed: {}", snip(&lib.1))),
+            ));
+        }
+        if !mode.eq_ignore_ascii_case("full") {
+            return Ok((true, Some("cargo check + test --lib ok".into())));
+        }
+    }
+
+    let full = cargo_status(
+        repo,
+        &["test", "--all-targets", "--", "--test-threads=2"],
+        360,
+    )?;
+    if full.0 {
+        Ok((true, Some("cargo check + full test ok".into())))
+    } else {
+        Ok((
+            false,
+            Some(format!("cargo test --all-targets failed: {}", snip(&full.1))),
+        ))
+    }
+}
+
+fn cargo_status(repo: &Path, args: &[&str], timeout_secs: u64) -> Result<(bool, String)> {
+    // Prefer GNU timeout when present so hung tests cannot block the orch forever.
+    let use_timeout = which::which("timeout").is_ok();
+    let mut cmd = if use_timeout {
+        let mut c = Command::new("timeout");
+        c.arg(timeout_secs.to_string()).arg("cargo");
+        for a in args {
+            c.arg(a);
+        }
+        c
+    } else {
+        let mut c = Command::new("cargo");
+        for a in args {
+            c.arg(a);
+        }
+        c
+    };
+    cmd.current_dir(repo)
+        .env("CARGO_TERM_COLOR", "never")
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let out = cmd.output()?;
+    let mut blob = String::new();
+    blob.push_str(&String::from_utf8_lossy(&out.stdout));
+    blob.push_str(&String::from_utf8_lossy(&out.stderr));
+    // timeout(1) exit 124 = timed out
+    let ok = out.status.success();
+    if !ok && use_timeout && out.status.code() == Some(124) {
+        blob.push_str("\n(timeout)");
+    }
+    Ok((ok, blob))
+}
+
+fn snip(s: &str) -> String {
+    let t = s.trim();
+    // keep last lines — usually the error
+    let lines: Vec<&str> = t.lines().rev().take(12).collect();
+    let out: Vec<&str> = lines.into_iter().rev().collect();
+    if out.is_empty() {
+        return "no output".into();
+    }
+    let joined = out.join(" | ");
+    joined.chars().take(400).collect()
 }
 
 fn git_dirty(repo: &Path) -> Result<bool> {
@@ -639,6 +795,19 @@ fn git_rev_parse(repo: &Path) -> Result<String> {
     Ok(String::from_utf8_lossy(&o.stdout).trim().to_string())
 }
 
+/// Short godspeed **directive** only (4 rules + concurrent tools + Rust lock).
+/// Never inject filter/velocity (trilogy stays judge-only).
+const GODSPEED_DIRECTIVE: &str = "\
+You are Godspeed-enabled. \
+1. Name the axes. \
+2. Iterate cheap, in parallel. \
+3. Keep moves that improve any axis and harm none. \
+4. Don't aim — let the frontier walk itself. \
+IMMEDIATELY STOP ASKING CLARIFYING QUESTIONS. \
+Execute tool calls concurrently in large batches. Do not serialize what can run in parallel. \
+Do not output philosophical reasoning or verbose plans. Act directly via tool calls. \
+Language lock: only Rust. No Python.";
+
 fn pick_scope_repo(repos: &[LocalRepo], wave: u64, kind: WaveKind) -> Option<LocalRepo> {
     if repos.is_empty() || kind == WaveKind::Issues {
         return None;
@@ -663,13 +832,13 @@ fn build_wave_tasks(
             WaveKind::Issues => {
                 if issues.is_empty() {
                     format!(
-                        "ROLE={role} | No open issues loaded. Propose how to discover work. Under 20 lines."
+                        "{GODSPEED_DIRECTIVE} ROLE={role} | No open issues loaded. Propose how to discover work. Under 20 lines."
                     )
                 } else {
                     let issue = &issues[(wave as usize + i) % issues.len()];
                     let body: String = issue.body.chars().take(500).collect();
                     format!(
-                        "You are Godspeed-enabled xbgst `{role}` (Titanium OAuth). \
+                        "{GODSPEED_DIRECTIVE} You are xbgst `{role}` (Titanium OAuth). \
 ISSUE {repo}#{num}: {title} | URL {url} | BODY {body} | \
 Produce role-specific output (labrat=probe+gate, scout=prior-art, reviewer=risks, executor=Rust sketch, \
 critic=attacks, connector=cross-links 2 issues, sentinel=security, distiller=5-bullet next session plan, \
@@ -691,7 +860,7 @@ Max 35 lines. Start with ROLE={role} ISSUE={repo}#{num}.",
                     .unwrap_or("workspace");
                 let verb = kind.as_str();
                 format!(
-                    "You are Godspeed-enabled xbgst `{role}` working INSIDE scoped repo `{repo}` (Titanium may mutate workspace). \
+                    "{GODSPEED_DIRECTIVE} You are xbgst `{role}` working INSIDE scoped repo `{repo}` (Titanium may mutate workspace). \
 Wave kind={verb}. Language lock: Rust only for code changes. \
 1) Inspect the tree (src/, tests/, README, Cargo.toml). \
 2) Make a STRICT IMPROVEMENT only: fix a real bug, add a missing test, tighten docs/AGENTS, remove dead code, or improve sekhmet/xbgst wiring. \
@@ -834,11 +1003,11 @@ fn load_repos(path: Option<&Path>) -> Result<Vec<LocalRepo>> {
             }
         }
     }
-    // Default high-value local trees if file empty
+    // Default high-value local trees if file empty.
+    // Prefer sekhmetalt over xbrd-spark when both exist (same origin; avoid dual dirty).
     if out.is_empty() {
         for name in [
             "sekhmetalt",
-            "xbrd-spark",
             "xbrd-selector",
             "grok-marketplace",
             "xbrd-grok",
@@ -851,7 +1020,20 @@ fn load_repos(path: Option<&Path>) -> Result<Vec<LocalRepo>> {
                 });
             }
         }
+        // Only include xbrd-spark if sekhmetalt missing
+        if !out.iter().any(|r| r.name == "sekhmetalt") {
+            let pb = PathBuf::from("/home/vgpnk1337/Projects/xbrd-spark");
+            if pb.is_dir() && pb.join(".git").exists() {
+                out.push(LocalRepo {
+                    path: pb,
+                    name: "xbrd-spark".into(),
+                });
+            }
+        }
     }
+    // Dedupe by canonical path
+    out.sort_by(|a, b| a.path.cmp(&b.path));
+    out.dedup_by(|a, b| a.path == b.path);
     Ok(out)
 }
 

@@ -19,3 +19,5 @@ benchmarks/**/runs/
 **/ndjson.ship.out
 **/swarm.ship.stderr.log
 **/__pycache__/
+NON-SSOT.md
+residual-twin.txt

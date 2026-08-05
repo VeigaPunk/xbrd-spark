@@ -16,3 +16,6 @@ benchmarks/**/payload-private/
 
 # Benchmark run telemetry noise
 benchmarks/**/runs/
+**/ndjson.ship.out
+**/swarm.ship.stderr.log
+**/__pycache__/

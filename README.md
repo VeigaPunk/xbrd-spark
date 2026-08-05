@@ -13,19 +13,22 @@ Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex
 | | Value | Env / flag |
 |---|---|---|
 | Primary | `gpt-5.3-codex-spark` | `XBRD_SPARK_MODEL` |
-| Fallback (OAuth) | `gpt-5.6-luna` | `XBRD_SPARK_FALLBACK_MODEL` |
+| Fallback chain (OAuth) | `gpt-5.6-luna` (default; comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
+| Disable auto-fallback | empty chain | `XBRD_SPARK_FALLBACK_MODEL=none` (also `off` / `0` / empty) |
 | Reasoning | `low` | `-c model_reasoning_effort=low` |
 | Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
 | Force fallback | skip primary | `XBRD_SPARK_USE_FALLBACK=1` |
+| Swarm jobs | **64** default, hard cap **64** | `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` |
 
-On primary `usage_limit`, sekhmet retries on **luna** with effort **low** + **service_tier=fast**, then sticks for the process. Recorded in meta as `model` + optional `model_fallback_from`.
+On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain (default **luna**) with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
+OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `service_tier=fast` (not a `-fast` model id). Env name is **`XBRD_SPARK_FALLBACK_MODEL`** (not `XBRD_SPARK_FALLBACK`).
 
 Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
 
 Routes executions through **Titanium OAuth** (codex-spark primary, luna + Fast tier when sparks are out) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
-- **Up to 64 concurrent runners** — `sekhmet swarm -j N` (hard cap 64)
+- **Up to 64 concurrent runners** — `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` (default **64**, hard cap **64**)
 - **No git worktrees** — namespaced ephemeral dirs only
 - **Double-work tolerance** — concurrent identical tasks are fine; higher layer (distiller / the-judge) dedups by content hash + provenance
 - **Any-CLI invocable** — labrat, mutation-tester, executor, or plain bash can call it
@@ -183,6 +186,19 @@ xbrd-spark status --help
 ## Relation to mutation-harbor
 
 The `--scope` path re-uses the exact exclude list and rsync pattern from `scripts/mutation-harbor-scaffold.sh` in xbrd-gdsp-fknpft. This substrate generalizes that pattern from “mutation only” to “any pure worker”.
+
+## Related (stack)
+
+| Piece | Role |
+|---|---|
+| **[xbgst](https://github.com/VeigaPunk)** / godspeed host | L3 always-on orchestration; prefers `sekhmet swarm -j 64` / `xbgst-l3-orch` |
+| **[grok-marketplace](https://github.com/VeigaPunk/grok-marketplace)** | Grok skills / marketplace surface that wires workers onto this substrate |
+| **[ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)** `sekhmet` plugin | Marketplace package name for this binary surface |
+| **[codex-titanium](https://github.com/VeigaPunk/codex-titanium)** | Titanium dispatcher (`codex-titanium` / `codex`); OAuth ChatGPT path |
+| **tmux-orch** | Ensures long-lived `sekhmet` tmux session for L3 pools (do not kill session `0`) |
+| **xbrd-sol-ultra** | Higher / adjacent xbreed execution path; coordination stays above L3 |
+
+**SSoT:** this repo (`sekhmetalt`) owns VeigaPunk / xbrd-spark docs for model routing, fallback, and swarm caps. Product twin `xbrd-spark` may lag — edit here first.
 
 ---
 

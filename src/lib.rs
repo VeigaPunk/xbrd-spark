@@ -145,8 +145,8 @@ enum Commands {
         #[arg(long = "tasks-file", short = 'f')]
         tasks_file: Option<PathBuf>,
 
-        /// Number of concurrent runners (1..=64). Default 16. Env: XBRD_SPARK_JOBS.
-        #[arg(long, short = 'j', default_value_t = 16, env = "XBRD_SPARK_JOBS")]
+        /// Number of concurrent runners (1..=64). Default 64 (always-on L3 pool). Env: XBRD_SPARK_JOBS.
+        #[arg(long, short = 'j', default_value_t = 64, env = "XBRD_SPARK_JOBS")]
         jobs: usize,
 
         /// Optional shared scope directory rsync'd into each spark workspace.

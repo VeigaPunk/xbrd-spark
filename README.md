@@ -192,6 +192,7 @@ The `--scope` path re-uses the exact exclude list and rsync pattern from `script
 | Piece | Role |
 |---|---|
 | **[xbgst](https://github.com/VeigaPunk)** / godspeed host | L3 always-on orchestration; prefers `sekhmet swarm -j 64` / `xbgst-l3-orch` |
+| **[xbgst-site](https://github.com/VeigaPunk/xbgst-site)** | Public xbgst hub · [site](https://veigapunk.github.io/xbgst-site/) · [github.com/VeigaPunk/xbgst-site](https://github.com/VeigaPunk/xbgst-site) |
 | **[grok-marketplace](https://github.com/VeigaPunk/grok-marketplace)** | Grok skills / marketplace surface that wires workers onto this substrate |
 | **[ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)** `sekhmet` plugin | Marketplace package name for this binary surface |
 | **[codex-titanium](https://github.com/VeigaPunk/codex-titanium)** | Titanium dispatcher (`codex-titanium` / `codex`); OAuth ChatGPT path |

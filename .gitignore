@@ -13,3 +13,6 @@ benchmarks/**/payload-private/
 
 # Generated Q→A markdown dumps (use paste-out; keep SUMMARY only)
 **/qa/*-QA.md
+
+# Benchmark run telemetry noise
+benchmarks/**/runs/

@@ -418,19 +418,19 @@ fn run() -> Result<()> {
         let _ = fs::remove_dir_all(&root);
         clean_tmp_globs()?;
 
-        write_summary(
-            &telem,
-            wave,
-            orch_start.elapsed().as_secs_f64(),
-            grand_tasks,
-            grand_ok,
-            grand_fail,
-            grand_tokens,
-            grand_ships,
-            &cli,
-            issues.len(),
-            repos.len(),
-        )?;
+        write_summary(&OrchSummary {
+            telem: &telem,
+            waves: wave,
+            wall_secs: orch_start.elapsed().as_secs_f64(),
+            tasks: grand_tasks,
+            ok: grand_ok,
+            fail: grand_fail,
+            tokens: grand_tokens,
+            ships: grand_ships,
+            cli: &cli,
+            issues_n: issues.len(),
+            repos_n: repos.len(),
+        })?;
 
         eprintln!(
             "xbgst-l3-orch: wave {wave} done kind={} exit={sekhmet_exit} ok={} fail={} tok={} wall={wall:.1}s ships={grand_ships}",
@@ -447,19 +447,19 @@ fn run() -> Result<()> {
     }
 
     clean_tmp_globs()?;
-    write_summary(
-        &telem,
-        wave,
-        orch_start.elapsed().as_secs_f64(),
-        grand_tasks,
-        grand_ok,
-        grand_fail,
-        grand_tokens,
-        grand_ships,
-        &cli,
-        issues.len(),
-        repos.len(),
-    )?;
+    write_summary(&OrchSummary {
+        telem: &telem,
+        waves: wave,
+        wall_secs: orch_start.elapsed().as_secs_f64(),
+        tasks: grand_tasks,
+        ok: grand_ok,
+        fail: grand_fail,
+        tokens: grand_tokens,
+        ships: grand_ships,
+        cli: &cli,
+        issues_n: issues.len(),
+        repos_n: repos.len(),
+    })?;
     fs::write(
         cli.out.join("DONE"),
         format!(
@@ -609,10 +609,10 @@ fn sanitize_worktree(repo: &Path) {
             .status();
     }
     // Explicit known junk dirs under benchmarks
-    for rel in [
-        "benchmarks/dry-hump/telemetry-e2e-model-questions/__pycache__",
-    ] {
-        let p = repo.join(rel);
+    {
+        let p = repo.join(
+            "benchmarks/dry-hump/telemetry-e2e-model-questions/__pycache__",
+        );
         if p.exists() {
             let _ = fs::remove_dir_all(&p);
         }
@@ -1037,8 +1037,9 @@ fn load_repos(path: Option<&Path>) -> Result<Vec<LocalRepo>> {
     Ok(out)
 }
 
-fn write_summary(
-    telem: &Path,
+/// Aggregated orch counters + pointers for `write_summary` (avoids clippy too_many_arguments).
+struct OrchSummary<'a> {
+    telem: &'a Path,
     waves: u64,
     wall_secs: f64,
     tasks: usize,
@@ -1046,10 +1047,25 @@ fn write_summary(
     fail: usize,
     tokens: u64,
     ships: usize,
-    cli: &Cli,
+    cli: &'a Cli,
     issues_n: usize,
     repos_n: usize,
-) -> Result<()> {
+}
+
+fn write_summary(s: &OrchSummary<'_>) -> Result<()> {
+    let OrchSummary {
+        telem,
+        waves,
+        wall_secs,
+        tasks,
+        ok,
+        fail,
+        tokens,
+        ships,
+        cli,
+        issues_n,
+        repos_n,
+    } = s;
     let v = json!({
         "updated_at": chrono_now(),
         "waves_completed": waves,

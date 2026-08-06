@@ -1,0 +1,89 @@
+{
+  "run_id": "l1l2l3_j64_20260806T224731Z",
+  "layout": "9-pane tmux sekhmet:bench, 8 domains x j=8 = 64 concurrent",
+  "model": "gpt-5.6-luna",
+  "service_tier": "fast",
+  "codex_bin": "/home/vgpnk1337/.local/bin/codex-titanium",
+  "started_utc": "2026-08-06T22:47:31+00:00",
+  "finished_utc": "2026-08-06T22:48:17+00:00",
+  "sparks_expected": 64,
+  "sparks_ok": 64,
+  "tokens_total": 304082,
+  "tokens_n": 64,
+  "tokens_avg": 4751.28125,
+  "domains": {
+    "religion": {
+      "domain": "religion",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 42522,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:48:16+00:00"
+    },
+    "sex": {
+      "domain": "sex",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 35524,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:47:51+00:00"
+    },
+    "drugs": {
+      "domain": "drugs",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 42624,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:48:06+00:00"
+    },
+    "politics": {
+      "domain": "politics",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 37702,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:48:04+00:00"
+    },
+    "money": {
+      "domain": "money",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 37532,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:47:52+00:00"
+    },
+    "violence": {
+      "domain": "violence",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 37202,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:48:09+00:00"
+    },
+    "ai": {
+      "domain": "ai",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 33051,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:47:51+00:00"
+    },
+    "charlie-kirk": {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "ok": 8,
+      "lines": 8,
+      "tokens_sum": 37925,
+      "tokens_n": 8,
+      "finished": "2026-08-06T22:47:53+00:00"
+    }
+  },
+  "godspeed": true
+}

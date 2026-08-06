@@ -1,0 +1,13 @@
+GATE: sekhmet dry-hump L1/L3 9-pane bench
+run_id: l1l2l3_j64_20260806T224731Z
+layout: tmux sekhmet:bench 9 panes (ORCH + 8 domains)
+concurrency: 8 domains x j=8 = 64 concurrent Titanium workers
+model: gpt-5.6-luna
+service_tier: fast
+codex: codex-titanium
+sparks_ok: 64/64
+tokens_total: 304082
+tokens_n: 64
+tokens_avg: 4751.3
+wall: ~46s (22:47:31 -> 22:48:17 UTC)
+GATE_OK

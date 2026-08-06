@@ -1,0 +1,13 @@
+{
+  "worker": "drugs",
+  "tasks": 64,
+  "ok": 64,
+  "lines": 59,
+  "tokens_sum": 149931,
+  "tokens_n": 32,
+  "rounds": 4,
+  "jobs": 64,
+  "finished": "2026-08-06T23:17:19+00:00",
+  "godspeed": true,
+  "whipped": true
+}

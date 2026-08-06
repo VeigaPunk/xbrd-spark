@@ -1,0 +1,13 @@
+{
+  "run_id": "x8x64_redo_20260806T230842Z",
+  "prev_run": "x8x64_20260806T230335Z",
+  "purpose": "redo answer 512 with j=64, godspeed, retry until 64/64 per worker",
+  "model": "gpt-5.6-luna",
+  "service_tier": "fast",
+  "jobs_per_worker": 64,
+  "workers": 8,
+  "sparks_target": 512,
+  "godspeed": true,
+  "started_utc": "2026-08-06T23:08:42+00:00",
+  "root": "/tmp/sekhmet-x8x64_redo_20260806T230842Z-9Rzb4a"
+}

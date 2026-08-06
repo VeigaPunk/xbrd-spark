@@ -1,0 +1,11 @@
+{
+  "worker": "religion",
+  "ok": 64,
+  "tasks": 64,
+  "tokens_sum": 326267,
+  "jobs": 64,
+  "finished": "2026-08-06T23:18:20+00:00",
+  "godspeed": true,
+  "whipped": true,
+  "note": "completed prior to whip rewrite"
+}

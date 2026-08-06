@@ -1,0 +1,13 @@
+{
+  "worker": "money",
+  "tasks": 64,
+  "ok": 64,
+  "lines": 40,
+  "tokens_sum": 122722,
+  "tokens_n": 22,
+  "rounds": 4,
+  "jobs": 64,
+  "finished": "2026-08-06T23:17:23+00:00",
+  "godspeed": true,
+  "whipped": true
+}

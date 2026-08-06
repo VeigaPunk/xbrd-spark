@@ -1,0 +1,13 @@
+{
+  "worker": "violence",
+  "tasks": 64,
+  "ok": 64,
+  "lines": 101,
+  "tokens_sum": 337893,
+  "tokens_n": 58,
+  "rounds": 4,
+  "jobs": 64,
+  "finished": "2026-08-06T23:17:18+00:00",
+  "godspeed": true,
+  "whipped": true
+}

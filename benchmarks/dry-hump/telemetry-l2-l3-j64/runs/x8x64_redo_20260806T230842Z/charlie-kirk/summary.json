@@ -1,0 +1,13 @@
+{
+  "worker": "charlie-kirk",
+  "tasks": 64,
+  "ok": 64,
+  "lines": 128,
+  "tokens_sum": 262151,
+  "tokens_n": 55,
+  "rounds": 4,
+  "jobs": 64,
+  "finished": "2026-08-06T23:17:18+00:00",
+  "godspeed": true,
+  "whipped": true
+}

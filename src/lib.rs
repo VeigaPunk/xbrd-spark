@@ -49,6 +49,48 @@ static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
 /// Process-wide sticky model once a working fallback is selected (or next candidate after reject).
 static STICKY_MODEL: Mutex<Option<String>> = Mutex::new(None);
 
+/// Serializes env mutations for godspeed inject tests / rare probes.
+#[cfg(test)]
+static GODSPEED_ENV_LOCK: Mutex<()> = Mutex::new(());
+
+/// Short godspeed **directive** only (4 rules + concurrent tools + Rust lock).
+/// Injected on **every** sekhmet/`xbrd-spark` dispatch (`run` and `swarm`).
+/// Never inject filter/velocity (trilogy stays judge-only).
+/// Opt out: `XBRD_SPARK_NO_GODSPEED=1` (tests / rare probes only).
+pub const GODSPEED_DIRECTIVE: &str = "\
+You are Godspeed-enabled.
+1. Name the axes.
+2. Iterate cheap, in parallel.
+3. Keep moves that improve any axis and harm none.
+4. Don't aim — let the frontier walk itself.
+IMMEDIATELY STOP ASKING CLARIFYING QUESTIONS.
+Execute tool calls concurrently in large batches. Do not serialize what can run in parallel.
+Do not output philosophical reasoning or verbose plans. Act directly via tool calls.
+Language lock: only Rust. No Python.";
+
+/// True when env disables automatic godspeed prepend.
+pub fn godspeed_inject_enabled() -> bool {
+    match env::var("XBRD_SPARK_NO_GODSPEED") {
+        Ok(v) => {
+            let t = v.trim().to_ascii_lowercase();
+            !(t == "1" || t == "true" || t == "yes" || t == "on")
+        }
+        Err(_) => true,
+    }
+}
+
+/// Prepend short godspeed directive if missing. Idempotent for already-injected prompts.
+pub fn with_godspeed_directive(task: &str) -> String {
+    if !godspeed_inject_enabled() {
+        return task.to_string();
+    }
+    let t = task.trim_start();
+    if t.starts_with("You are Godspeed-enabled") {
+        return task.to_string();
+    }
+    format!("{GODSPEED_DIRECTIVE}\n\n---\n\n{task}")
+}
+
 #[derive(Parser, Debug)]
 #[command(
     name = "sekhmet",
@@ -1177,10 +1219,24 @@ fn run_spark(
 
     // Setup through rsync only: on failure, release exclusive claim so the id is reusable.
     // After meta/finalize, keep current emit-record behavior (do not delete when keep=true).
+    // Always inject short godspeed directive (visible in in/task.md + in/godspeed.md).
+    let task_body = with_godspeed_directive(task);
+    let godspeed_on = godspeed_inject_enabled()
+        && task_body
+            .trim_start()
+            .starts_with("You are Godspeed-enabled");
+    if godspeed_on {
+        eprintln!(
+            "sekhmet: godspeed directive INJECTED spark_id={id} (read in/godspeed.md + in/task.md head)"
+        );
+    }
+
     let setup = || -> Result<()> {
         ensure_dirs(&base)?;
         seed_codex_home(&base.join("codex-home"))?;
-        fs::write(base.join("in/task.md"), task)?;
+        fs::write(base.join("in/task.md"), &task_body)?;
+        // Standalone copy so operators/tmux can `head` godspeed without digging the full prompt.
+        fs::write(base.join("in/godspeed.md"), format!("{GODSPEED_DIRECTIVE}\n"))?;
         // Scope snapshot always when requested (including dry-run) so probes see workspace files.
         if let Some(s) = scope {
             if !s.is_dir() {
@@ -1195,7 +1251,8 @@ fn run_spark(
         return Err(e);
     }
 
-    let task_hash = hash_str(task);
+    let task_hash = hash_str(&task_body);
+    let task = task_body.as_str();
 
     let (model, model_fallback_from) = resolve_run_model();
     let fallback_chain = fallback_spark_models();
@@ -2008,7 +2065,43 @@ mod tests {
     }
 
     #[test]
+    fn with_godspeed_directive_prepends_once() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
+        env::remove_var("XBRD_SPARK_NO_GODSPEED");
+        let raw = "do the thing";
+        let once = with_godspeed_directive(raw);
+        assert!(
+            once.starts_with("You are Godspeed-enabled"),
+            "got: {once:?}"
+        );
+        assert!(once.contains("do the thing"));
+        let twice = with_godspeed_directive(&once);
+        assert_eq!(once, twice, "idempotent");
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
+            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
+        }
+    }
+
+    #[test]
+    fn with_godspeed_directive_respects_opt_out() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
+        env::set_var("XBRD_SPARK_NO_GODSPEED", "1");
+        let out = with_godspeed_directive("plain");
+        assert_eq!(out, "plain");
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
+            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
+        }
+    }
+
+    #[test]
     fn dry_run_writes_namespace_and_record() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
+        env::remove_var("XBRD_SPARK_NO_GODSPEED");
         let tmp = TempDir::new().unwrap();
         let root = tmp.path();
         let id = "sp-dry-1";
@@ -2023,7 +2116,17 @@ mod tests {
         assert!(base.join("logs/stdout.log").is_file());
 
         let task = fs::read_to_string(base.join("in/task.md")).unwrap();
-        assert_eq!(task, "probe task");
+        assert!(
+            task.starts_with("You are Godspeed-enabled"),
+            "godspeed must be injected into task.md, got: {task}"
+        );
+        assert!(task.contains("probe task"), "raw task retained");
+        let gs = fs::read_to_string(base.join("in/godspeed.md")).unwrap();
+        assert!(gs.starts_with("You are Godspeed-enabled"));
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
+            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
+        }
 
         let result: ResultJson =
             serde_json::from_str(&fs::read_to_string(base.join("out/result.json")).unwrap())

@@ -221,3 +221,25 @@ If any line differs (especially system Chromium on 9222 or unauthed tabs), **fix
 ---
 
 *Maintainer note: chitchat’s default profile path (`~/.local/share/ds4cc/chromium-cdp`) is legacy. Operational SSoT is musketeer-chrome + `~/.local/share/the-musketeer/chrome-profile` on 9222.*
+
+---
+
+## Appendix: Gemini Notebook Studio DOM (2026 snapshot)
+
+Host: `https://notebook.google.com/notebook/<uuid>` (rebrand from notebooklm.google.com).
+
+| Surface | Selector / signal |
+|---------|-------------------|
+| Create notebook | `button[aria-label="Create new notebook"]` or **Create notebook** |
+| Notebook title | `input.title-input` or top textbox with notebook name |
+| Sources | **Add source** / `button.add-source-button`; source rows `button.source-stretched-button` |
+| Studio panel | `section.studio-panel` / **Studio** heading |
+| Artifact cards | `div.create-artifact-button-container` + `.create-label-container` |
+| Audio Overview open | click label **Audio Overview** |
+| Audio customize dialog | heading **Customize Audio Overview** |
+| Modes | radios Deep Dive / Brief / Critique / Debate (aria-label) |
+| Length | **Short** / **Default** / **Long** (en-US 2026; not Shorter/Longer) |
+| Focus prompt | `textarea[aria-label="What should the AI hosts focus on in this episode?"]` |
+| Generate | dialog button **Generate** |
+
+**the-almanacker ≥ 0.2.1** accepts both hosts and these Studio labels. Always: **fnm multishell + musketeer-chrome + pre-auth**.

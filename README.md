@@ -91,7 +91,7 @@ xbrd-spark run --direct --task "..."
 sekhmet run --direct --task "..."
 
 # Swarm: up to 64 concurrent Titanium runners (NDJSON per completion)
-printf 'task A\ntask B\ntask C\n' | sekhmet swarm --direct -j 16 --tasks-file - --root "$(mktemp -d)"
+printf 'task A\ntask B\ntask C\n' | sekhmet swarm --direct -j 64 --tasks-file - --root "$(mktemp -d)"
 # tasks file: one prompt per line, or JSONL {"task":"...","id":"sp-...","scope":"/path"}
 
 # Deterministic id from task+scope hash (stable; collision risk under concurrent same task)

@@ -2679,7 +2679,12 @@ mod tests {
     #[test]
     fn dry_run_records_model_and_optional_fallback_from() {
         clear_fallback_latch();
+        // Isolate from host L3 env (e.g. XBRD_SPARK_FALLBACK_MODEL=none from env.l3-sekhmet.sh).
+        let prev_m = env::var_os("XBRD_SPARK_MODEL");
+        let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         let prev_u = env::var_os("XBRD_SPARK_USE_FALLBACK");
+        env::remove_var("XBRD_SPARK_MODEL");
+        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
         env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
         let tmp = TempDir::new().unwrap();
         let root = tmp.path();
@@ -2695,6 +2700,14 @@ mod tests {
             meta.model_fallback_from.as_deref(),
             Some(DEFAULT_SPARK_MODEL)
         );
+        match prev_m {
+            Some(v) => env::set_var("XBRD_SPARK_MODEL", v),
+            None => env::remove_var("XBRD_SPARK_MODEL"),
+        }
+        match prev_f {
+            Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
+            None => env::remove_var("XBRD_SPARK_FALLBACK_MODEL"),
+        }
         match prev_u {
             Some(v) => env::set_var("XBRD_SPARK_USE_FALLBACK", v),
             None => env::remove_var("XBRD_SPARK_USE_FALLBACK"),

@@ -1,0 +1,12 @@
+{
+  "worker": "ai",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 44,
+  "lines": 64,
+  "tokens_sum": 208776,
+  "tokens_n": 52,
+  "finished": "2026-08-06T23:05:00+00:00",
+  "jobs": 64
+}

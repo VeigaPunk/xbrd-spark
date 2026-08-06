@@ -1,0 +1,12 @@
+{
+  "worker": "religion",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 24,
+  "lines": 64,
+  "tokens_sum": 102494,
+  "tokens_n": 29,
+  "finished": "2026-08-06T23:05:07+00:00",
+  "jobs": 64
+}

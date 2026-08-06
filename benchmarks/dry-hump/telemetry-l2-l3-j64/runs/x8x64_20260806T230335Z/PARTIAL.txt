@@ -1,0 +1,3 @@
+PARTIAL: 200/512 ok on first x8×j=64 blast.
+Fail drivers: rate_limit/auth_ws + /tmp tmpfs quota (~13G namespaces).
+Superseded by x8x64_redo_20260806T230842Z → 512/512 GATE_OK.

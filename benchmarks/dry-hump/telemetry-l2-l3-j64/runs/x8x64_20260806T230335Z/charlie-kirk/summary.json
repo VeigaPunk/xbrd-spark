@@ -1,0 +1,12 @@
+{
+  "worker": "charlie-kirk",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 10,
+  "lines": 64,
+  "tokens_sum": 36156,
+  "tokens_n": 10,
+  "finished": "2026-08-06T23:05:06+00:00",
+  "jobs": 64
+}

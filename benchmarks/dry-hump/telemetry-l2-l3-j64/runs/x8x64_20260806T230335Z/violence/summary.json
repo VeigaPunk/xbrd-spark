@@ -1,0 +1,12 @@
+{
+  "worker": "violence",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 25,
+  "lines": 64,
+  "tokens_sum": 121016,
+  "tokens_n": 25,
+  "finished": "2026-08-06T23:05:05+00:00",
+  "jobs": 64
+}

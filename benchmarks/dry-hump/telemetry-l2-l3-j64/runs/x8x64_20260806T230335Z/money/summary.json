@@ -1,0 +1,12 @@
+{
+  "worker": "money",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 58,
+  "lines": 64,
+  "tokens_sum": 222498,
+  "tokens_n": 59,
+  "finished": "2026-08-06T23:04:49+00:00",
+  "jobs": 64
+}

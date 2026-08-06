@@ -1,0 +1,12 @@
+{
+  "worker": "sex",
+  "gen_exit": 0,
+  "answer_exit": 1,
+  "tasks": 64,
+  "ok": 3,
+  "lines": 64,
+  "tokens_sum": 11158,
+  "tokens_n": 3,
+  "finished": "2026-08-06T23:05:11+00:00",
+  "jobs": 64
+}

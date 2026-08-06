@@ -9,23 +9,23 @@ Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex
 
 **Auth path:** ChatGPT **OAuth** via seeded `~/.codex` (not platform API key).
 
-**Model routing (everything else equal — same namespace, swarm, NDJSON for xbgst):**
+**Model routing (xbgst L3 pin — same namespace, swarm, NDJSON):**
 | | Value | Env / flag |
 |---|---|---|
-| Primary | `gpt-5.3-codex-spark` | `XBRD_SPARK_MODEL` |
-| Fallback chain (OAuth) | `gpt-5.6-luna` (default; comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
-| Disable auto-fallback | empty chain | `XBRD_SPARK_FALLBACK_MODEL=none` (also `off` / `0` / empty) |
+| Primary (**xbgst default**) | `gpt-5.6-luna` | `XBRD_SPARK_MODEL` |
+| Fallback chain (crate default) | `gpt-5.3-codex-spark` (comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
+| xbgst always-on | fallback **disabled** | `XBRD_SPARK_FALLBACK_MODEL=none` via `~/.xbgst/env.l3-sekhmet.sh` |
 | Reasoning | `low` | `-c model_reasoning_effort=low` |
 | Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
 | Force fallback | skip primary | `XBRD_SPARK_USE_FALLBACK=1` |
 | Swarm jobs | **64** default, hard cap **64** | `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` |
 
-On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain (default **luna**) with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
+On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain (if enabled) with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
 OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `service_tier=fast` (not a `-fast` model id). Env name is **`XBRD_SPARK_FALLBACK_MODEL`** (not `XBRD_SPARK_FALLBACK`).
 
 Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
 
-Routes executions through **Titanium OAuth** (codex-spark primary, luna + Fast tier when sparks are out) with:
+Routes executions through **Titanium OAuth** (**luna + Fast tier** primary under xbgst; optional spark fallback) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
 - **Up to 64 concurrent runners** — `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` (default **64**, hard cap **64**)

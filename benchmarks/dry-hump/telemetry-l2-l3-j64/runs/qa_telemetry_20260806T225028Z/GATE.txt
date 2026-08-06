@@ -1,0 +1,7 @@
+GATE: dry-hump QA + telemetry
+run_id: qa_telemetry_20260806T225028Z
+sparks_ok: 64/64
+tokens_total: 320992
+qa_pairs: 64
+qa_file: QA.md
+GATE_OK

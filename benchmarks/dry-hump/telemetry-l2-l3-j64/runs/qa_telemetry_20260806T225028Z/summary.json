@@ -1,0 +1,12 @@
+{
+  "run_id": "qa_telemetry_20260806T225028Z",
+  "finished_utc": "2026-08-06T22:52:35+00:00",
+  "sparks_ok": 64,
+  "sparks_expected": 64,
+  "tokens_total": 320992,
+  "qa_pairs": 64,
+  "qa_markdown": "QA.md",
+  "model": "gpt-5.6-luna",
+  "service_tier": "fast",
+  "concurrency": "8x8=64"
+}

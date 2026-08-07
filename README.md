@@ -23,7 +23,7 @@ Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex
 On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain (if enabled) with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
 OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `service_tier=fast` (not a `-fast` model id). Env name is **`XBRD_SPARK_FALLBACK_MODEL`** (not `XBRD_SPARK_FALLBACK`).
 
-Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → `codex`.
+Dispatcher resolve order: `CODEX_BIN` → `codex` → `codex-titanium` (Titanium under the `codex` path name).
 
 Routes executions through **Titanium OAuth** (**luna + Fast tier** primary under xbgst; optional spark fallback) with:
 
@@ -117,7 +117,7 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 ### Flags (enforcement)
 
 - **`--timeout SECS`**: wall-clock kill when `SECS > 0` (poll `try_wait` + process-group `SIGKILL` on Linux); result status is `timeout` (not `fail`). After kill, stdout/stderr reader joins are **bounded** (~2s) so orphan pipe holders cannot hang the spark forever (logs may truncate). `0` waits unlimited. Recorded in `meta.timeout_secs`.
-- **`--ro`**: **forces the codex dispatcher** with `--sandbox read-only` (skips xask so sandbox is actually enforced). Without `--ro`, prefers xask when present, else codex with `danger-full-access`. Recorded in `meta.ro`.
+- **`--ro`**: **forces the codex dispatcher** with `--sandbox read-only` (skips xask so sandbox is actually enforced). Pure L3 default is **direct Titanium as `codex`**; use `--no-direct` only for legacy `xask --spark`. Sandbox without `--ro` is `danger-full-access`. Recorded in `meta.ro` / `meta.direct`.
 - **`--scope`**: must be a directory; rsync snapshot into `workspace/` even on `--dry-run` (when rsync is available). Non-directory paths fail setup and roll back the namespace.
 - **Provenance**: `meta` also records `direct`, `dry_run`, and `timeout_secs` for every run.
 - **`usage_tokens`**: best-effort parse from dispatcher stdout/stderr (`tokens used`, `total_tokens`, …) written into `meta.json`, `out/result.json`, and NDJSON when present.

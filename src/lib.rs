@@ -130,8 +130,9 @@ enum Commands {
         #[arg(long, default_value_t = 120)]
         timeout: u64,
 
-        /// Prefer direct `codex` over `xask --spark` (pure L3, min latency).
-        #[arg(long, default_value_t = false)]
+        /// Prefer direct Titanium as `codex` over `xask --spark` (pure L3 default).
+        #[arg(long = "direct", action = clap::ArgAction::SetTrue, default_value_t = true)]
+        #[arg(long = "no-direct", action = clap::ArgAction::SetFalse)]
         direct: bool,
 
         /// Override root for spark dirs (default: $XDG_RUNTIME_DIR/xbrd-spark or /tmp/...).
@@ -204,8 +205,9 @@ enum Commands {
         #[arg(long, default_value_t = 120)]
         timeout: u64,
 
-        /// Prefer direct `codex` over `xask --spark`.
-        #[arg(long, default_value_t = false)]
+        /// Prefer direct Titanium as `codex` over `xask --spark` (pure L3 default).
+        #[arg(long = "direct", action = clap::ArgAction::SetTrue, default_value_t = true)]
+        #[arg(long = "no-direct", action = clap::ArgAction::SetFalse)]
         direct: bool,
 
         #[arg(long, env = "XBRD_SPARK_ROOT")]
@@ -715,7 +717,11 @@ fn should_fallback_on_fail_reason(reason: Option<&str>) -> bool {
     )
 }
 
-/// Resolve Codex Titanium binary: `CODEX_BIN` → `codex-titanium` → `codex`.
+/// Resolve Codex Titanium binary: `CODEX_BIN` → `codex` → `codex-titanium`.
+///
+/// L3 is invisible: workers are Titanium, but the public path name is **`codex`**
+/// (symlink to titanium is the intended install). Prefer `codex` over the
+/// `codex-titanium` binary name so meta/cmdline stay operator-facing.
 fn resolve_codex_bin() -> Result<PathBuf> {
     if let Ok(p) = env::var("CODEX_BIN") {
         let pb = PathBuf::from(&p);
@@ -727,11 +733,11 @@ fn resolve_codex_bin() -> Result<PathBuf> {
         }
         bail!("CODEX_BIN not found or not a file: {p}");
     }
-    if let Ok(p) = which::which("codex-titanium") {
+    if let Ok(p) = which::which("codex") {
         return Ok(p);
     }
-    which::which("codex").with_context(|| {
-        "codex-titanium/codex not found on PATH (install Codex Titanium or set CODEX_BIN)"
+    which::which("codex-titanium").with_context(|| {
+        "codex/codex-titanium not found on PATH (install Codex Titanium as `codex`, or set CODEX_BIN)"
     })
 }
 
@@ -759,9 +765,9 @@ pub fn spark_service_tier() -> String {
 /// - `model_reasoning_effort=low`
 /// - `service_tier=<XBRD_SPARK_SERVICE_TIER|fast>` — Fast mode (priority processing)
 fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Result<(String, Vec<String>)> {
-    // Prefer pure Titanium codex for L3 substrate (single source of flags).
-    // xask is optional convenience for migration / loadout continuity.
-    // --ro forces codex so `--sandbox read-only` is actually applied (xask has no sandbox flags).
+    // Pure L3 default: Titanium exposed as `codex` (single source of flags).
+    // xask only when `--no-direct` (legacy migration / loadout continuity).
+    // --ro always forces codex so `--sandbox read-only` is actually applied.
     // Fallback retries also force codex so the alternate model is actually selected.
     if !force_codex && !direct && !ro {
         if let Ok(p) = which::which("xask") {
@@ -779,11 +785,11 @@ fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Re
     let tier = spark_service_tier();
     let p = resolve_codex_bin().with_context(|| {
         if ro {
-            "codex-titanium/codex not found on PATH (--ro forces titanium sandbox; xask skipped)"
+            "codex/codex-titanium not found on PATH (--ro forces titanium sandbox; xask skipped)"
         } else if direct || force_codex {
-            "codex-titanium/codex not found on PATH (--direct / model fallback)"
+            "codex/codex-titanium not found on PATH (pure L3 / model fallback)"
         } else {
-            "neither xask nor codex-titanium/codex found on PATH"
+            "neither xask nor codex/codex-titanium found on PATH"
         }
     })?;
     Ok((
@@ -1225,7 +1231,8 @@ fn run_spark(
         && task_body
             .trim_start()
             .starts_with("You are Godspeed-enabled");
-    if godspeed_on {
+    // Quiet by default — L3 is invisible. Verbose only when requested.
+    if godspeed_on && env::var_os("XBRD_SPARK_VERBOSE").is_some() {
         eprintln!(
             "sekhmet: godspeed directive INJECTED spark_id={id} (read in/godspeed.md + in/task.md head)"
         );

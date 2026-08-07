@@ -44,7 +44,8 @@ Key flags:
 - `--ro` — forces titanium `--sandbox read-only` (skips xask); recorded in meta
 - `--timeout` — wall-clock kill when >0; after kill stdout/stderr joins bounded ~2s; in meta.timeout_secs
 - `--root` / `XBRD_SPARK_ROOT` — isolation root (else `$XDG_RUNTIME_DIR/xbrd-spark` or `/tmp/xbrd-spark`)
-- `CODEX_BIN` — pin titanium binary path; else `codex-titanium` then `codex`
+- `CODEX_BIN` — pin Titanium binary path; else `codex` then `codex-titanium` (path as `codex`)
+- `--direct` default **on** (pure L3); `--no-direct` for legacy xask
 
 Exclusive ns; setup rollback (id reusable); gc age-only for running. Seeded auth 0o600/0o700 on unix.
 

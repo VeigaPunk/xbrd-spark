@@ -538,6 +538,60 @@ fn rsync_scope(scope: &Path, dest: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Host fnm root (`FNM_DIR` or `$HOME/.local/share/fnm`). Uses **host** HOME
+/// (call before namespace HOME rewrite). Always-on Node toolchain for L3 workers.
+fn host_fnm_dir() -> Option<PathBuf> {
+    if let Ok(d) = env::var("FNM_DIR") {
+        let p = PathBuf::from(d);
+        if p.is_dir() {
+            return Some(p);
+        }
+    }
+    let home = env::var_os("HOME")?;
+    let p = PathBuf::from(home).join(".local/share/fnm");
+    if p.is_dir() {
+        Some(p)
+    } else {
+        None
+    }
+}
+
+/// Stable `…/installation/bin` for fnm's `default` alias (not ephemeral multishell).
+fn host_fnm_default_bin() -> Option<PathBuf> {
+    let fnm = host_fnm_dir()?;
+    let alias = fnm.join("aliases/default");
+    let install = fs::canonicalize(&alias).ok()?;
+    let bin = install.join("bin");
+    if bin.join("node").is_file() {
+        Some(bin)
+    } else {
+        None
+    }
+}
+
+/// Prepend stable fnm bins so Titanium workers always see `node`/`npm`/`agent-browser`
+/// even when the parent shell never ran `eval "$(fnm env)"`.
+fn path_with_fnm(host_path: &str) -> String {
+    let mut parts: Vec<String> = host_path
+        .split(':')
+        .filter(|s| !s.is_empty())
+        .map(String::from)
+        .collect();
+    let mut head: Vec<String> = Vec::new();
+    if let Some(bin) = host_fnm_default_bin() {
+        head.push(bin.to_string_lossy().into_owned());
+    }
+    if let Some(fnm) = host_fnm_dir() {
+        head.push(fnm.to_string_lossy().into_owned());
+    }
+    for p in head.into_iter().rev() {
+        if !parts.iter().any(|x| x == &p) {
+            parts.insert(0, p);
+        }
+    }
+    parts.join(":")
+}
+
 fn build_env(base: &Path) -> HashMap<String, String> {
     let mut envm = HashMap::new();
     for (k, v) in [
@@ -587,10 +641,26 @@ fn build_env(base: &Path) -> HashMap<String, String> {
         if k == "CODEX_HOME" {
             continue;
         }
-        if k.starts_with("OPENAI_") || k.starts_with("CODEX_") || k.starts_with("ANTHROPIC_") {
+        if k.starts_with("OPENAI_")
+            || k.starts_with("CODEX_")
+            || k.starts_with("ANTHROPIC_")
+            || k.starts_with("FNM_")
+        {
             envm.insert(k, v);
         }
     }
+    // Always-on fnm: stable default node bin + FNM_DIR (workers get env_clear).
+    if let Some(fnm) = host_fnm_dir() {
+        envm
+            .entry("FNM_DIR".into())
+            .or_insert_with(|| fnm.to_string_lossy().into_owned());
+    }
+    let host_path = envm
+        .get("PATH")
+        .cloned()
+        .or_else(|| env::var("PATH").ok())
+        .unwrap_or_else(|| "/usr/bin:/bin".into());
+    envm.insert("PATH".into(), path_with_fnm(&host_path));
     envm
 }
 
@@ -2207,6 +2277,60 @@ mod tests {
         assert!(Path::new(codex).ends_with("codex-home"));
         assert_eq!(Path::new(codex), base.join("codex-home"));
         assert_ne!(codex, "/host/should-not-win");
+    }
+
+    #[test]
+    fn build_env_always_injects_fnm_default_bin() {
+        let tmp = TempDir::new().unwrap();
+        let fake_fnm = tmp.path().join("fnm-root");
+        let install = fake_fnm.join("node-versions/v99.0.0/installation");
+        let bin = install.join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        fs::write(bin.join("node"), b"#!/bin/sh\necho fake\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = fs::metadata(bin.join("node")).unwrap().permissions();
+            perms.set_mode(0o755);
+            fs::set_permissions(bin.join("node"), perms).unwrap();
+        }
+        let aliases = fake_fnm.join("aliases");
+        fs::create_dir_all(&aliases).unwrap();
+        std::os::unix::fs::symlink(&install, aliases.join("default")).unwrap();
+
+        let prev_fnm = env::var_os("FNM_DIR");
+        let prev_path = env::var_os("PATH");
+        env::set_var("FNM_DIR", &fake_fnm);
+        env::set_var("PATH", "/usr/bin:/bin");
+
+        let base = tmp.path().join("sp-fnm");
+        ensure_dirs(&base).unwrap();
+        let envm = build_env(&base);
+
+        match prev_fnm {
+            Some(v) => env::set_var("FNM_DIR", v),
+            None => env::remove_var("FNM_DIR"),
+        }
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+
+        let path = envm.get("PATH").expect("PATH");
+        let want = bin.canonicalize().unwrap_or(bin);
+        assert!(
+            path.split(':').any(|p| Path::new(p) == want || p == want.to_string_lossy()),
+            "PATH missing fnm default bin {want:?}: {path}"
+        );
+        assert_eq!(
+            envm.get("FNM_DIR").map(String::as_str),
+            Some(fake_fnm.to_string_lossy().as_ref())
+        );
+        // FNM_* preserved from host when set
+        env::set_var("FNM_LOGLEVEL", "error");
+        let envm2 = build_env(&base);
+        env::remove_var("FNM_LOGLEVEL");
+        assert_eq!(envm2.get("FNM_LOGLEVEL").map(String::as_str), Some("error"));
     }
 
     #[test]

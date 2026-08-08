@@ -12,9 +12,9 @@ Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex
 **Model routing (xbgst L3 pin — same namespace, swarm, NDJSON):**
 | | Value | Env / flag |
 |---|---|---|
-| Primary (**xbgst default**) | `gpt-5.6-luna` | `XBRD_SPARK_MODEL` |
-| Fallback chain (crate default) | `gpt-5.3-codex-spark` (comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
-| xbgst always-on | fallback **disabled** | `XBRD_SPARK_FALLBACK_MODEL=none` via `~/.xbgst/env.l3-sekhmet.sh` |
+| Primary (**xbgst default**) | **`gpt-5.3-codex-spark`** (Codex Spark) | `XBRD_SPARK_MODEL` |
+| Fallback chain (crate default) | `gpt-5.6-luna` (comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
+| xbgst always-on | spark → luna | `~/.xbgst/env.l3-sekhmet.sh` |
 | Reasoning | `low` | `-c model_reasoning_effort=low` |
 | Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
 | Force fallback | skip primary | `XBRD_SPARK_USE_FALLBACK=1` |
@@ -25,7 +25,7 @@ OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `servi
 
 Dispatcher resolve order: `CODEX_BIN` → `codex` → `codex-titanium` (Titanium under the `codex` path name).
 
-Routes executions through **Titanium OAuth** (**luna + Fast tier** primary under xbgst; optional spark fallback) with:
+Routes executions through **Titanium OAuth** (**Codex Spark** primary; **luna** fallback) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
 - **Up to 64 concurrent runners** — `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` (default **64**, hard cap **64**)

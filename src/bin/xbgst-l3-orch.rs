@@ -40,7 +40,7 @@ struct Cli {
     #[arg(long)]
     out: PathBuf,
 
-    #[arg(long, default_value = "gpt-5.6-luna", env = "XBRD_SPARK_MODEL")]
+    #[arg(long, default_value = "gpt-5.3-codex-spark", env = "XBRD_SPARK_MODEL")]
     model: String,
 
     #[arg(long, default_value = "fast", env = "XBRD_SPARK_SERVICE_TIER")]

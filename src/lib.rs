@@ -26,20 +26,18 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 
 /// Default Titanium model for pure L3 sparks under **xbgst** (override: `XBRD_SPARK_MODEL`).
 ///
-/// Pin is `gpt-5.6-luna` + `service_tier=fast` + `model_reasoning_effort=low`.
-/// Codex OAuth rejects the slug `gpt-5.6-luna-fast` — use model + tier, not a fused slug.
-/// Legacy spark slug `gpt-5.3-codex-spark` remains available via env override.
-pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.6-luna";
+/// Pin is **Codex Spark** `gpt-5.3-codex-spark` + `service_tier=fast` + `model_reasoning_effort=low`.
+/// Fallback OAuth path: `gpt-5.6-luna` (+ same tier/effort). Never use fused slug `gpt-5.6-luna-fast`.
+pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
 
 /// Default fallback when primary is unavailable (OAuth / ChatGPT-account Codex path).
-/// With luna as primary, default fallback is disabled (`none` via env) unless overridden.
-pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.3-codex-spark";
+pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna";
 
 /// Default service tier for Titanium exec (Fast mode). Override: `XBRD_SPARK_SERVICE_TIER`.
 /// Codex config key `service_tier`; values `fast` or `priority` are equivalent for GPT-5.6.
 pub const DEFAULT_SERVICE_TIER: &str = "fast";
 
-/// Default fallback chain (OAuth): luna only. Comma-separated override via env.
+/// Default fallback chain (OAuth): luna after spark. Comma-separated override via env.
 /// Disable: empty / `none` / `off` / `0`.
 pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[DEFAULT_FALLBACK_MODEL];
 
@@ -1492,7 +1490,7 @@ fn run_spark(
     };
 
     // Automatic model fallback chain: usage_limit / model_unsupported → next model.
-    // Default OAuth chain: gpt-5.6-luna (effort low + service_tier=fast). Sticky for swarm.
+    // Default OAuth chain: gpt-5.3-codex-spark → gpt-5.6-luna (effort low + service_tier=fast).
     let origin_model = meta.model.clone();
     let mut tried: Vec<String> = vec![meta.model.clone()];
     let mut prior_stderr = attempt.1.clone();
@@ -2790,17 +2788,17 @@ mod tests {
     }
 
     #[test]
-    fn default_model_is_luna_xbgst_primary() {
+    fn default_model_is_codex_spark_xbgst_primary() {
         clear_fallback_latch();
         let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
-        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.6-luna");
+        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.3-codex-spark");
         assert_eq!(
             fallback_spark_models(),
             vec![DEFAULT_FALLBACK_MODEL.to_string()]
         );
-        // Legacy spark remains secondary only when FALLBACK_MODEL unset (xbgst pins none).
-        assert_eq!(DEFAULT_FALLBACK_MODEL, "gpt-5.3-codex-spark");
+        // Luna is OAuth fallback when FALLBACK_MODEL unset.
+        assert_eq!(DEFAULT_FALLBACK_MODEL, "gpt-5.6-luna");
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
             None => env::remove_var("XBRD_SPARK_FALLBACK_MODEL"),

@@ -16,7 +16,7 @@ case "$PACK" in
     ;;
   hard10)
     TASKS="$BENCH/hard10/tasks-hard10.swarm.md"
-    JOBS="${XBRD_SPARK_JOBS:-5}"
+    JOBS="${XBRD_SPARK_JOBS:-8}"
     TIMEOUT="${TIMEOUT:-360}"
     ;;
   *) echo "pack must be ethics|hard10" >&2; exit 2 ;;
@@ -67,8 +67,11 @@ for model in "${MODELS[@]}"; do
   RUN_ID="${PACK}_${safe}"
   OUT="$BENCH/runs/$RUN_ID"
   mkdir -p "$OUT"
-  ROOT=$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/sekhmet-tp-${RUN_ID}-XXXXXX")
+  # Force /tmp (never XDG_RUNTIME_DIR — ethics-300 needs multi-GB headroom)
+  ROOT=$(mktemp -d "/tmp/sekhmet-tp-${RUN_ID}-XXXXXX")
   export XBRD_SPARK_MODEL="$model"
+  # sekhmet Titanium inject: effort=low + service_tier=fast (not host medium)
+  export XBRD_SPARK_SERVICE_TIER="${XBRD_SPARK_SERVICE_TIER:-fast}"
 
   # refresh host model default to match (sekhmet also passes -m via env)
   if grep -q '^model ' "${HOME}/.codex/config.toml"; then
@@ -150,18 +153,43 @@ for model in "${MODELS[@]}"; do
   QPS=$(awk -v ok="$OK" -v w="$WALL" 'BEGIN{if(w>0) printf "%.4f", ok/w; else print "0"}')
   TPM=$(awk -v s="$TOK_SUM" -v w="$WALL" 'BEGIN{if(w>0) printf "%.1f", s/w; else print "0"}')
 
-  # Stamp identity from host CODEX config + known sekhmet injects
-  EFFORT=$(grep -E '^model_reasoning_effort' "${HOME}/.codex/config.toml" 2>/dev/null | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/' || echo unknown)
-  EFFORT=${EFFORT:-low}
-  # sekhmet Titanium path forces effort=low + service_tier=fast in dispatcher
+  # Stamp identity from first ndjson provenance.cmdline (sekhmet inject), never host medium
+  EFFORT="low"
   TIER="fast"
+  CMDLINE_MODEL=""
+  if [[ -f "$OUT/ndjson.out" ]]; then
+    FIRST=$(head -1 "$OUT/ndjson.out" || true)
+    if [[ -n "$FIRST" ]]; then
+      CMDLINE_MODEL=$(printf '%s' "$FIRST" | jq -r '
+        (.provenance.cmdline // []) as $c
+        | ($c | to_entries | map(select(.value == "-m") | .key) | .[0]) as $i
+        | if $i != null then $c[$i+1] else (.provenance.model // empty) end
+      ' 2>/dev/null || true)
+      EFFORT_FROM=$(printf '%s' "$FIRST" | jq -r '
+        (.provenance.cmdline // [])[] | select(startswith("model_reasoning_effort="))
+        | sub("model_reasoning_effort=";"")
+      ' 2>/dev/null | head -1 || true)
+      TIER_FROM=$(printf '%s' "$FIRST" | jq -r '
+        (.provenance.cmdline // [])[] | select(startswith("service_tier="))
+        | sub("service_tier=";"")
+      ' 2>/dev/null | head -1 || true)
+      [[ -n "${EFFORT_FROM:-}" && "$EFFORT_FROM" != "null" ]] && EFFORT="$EFFORT_FROM"
+      [[ -n "${TIER_FROM:-}" && "$TIER_FROM" != "null" ]] && TIER="$TIER_FROM"
+    fi
+  fi
+  # Never stamp host medium — sekhmet inject is low+fast
+  if [[ "$EFFORT" == "medium" || "$EFFORT" == "high" || -z "$EFFORT" ]]; then
+    EFFORT="low"
+  fi
+  TIER="${TIER:-fast}"
+  STAMP_MODEL="${CMDLINE_MODEL:-$model}"
   BASE=$(grep -E 'base_url' "${HOME}/.codex/config.toml" 2>/dev/null | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/' || echo unknown)
 
   jq -n \
     --arg run_id "$RUN_ID" \
     --arg pack "$PACK" \
     --arg model "$model" \
-    --arg model_id "$model" \
+    --arg model_id "$STAMP_MODEL" \
     --arg model_reasoning_effort "$EFFORT" \
     --arg service_tier "$TIER" \
     --arg lane_base_url "$BASE" \
@@ -210,13 +238,41 @@ for model in "${MODELS[@]}"; do
       start_iso:$start_iso, end_iso:$end_iso, root:$root, codex_bin:$codex_bin
     }' >"$OUT/summary.json"
 
-  echo "done $RUN_ID ok=$OK fail=$FAIL to=$TO wall=${WALL}s qps=$QPS tokens=$TOK_SUM exit=$EC" | tee -a "$OUT/campaign.log"
+  echo "done $RUN_ID ok=$OK fail=$FAIL to=$TO wall=${WALL}s qps=$QPS tokens=$TOK_SUM exit=$EC effort=$EFFORT tier=$TIER model_id=$STAMP_MODEL" | tee -a "$OUT/campaign.log"
+  echo "$ROOT" >"$OUT/root.path"
 
-  # keep root for hard10 (small); for ethics reclaim after copy
-  if [[ "$PACK" == "ethics" ]]; then
-    rm -rf "$ROOT"
+  # Harvest ALL-QA after each model (M02)
+  QA_OUT="$BENCH/qa/$RUN_ID/ALL-QA.md"
+  mkdir -p "$(dirname "$QA_OUT")"
+  HARVEST_BIN="$(command -v harvest-qa || true)"
+  if [[ -z "$HARVEST_BIN" && -x "$BENCH/../../target/release/harvest-qa" ]]; then
+    HARVEST_BIN="$BENCH/../../target/release/harvest-qa"
+  fi
+  if [[ -n "$HARVEST_BIN" ]]; then
+    set +e
+    "$HARVEST_BIN" \
+      --run-dir "$OUT" \
+      --root "$ROOT" \
+      --tasks "$TASKS" \
+      --out "$QA_OUT" \
+      --model-id "$STAMP_MODEL" \
+      --effort "$EFFORT" \
+      --tier "$TIER" \
+      --pack "$PACK" \
+      2>>"$OUT/campaign.log"
+    HARVEST_EC=$?
+    set -e
+    echo "[harvest] $QA_OUT exit=$HARVEST_EC" | tee -a "$OUT/campaign.log"
   else
-    echo "$ROOT" >"$OUT/root.path"
+    echo "[harvest] SKIP harvest-qa not on PATH — install cargo bin harvest-qa" | tee -a "$OUT/campaign.log"
+  fi
+
+  # Reclaim /tmp root after harvest (optional keep via KEEP_ROOT=1)
+  if [[ "${KEEP_ROOT:-0}" != "1" ]]; then
+    rm -rf "$ROOT"
+    echo "[root] reclaimed $ROOT" | tee -a "$OUT/campaign.log"
+  else
+    echo "[root] kept $ROOT (KEEP_ROOT=1)" | tee -a "$OUT/campaign.log"
   fi
 done
 

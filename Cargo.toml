@@ -18,6 +18,10 @@ path = "src/bin/sekhmet.rs"
 name = "xbgst-l3-orch"
 path = "src/bin/xbgst-l3-orch.rs"
 
+[[bin]]
+name = "harvest-qa"
+path = "src/bin/harvest-qa.rs"
+
 [dependencies]
 anyhow = "1"
 clap = { version = "4", features = ["derive", "env"] }

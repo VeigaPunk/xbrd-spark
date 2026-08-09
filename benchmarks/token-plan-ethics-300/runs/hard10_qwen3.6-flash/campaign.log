@@ -1,0 +1,2 @@
+==== hard10_qwen3.6-flash model=qwen3.6-flash j=8 root=/tmp/sekhmet-tp-hard10_qwen3.6-flash-2tISv1 ====
+done hard10_qwen3.6-flash ok=6 fail=0 wall=609.163 exit=1

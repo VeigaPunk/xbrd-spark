@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xbrd-spark.local/schemas/baton.v1.json",
+  "title": "ij-section-bench baton v1",
+  "type": "object",
+  "required": [
+    "v",
+    "spark_id",
+    "seq",
+    "offset",
+    "page_start",
+    "page_end",
+    "chars_this_window",
+    "cumsum_chars",
+    "wall_ms",
+    "corpus_sha256",
+    "url",
+    "status"
+  ],
+  "properties": {
+    "v": { "const": 1 },
+    "spark_id": { "type": "string" },
+    "seq": { "type": "integer", "minimum": 0 },
+    "offset": { "type": "integer", "minimum": 0 },
+    "page_start": { "type": "integer", "minimum": 0 },
+    "page_end": { "type": "integer", "minimum": 0 },
+    "chars_this_window": { "type": "integer", "minimum": 0 },
+    "cumsum_chars": { "type": "integer", "minimum": 0 },
+    "cumsum_tokens_est": { "type": ["integer", "null"] },
+    "wall_ms": { "type": "integer", "minimum": 0 },
+    "corpus_sha256": { "type": "string" },
+    "url": { "type": "string" },
+    "status": { "type": "string" }
+  }
+}

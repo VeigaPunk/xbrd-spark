@@ -1,0 +1,6 @@
+/target/
+/corpus/
+/out/
+/out-*/
+/results/
+Cargo.lock

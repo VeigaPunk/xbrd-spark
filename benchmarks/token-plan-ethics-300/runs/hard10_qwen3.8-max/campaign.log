@@ -1,0 +1,2 @@
+==== hard10_qwen3.8-max model=qwen3.8-max j=8 root=/tmp/sekhmet-tp-hard10_qwen3.8-max-9hVe17 ====
+done hard10_qwen3.8-max ok=2 fail=0 wall=590.753 exit=1

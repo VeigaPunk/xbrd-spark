@@ -77,16 +77,46 @@ pub fn godspeed_inject_enabled() -> bool {
     }
 }
 
-/// Prepend short godspeed directive if missing. Idempotent for already-injected prompts.
+/// Suffix appended to every Titanium/Codex prompt when godspeed inject is on.
+/// Codex/ChatGPT routes often key off a trailing `| godspeed` token.
+pub const GODSPEED_PROMPT_SUFFIX: &str = "| godspeed";
+
+/// True if task already ends with `| godspeed` (any whitespace).
+fn has_godspeed_suffix(task: &str) -> bool {
+    let t = task.trim_end();
+    t.ends_with("| godspeed")
+        || t.ends_with("|godspeed")
+        || t.to_ascii_lowercase().ends_with("| godspeed")
+}
+
+/// Append ` | godspeed` if missing. Idempotent.
+pub fn with_godspeed_suffix(task: &str) -> String {
+    if !godspeed_inject_enabled() {
+        return task.to_string();
+    }
+    if has_godspeed_suffix(task) {
+        return task.to_string();
+    }
+    let t = task.trim_end();
+    if t.is_empty() {
+        return GODSPEED_PROMPT_SUFFIX.to_string();
+    }
+    format!("{t} {GODSPEED_PROMPT_SUFFIX}")
+}
+
+/// Prepend short godspeed directive + append `| godspeed` if missing.
+/// Idempotent for already-injected prompts.
 pub fn with_godspeed_directive(task: &str) -> String {
     if !godspeed_inject_enabled() {
         return task.to_string();
     }
     let t = task.trim_start();
-    if t.starts_with("You are Godspeed-enabled") {
-        return task.to_string();
-    }
-    format!("{GODSPEED_DIRECTIVE}\n\n---\n\n{task}")
+    let body = if t.starts_with("You are Godspeed-enabled") {
+        task.to_string()
+    } else {
+        format!("{GODSPEED_DIRECTIVE}\n\n---\n\n{task}")
+    };
+    with_godspeed_suffix(&body)
 }
 
 #[derive(Parser, Debug)]
@@ -2151,8 +2181,30 @@ mod tests {
             "got: {once:?}"
         );
         assert!(once.contains("do the thing"));
+        assert!(
+            once.trim_end().ends_with("| godspeed"),
+            "must append | godspeed, got: {once:?}"
+        );
         let twice = with_godspeed_directive(&once);
         assert_eq!(once, twice, "idempotent");
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
+            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
+        }
+    }
+
+    #[test]
+    fn with_godspeed_suffix_appends_once() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
+        env::remove_var("XBRD_SPARK_NO_GODSPEED");
+        let once = with_godspeed_suffix("probe authz");
+        assert_eq!(once, "probe authz | godspeed");
+        assert_eq!(with_godspeed_suffix(&once), once);
+        assert_eq!(
+            with_godspeed_suffix("already | godspeed"),
+            "already | godspeed"
+        );
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
             None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
@@ -2166,6 +2218,7 @@ mod tests {
         env::set_var("XBRD_SPARK_NO_GODSPEED", "1");
         let out = with_godspeed_directive("plain");
         assert_eq!(out, "plain");
+        assert_eq!(with_godspeed_suffix("plain"), "plain");
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
             None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
@@ -2196,6 +2249,10 @@ mod tests {
             "godspeed must be injected into task.md, got: {task}"
         );
         assert!(task.contains("probe task"), "raw task retained");
+        assert!(
+            task.trim_end().ends_with("| godspeed"),
+            "task.md must end with | godspeed, got: {task}"
+        );
         let gs = fs::read_to_string(base.join("in/godspeed.md")).unwrap();
         assert!(gs.starts_with("You are Godspeed-enabled"));
         match prev {

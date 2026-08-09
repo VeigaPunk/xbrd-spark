@@ -883,7 +883,17 @@ If nothing is a strict improvement, write NO_IMPROVEMENT and why.",
         } else {
             prompt
         };
-        lines.push(prompt.replace('\n', " "));
+        // Always append | godspeed (Titanium/Codex routing token); idempotent.
+        let prompt = {
+            let p = prompt.replace('\n', " ");
+            let t = p.trim_end();
+            if t.ends_with("| godspeed") || t.ends_with("|godspeed") {
+                p
+            } else {
+                format!("{t} | godspeed")
+            }
+        };
+        lines.push(prompt);
     }
     roles.truncate(12);
     (lines, roles)

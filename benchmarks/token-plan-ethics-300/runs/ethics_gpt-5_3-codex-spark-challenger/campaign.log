@@ -1,0 +1,6 @@
+==== ethics_gpt-5_3-codex-spark-challenger j=64 tasks=300 root=/tmp/sekhmet-spark-ethics300-T4slUI ====
+done ok=201 fail=99 to=0 wall=20.259s qps=9.9215 tok=400486 tok/s=19768.3 exit=1
+==== redo ethics_gpt-5_3-codex-spark-challenger j=32 root=/tmp/sekhmet-spark-ethics300-r2-E8Tixl ====
+done ok=0 fail=300 to=0 wall=2.680s qps=0.0000 tok=0 exit=1
+==== cooldown redo j=16 root=/tmp/sekhmet-spark-ethics300-j16-WR6H7i ====
+j16 done ok=292 fail=8 to=0 wall=68.351s qps=4.2721 tok=567153 exit=1

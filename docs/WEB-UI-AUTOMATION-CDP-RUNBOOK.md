@@ -187,7 +187,29 @@ printf '%s' "$PROMPT" | chitchat-fnm-run --stdin --new-chat
 [ ] agent-browser --cdp http://127.0.0.1:9222 …
 [ ] chitchat uses that CDP (not a second random chromium)
 [ ] prompts carry public links or inline content (no local-only paths)
+[ ] 1Password extension bridge: the-janitor cdp-bridge status → READY (or ensure + restart Chrome)
 ```
+
+### 6b) 1Password extension on the burner (the-janitor)
+
+Custom `--user-data-dir` does **not** inherit daily Chrome Native Messaging Hosts.
+`musketeer-chrome` and `the-janitor cdp-bridge ensure` install:
+
+`~/.local/share/the-musketeer/chrome-profile/NativeMessagingHosts/com.1password.1password.json`
+→ `/opt/1Password/1Password-BrowserSupport`
+
+Extension expected in profile: Nightly `gejiddohjgogedgjnonbofjigllpkmbf` (or stable).
+
+```bash
+the-janitor cdp-bridge ensure   # write NMH if missing
+the-janitor cdp-bridge status   # NMH + ext + desktop + CDP
+# after first ensure on a live browser: restart musketeer-chrome
+the-janitor cdp-bridge open-popup   # optional human unlock UI via agent-browser
+```
+
+CLI secrets (`op` / `the-janitor run`) stay the default for agent injection; the
+extension path is for interactive autofill / pre-auth on product tabs. Never
+scrape vault secrets from the extension into agent chat.
 
 ---
 

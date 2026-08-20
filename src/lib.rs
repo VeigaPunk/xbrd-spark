@@ -26,20 +26,21 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 
 /// Default Titanium model for pure L3 sparks under **xbgst** (override: `XBRD_SPARK_MODEL`).
 ///
-/// Pin is **Codex Spark** `gpt-5.3-codex-spark` + `service_tier=fast` + `model_reasoning_effort=low`.
-/// Fallback OAuth path: `gpt-5.6-luna` (+ same tier/effort). Never use fused slug `gpt-5.6-luna-fast`.
-pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
+/// Pin is **`gpt-5.6-luna`** + `service_tier=fast` + `model_reasoning_effort=low`.
+/// Crate default fallback chain is empty (set `XBRD_SPARK_FALLBACK_MODEL` to enable).
+/// Never use fused slug `gpt-5.6-luna-fast` — tier is a separate `-c service_tier=…` flag.
+pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.6-luna";
 
-/// Default fallback when primary is unavailable (OAuth / ChatGPT-account Codex path).
+/// Slug const for an optional OAuth fallback candidate. Does **not** feed `DEFAULT_FALLBACK_CHAIN`.
 pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna";
 
 /// Default service tier for Titanium exec (Fast mode). Override: `XBRD_SPARK_SERVICE_TIER`.
 /// Codex config key `service_tier`; values `fast` or `priority` are equivalent for GPT-5.6.
 pub const DEFAULT_SERVICE_TIER: &str = "fast";
 
-/// Default fallback chain (OAuth): luna after spark. Comma-separated override via env.
-/// Disable: empty / `none` / `off` / `0`.
-pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[DEFAULT_FALLBACK_MODEL];
+/// Default fallback chain: empty (no auto-retry). Comma-separated override via env.
+/// Disable: empty / `none` / `off` / `0`. Do not add spark/luna into this crate default.
+pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[];
 
 /// Process-wide: skip primary after usage_limit (swarm efficiency).
 static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
@@ -715,7 +716,7 @@ pub fn primary_spark_model() -> String {
 /// Fallback chain when primary is quota-blocked / model rejected. Empty disables.
 ///
 /// `XBRD_SPARK_FALLBACK_MODEL` may be a single model or a comma-separated chain.
-/// Default (no env): legacy spark slug as secondary; xbgst sets `XBRD_SPARK_FALLBACK_MODEL=none`.
+/// Default (no env): empty — auto-retry only when the operator sets the env.
 pub fn fallback_spark_models() -> Vec<String> {
     match env::var("XBRD_SPARK_FALLBACK_MODEL") {
         Ok(s) => {
@@ -815,11 +816,29 @@ fn should_fallback_on_fail_reason(reason: Option<&str>) -> bool {
     )
 }
 
-/// Resolve Codex Titanium binary: `CODEX_BIN` → `codex` → `codex-titanium`.
+/// Omarchy/mise `npx @openai/codex` stub — not Titanium. False on read fail or ELF.
+fn is_omarchy_npx_codex_stub(path: &Path) -> bool {
+    let mut f = match fs::File::open(path) {
+        Ok(f) => f,
+        Err(_) => return false,
+    };
+    let mut buf = [0u8; 8192];
+    let n = match f.read(&mut buf) {
+        Ok(n) => n,
+        Err(_) => return false,
+    };
+    let head = &buf[..n];
+    if head.starts_with(&[0x7f, b'E', b'L', b'F']) {
+        return false;
+    }
+    let s = String::from_utf8_lossy(head);
+    s.contains("@openai/codex") && s.contains("npx")
+}
+
+/// Resolve Codex Titanium binary: `CODEX_BIN` → `codex-titanium` → non-stub `codex`.
 ///
-/// L3 is invisible: workers are Titanium, but the public path name is **`codex`**
-/// (symlink to titanium is the intended install). Prefer `codex` over the
-/// `codex-titanium` binary name so meta/cmdline stay operator-facing.
+/// Operator `CODEX_BIN` wins (no stub-skip). PATH `codex` that is the omarchy npx
+/// `@openai/codex` stub is skipped so Titanium is preferred over a false-green stub.
 fn resolve_codex_bin() -> Result<PathBuf> {
     if let Ok(p) = env::var("CODEX_BIN") {
         let pb = PathBuf::from(&p);
@@ -831,12 +850,19 @@ fn resolve_codex_bin() -> Result<PathBuf> {
         }
         bail!("CODEX_BIN not found or not a file: {p}");
     }
-    if let Ok(p) = which::which("codex") {
+    if let Ok(p) = which::which("codex-titanium") {
         return Ok(p);
     }
-    which::which("codex-titanium").with_context(|| {
-        "codex/codex-titanium not found on PATH (install Codex Titanium as `codex`, or set CODEX_BIN)"
-    })
+    if let Ok(p) = which::which("codex") {
+        if !is_omarchy_npx_codex_stub(&p) {
+            return Ok(p);
+        }
+    }
+    bail!(
+        "codex-titanium / non-stub codex not found on PATH \
+         (install Codex Titanium as `codex-titanium`, or set CODEX_BIN; \
+         omarchy npx @openai/codex stub is skipped)"
+    )
 }
 
 /// Service tier for Titanium (`service_tier` config). Default `fast` (Fast mode / priority).
@@ -1520,7 +1546,7 @@ fn run_spark(
     };
 
     // Automatic model fallback chain: usage_limit / model_unsupported → next model.
-    // Default OAuth chain: gpt-5.3-codex-spark → gpt-5.6-luna (effort low + service_tier=fast).
+    // Crate default chain is empty; set XBRD_SPARK_FALLBACK_MODEL to enable (effort low + service_tier=fast).
     let origin_model = meta.model.clone();
     let mut tried: Vec<String> = vec![meta.model.clone()];
     let mut prior_stderr = attempt.1.clone();
@@ -2390,8 +2416,7 @@ mod tests {
 
     #[test]
     fn find_dispatcher_direct_includes_exec_model_sandbox() {
-        // Requires codex on PATH for direct path; skip-like soft fail if missing.
-        if which::which("codex").is_err() {
+        if resolve_codex_bin().is_err() {
             // Still verify sandbox string selection via a local replica of the branch.
             let sandbox_ro = if true { "read-only" } else { "danger-full-access" };
             let sandbox_rw = if false {
@@ -2420,7 +2445,7 @@ mod tests {
 
     #[test]
     fn find_dispatcher_ro_toggles_sandbox_value() {
-        if which::which("codex").is_err() {
+        if resolve_codex_bin().is_err() {
             return;
         }
         let (_, a) = find_dispatcher(true, false, DEFAULT_SPARK_MODEL, false).unwrap();
@@ -2505,8 +2530,8 @@ mod tests {
 
     #[test]
     fn find_dispatcher_ro_forces_codex_sandbox() {
-        // --ro must never return xask argv (no sandbox); requires codex on PATH.
-        if which::which("codex").is_err() {
+        // --ro must never return xask argv (no sandbox); requires titanium resolve.
+        if resolve_codex_bin().is_err() {
             return;
         }
         let (bin, args) = find_dispatcher(false, true, DEFAULT_SPARK_MODEL, false).unwrap();
@@ -2711,6 +2736,7 @@ mod tests {
 
     #[test]
     fn resolve_codex_bin_honors_codex_bin_env() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let fake = tmp.path().join("fake-codex");
         fs::write(&fake, b"#!/bin/sh\nexit 0\n").unwrap();
@@ -2729,9 +2755,106 @@ mod tests {
         }
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn resolve_codex_bin_prefers_titanium_over_codex() {
+        use std::os::unix::fs::PermissionsExt;
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let bin = tmp.path().join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let titanium = bin.join("codex-titanium");
+        let codex = bin.join("codex");
+        fs::write(&titanium, b"#!/bin/sh\necho titanium\n").unwrap();
+        fs::write(&codex, b"#!/bin/sh\necho plain-codex\n").unwrap();
+        fs::set_permissions(&titanium, fs::Permissions::from_mode(0o755)).unwrap();
+        fs::set_permissions(&codex, fs::Permissions::from_mode(0o755)).unwrap();
+
+        let prev_path = env::var_os("PATH");
+        let prev_bin = env::var_os("CODEX_BIN");
+        env::remove_var("CODEX_BIN");
+        env::set_var("PATH", &bin);
+        let got = resolve_codex_bin().unwrap();
+        assert_eq!(got, titanium);
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+        match prev_bin {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn resolve_codex_bin_skips_omarchy_npx_stub() {
+        use std::os::unix::fs::PermissionsExt;
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let bin = tmp.path().join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let stub = bin.join("codex");
+        fs::write(
+            &stub,
+            b"#!/bin/bash\npackage=\"@openai/codex\"\ncommand=\"codex\"\nexec npx -y \"$package\" \"$@\"\n",
+        )
+        .unwrap();
+        fs::set_permissions(&stub, fs::Permissions::from_mode(0o755)).unwrap();
+        assert!(is_omarchy_npx_codex_stub(&stub));
+
+        let prev_path = env::var_os("PATH");
+        let prev_bin = env::var_os("CODEX_BIN");
+        env::remove_var("CODEX_BIN");
+        env::set_var("PATH", &bin);
+        let err = resolve_codex_bin().unwrap_err();
+        let msg = format!("{err:#}");
+        assert!(
+            msg.contains("codex-titanium") || msg.contains("stub"),
+            "unexpected: {msg}"
+        );
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+        match prev_bin {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn resolve_codex_bin_accepts_non_stub_codex() {
+        use std::os::unix::fs::PermissionsExt;
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let bin = tmp.path().join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let codex = bin.join("codex");
+        fs::write(&codex, b"#!/bin/sh\necho real-codex\n").unwrap();
+        fs::set_permissions(&codex, fs::Permissions::from_mode(0o755)).unwrap();
+        assert!(!is_omarchy_npx_codex_stub(&codex));
+
+        let prev_path = env::var_os("PATH");
+        let prev_bin = env::var_os("CODEX_BIN");
+        env::remove_var("CODEX_BIN");
+        env::set_var("PATH", &bin);
+        let got = resolve_codex_bin().unwrap();
+        assert_eq!(got, codex);
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+        match prev_bin {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
+    }
+
     #[test]
     fn find_dispatcher_resolves_titanium_when_available() {
-        if which::which("codex-titanium").is_err() && which::which("codex").is_err() {
+        if resolve_codex_bin().is_err() {
             return;
         }
         let (bin, args) = find_dispatcher(true, false, DEFAULT_SPARK_MODEL, false).unwrap();
@@ -2746,14 +2869,15 @@ mod tests {
 
     #[test]
     fn find_dispatcher_passes_explicit_model() {
-        if which::which("codex").is_err() && which::which("codex-titanium").is_err() {
+        if resolve_codex_bin().is_err() {
             return;
         }
-        let (_, args) =
-            find_dispatcher(true, false, DEFAULT_FALLBACK_MODEL, true).unwrap();
+        // Pass a model ≠ primary so -m is proven (both consts may be luna).
+        let explicit = "gpt-5.3-codex-spark";
+        let (_, args) = find_dispatcher(true, false, explicit, true).unwrap();
         assert!(args
             .windows(2)
-            .any(|w| w[0] == "-m" && w[1] == DEFAULT_FALLBACK_MODEL));
+            .any(|w| w[0] == "-m" && w[1] == explicit));
         assert!(
             args.windows(2)
                 .any(|w| w[0] == "-c" && w[1] == "service_tier=fast"),
@@ -2766,6 +2890,7 @@ mod tests {
 
     #[test]
     fn spark_service_tier_env_override() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
         let prev = env::var_os("XBRD_SPARK_SERVICE_TIER");
         env::remove_var("XBRD_SPARK_SERVICE_TIER");
         assert_eq!(spark_service_tier(), DEFAULT_SERVICE_TIER);
@@ -2779,6 +2904,7 @@ mod tests {
 
     #[test]
     fn model_defaults_and_fallback_env() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev_m = env::var_os("XBRD_SPARK_MODEL");
         let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
@@ -2788,28 +2914,24 @@ mod tests {
         env::remove_var("XBRD_SPARK_USE_FALLBACK");
 
         assert_eq!(primary_spark_model(), DEFAULT_SPARK_MODEL);
-        assert_eq!(
-            fallback_spark_model().as_deref(),
-            Some(DEFAULT_FALLBACK_MODEL)
-        );
+        assert_eq!(fallback_spark_model(), None);
         let (m, from) = resolve_run_model();
         assert_eq!(m, DEFAULT_SPARK_MODEL);
         assert!(from.is_none());
 
-        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "none");
-        assert!(fallback_spark_model().is_none());
-        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
-
+        // Empty crate chain: USE_FALLBACK=1 still stays on primary with no from.
         env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
         let (m2, from2) = resolve_run_model();
-        assert_eq!(m2, DEFAULT_FALLBACK_MODEL);
-        assert_eq!(from2.as_deref(), Some(DEFAULT_SPARK_MODEL));
-        env::remove_var("XBRD_SPARK_USE_FALLBACK");
+        assert_eq!(m2, DEFAULT_SPARK_MODEL);
+        assert!(from2.is_none());
 
-        latch_fallback_model();
+        // Explicit distinct fallback + USE_FALLBACK → that slug + from=primary.
+        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.3-codex-spark");
         let (m3, from3) = resolve_run_model();
-        assert_eq!(m3, DEFAULT_FALLBACK_MODEL);
+        assert_eq!(m3, "gpt-5.3-codex-spark");
         assert_eq!(from3.as_deref(), Some(DEFAULT_SPARK_MODEL));
+        env::remove_var("XBRD_SPARK_USE_FALLBACK");
+        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
         clear_fallback_latch();
 
         match prev_m {
@@ -2845,16 +2967,13 @@ mod tests {
     }
 
     #[test]
-    fn default_model_is_codex_spark_xbgst_primary() {
+    fn default_model_is_luna_xbgst_primary() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
-        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.3-codex-spark");
-        assert_eq!(
-            fallback_spark_models(),
-            vec![DEFAULT_FALLBACK_MODEL.to_string()]
-        );
-        // Luna is OAuth fallback when FALLBACK_MODEL unset.
+        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.6-luna");
+        assert!(fallback_spark_models().is_empty());
         assert_eq!(DEFAULT_FALLBACK_MODEL, "gpt-5.6-luna");
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
@@ -2864,13 +2983,14 @@ mod tests {
 
     #[test]
     fn dry_run_records_model_and_optional_fallback_from() {
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
-        // Isolate from host L3 env (e.g. XBRD_SPARK_FALLBACK_MODEL=none from env.l3-sekhmet.sh).
         let prev_m = env::var_os("XBRD_SPARK_MODEL");
         let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         let prev_u = env::var_os("XBRD_SPARK_USE_FALLBACK");
         env::remove_var("XBRD_SPARK_MODEL");
-        env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
+        // Distinct fallback so meta proves fallback_from (both consts are luna).
+        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.3-codex-spark");
         env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
         let tmp = TempDir::new().unwrap();
         let root = tmp.path();
@@ -2881,7 +3001,7 @@ mod tests {
             &fs::read_to_string(root.join(id).join("meta.json")).unwrap(),
         )
         .unwrap();
-        assert_eq!(meta.model, DEFAULT_FALLBACK_MODEL);
+        assert_eq!(meta.model, "gpt-5.3-codex-spark");
         assert_eq!(
             meta.model_fallback_from.as_deref(),
             Some(DEFAULT_SPARK_MODEL)

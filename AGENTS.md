@@ -2,16 +2,17 @@
 
 Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no distiller, no coordination logic lives here.
 
-**Runtime target:** Codex Titanium (`codex-titanium` / `CODEX_BIN`) on **ChatGPT OAuth** (not platform API key).
+**Runtime target:** Codex Titanium (`CODEX_BIN` → `codex-titanium` → non-stub `codex`; omarchy npx stub skipped) on **ChatGPT OAuth** (not platform API key). **Never** symlink titanium as `codex`. **`xask`** = thin `sekhmet run --direct` shim on `PATH`.
 
 **Models (xbgst L3 workers — same isolation/swarm surface):**
-- Primary: `gpt-5.3-codex-spark` (`XBRD_SPARK_MODEL`)
-- Fallback (OAuth): **`gpt-5.6-luna`** (`XBRD_SPARK_FALLBACK_MODEL`)
+- Primary: **`gpt-5.6-luna`** (`XBRD_SPARK_MODEL`)
+- Fallback chain (crate default): **none** — set `XBRD_SPARK_FALLBACK_MODEL` to enable auto-retry
 - Always on Titanium path:
   - `-c model_reasoning_effort=low`
   - `-c service_tier=fast` (Fast mode; Codex maps to priority processing — see [Codex config](https://developers.openai.com/codex/config-reference); override `XBRD_SPARK_SERVICE_TIER`)
-- Force fallback without probing spark: `XBRD_SPARK_USE_FALLBACK=1`
-- Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none`
+- Swarm: **`-j 64`** default / hard cap (`XBRD_SPARK_JOBS`)
+- Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1` (no-op unless a chain is set)
+- Disable auto-fallback: unset / `XBRD_SPARK_FALLBACK_MODEL=none` (crate default is already empty)
 - Meta: `model` + optional `model_fallback_from`
 
 Agents that should call it:
@@ -27,7 +28,7 @@ Invocation contract:
 sekhmet run [--id ...] [--task | --task-file | stdin] [--scope PATH] \
   [--direct] [--deterministic] [--dry-run] [--ro] [--timeout SECS] \
   [--root PATH | $XBRD_SPARK_ROOT] [--no-keep] --task "..."
-sekhmet swarm -f tasks.txt -j 16 --direct [--dry-run] [--ro] [--timeout SECS] \
+sekhmet swarm -f tasks.txt -j 64 --direct [--dry-run] [--ro] [--timeout SECS] \
   [--scope PATH] [--root PATH] [--fail-fast]
 sekhmet collect <id...> [--root PATH]
 sekhmet gc --max-age 2 [--root PATH]
@@ -40,12 +41,12 @@ Key flags:
 - `--deterministic` — stable id from task+scope hash (`sp-` + first 16 hex of sha256); collision risk under concurrent same task
 - `--no-keep` — delete namespace after run (default is keep artifacts; gc later)
 - `--scope` — must be a directory; rsync into workspace even on dry-run (mutation-harbor excludes)
-- `--direct` — prefer Codex Titanium over xask (use this for titanium)
-- `--ro` — forces titanium `--sandbox read-only` (skips xask); recorded in meta
+- `--direct` — Titanium path (default **on**); `xask` is already a thin `sekhmet --direct` shim
+- `--ro` — forces titanium `--sandbox read-only`; recorded in meta
 - `--timeout` — wall-clock kill when >0; after kill stdout/stderr joins bounded ~2s; in meta.timeout_secs
 - `--root` / `XBRD_SPARK_ROOT` — isolation root (else `$XDG_RUNTIME_DIR/xbrd-spark` or `/tmp/xbrd-spark`)
-- `CODEX_BIN` — pin Titanium binary path; else `codex` then `codex-titanium` (path as `codex`)
-- `--direct` default **on** (pure L3); `--no-direct` for legacy xask
+- `CODEX_BIN` — pin Titanium binary path; else `codex-titanium` then non-stub `codex` (omarchy npx stub skipped; never symlink titanium→`codex`)
+- `--no-direct` — legacy loadout only (prefer `xask` shim or `--direct`)
 
 Exclusive ns; setup rollback (id reusable); gc age-only for running. Seeded auth 0o600/0o700 on unix.
 
@@ -90,7 +91,7 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 
 ## Provider quota
 
-If Titanium returns **usage_limit** on the primary spark model, sekhmet **automatically retries** on `gpt-5.6-luna` with `service_tier=fast` + effort low (or `XBRD_SPARK_FALLBACK_MODEL`) and latches that model for the rest of the process.
+If Titanium returns **usage_limit** / `model_unsupported` / `model_chatgpt_unsupported` on the primary model, sekhmet **automatically retries only when** `XBRD_SPARK_FALLBACK_MODEL` is set (effort low + `service_tier=fast`), then latches that model for the rest of the process. Crate default chain is empty — luna primary does not auto-retry onto itself.
 
 For 403 websocket / 429 rate_limit / auth failures: no model fallback — stop or lower `-j`, prefer dry-run gates.
 

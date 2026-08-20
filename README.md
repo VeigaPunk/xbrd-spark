@@ -5,27 +5,29 @@
 Marketplace name: **`sekhmet`** ([ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)).  
 Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Python).
 
-Ships against **Codex Titanium** (`codex-titanium` / `codex` symlink) — [codex-titanium](https://github.com/VeigaPunk/codex-titanium).
+Ships against **Codex Titanium** (`codex-titanium` on `PATH`, or `CODEX_BIN`) — [codex-titanium](https://github.com/VeigaPunk/codex-titanium).  
+**Do not** symlink titanium as `codex` (omarchy npx `@openai/codex` stub stays separate and is skipped).  
+**`xask`** on `PATH` is a thin `sekhmet run --direct` shim (flag-compat), not a second dispatcher.
 
 **Auth path:** ChatGPT **OAuth** via seeded `~/.codex` (not platform API key).
 
 **Model routing (xbgst L3 pin — same namespace, swarm, NDJSON):**
 | | Value | Env / flag |
 |---|---|---|
-| Primary (**xbgst default**) | **`gpt-5.3-codex-spark`** (Codex Spark) | `XBRD_SPARK_MODEL` |
-| Fallback chain (crate default) | `gpt-5.6-luna` (comma-separated OK) | `XBRD_SPARK_FALLBACK_MODEL` |
-| xbgst always-on | spark → luna | `~/.xbgst/env.l3-sekhmet.sh` |
+| Primary (**xbgst default**) | **`gpt-5.6-luna`** | `XBRD_SPARK_MODEL` |
+| Fallback chain (crate default) | **none** (empty) | `XBRD_SPARK_FALLBACK_MODEL` |
+| xbgst always-on | luna + fallback none | `~/.xbgst/env.l3-sekhmet.sh` |
 | Reasoning | `low` | `-c model_reasoning_effort=low` |
 | Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
-| Force fallback | skip primary | `XBRD_SPARK_USE_FALLBACK=1` |
+| Force fallback | skip primary (needs chain) | `XBRD_SPARK_USE_FALLBACK=1` |
 | Swarm jobs | **64** default, hard cap **64** | `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` |
 
-On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain (if enabled) with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
+On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain **only if** `XBRD_SPARK_FALLBACK_MODEL` is set, with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
 OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `service_tier=fast` (not a `-fast` model id). Env name is **`XBRD_SPARK_FALLBACK_MODEL`** (not `XBRD_SPARK_FALLBACK`).
 
-Dispatcher resolve order: `CODEX_BIN` → `codex` → `codex-titanium` (Titanium under the `codex` path name).
+Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → non-stub `codex` (omarchy npx `@openai/codex` stub is skipped).
 
-Routes executions through **Titanium OAuth** (**Codex Spark** primary; **luna** fallback) with:
+Routes executions through **Titanium OAuth** (**luna** primary; crate default fallback **none**) with:
 
 - **Always callable** — default channel for labrat swarms and pure worker sparks
 - **Up to 64 concurrent runners** — `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` (default **64**, hard cap **64**)
@@ -117,7 +119,7 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 ### Flags (enforcement)
 
 - **`--timeout SECS`**: wall-clock kill when `SECS > 0` (poll `try_wait` + process-group `SIGKILL` on Linux); result status is `timeout` (not `fail`). After kill, stdout/stderr reader joins are **bounded** (~2s) so orphan pipe holders cannot hang the spark forever (logs may truncate). `0` waits unlimited. Recorded in `meta.timeout_secs`.
-- **`--ro`**: **forces the codex dispatcher** with `--sandbox read-only` (skips xask so sandbox is actually enforced). Pure L3 default is **direct Titanium as `codex`**; use `--no-direct` only for legacy `xask --spark`. Sandbox without `--ro` is `danger-full-access`. Recorded in `meta.ro` / `meta.direct`.
+- **`--ro`**: **forces Titanium** with `--sandbox read-only`. Pure L3 default is **`--direct`** (`codex-titanium` / `CODEX_BIN`); `xask` is already a thin `sekhmet --direct` shim — use `--no-direct` only for rare legacy loadouts. Sandbox without `--ro` is `danger-full-access`. Recorded in `meta.ro` / `meta.direct`.
 - **`--scope`**: must be a directory; rsync snapshot into `workspace/` even on `--dry-run` (when rsync is available). Non-directory paths fail setup and roll back the namespace.
 - **Provenance**: `meta` also records `direct`, `dry_run`, and `timeout_secs` for every run.
 - **`usage_tokens`**: best-effort parse from dispatcher stdout/stderr (`tokens used`, `total_tokens`, …) written into `meta.json`, `out/result.json`, and NDJSON when present.
@@ -137,20 +139,16 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 
 ## Integration under xbrd
 
-Today labrat / executor / mutation-tester do:
+Preferred L3 calls:
 
 ```bash
-xask --spark --gs codex "<probe>"
-```
-
-They can switch to (or xask can grow a thin wrapper for):
-
-```bash
-xbrd-spark run --task "<probe>"
-# or with scope for mutation-tester
-xbrd-spark run --scope "$REPO" --task "..."
+sekhmet run --direct --task "<probe>"
+# thin PATH shim (same surface):
+xask --direct "<probe>"
+# scope for mutation-tester
+sekhmet run --scope "$REPO" --direct --task "..."
 # CI / gates without live model
-xbrd-spark run --dry-run --task "smoke"
+sekhmet run --dry-run --task "smoke"
 ```
 
 Higher layer receives the NDJSON records, hashes content, clusters duplicates, keeps the Pareto survivors. Double execution is intentional and cheap.
@@ -164,7 +162,7 @@ cargo build --release
 # binary: target/release/xbrd-spark
 ```
 
-Real runs need `codex` or `xask` on `PATH`; `--ro` requires `codex`; `--dry-run` needs neither.
+Real runs need `codex-titanium` (or `CODEX_BIN`) on `PATH`; `xask` is optional thin shim. `--dry-run` needs neither.
 
 Smoke:
 
@@ -196,7 +194,7 @@ The `--scope` path re-uses the exact exclude list and rsync pattern from `script
 | **[xbgst-site](https://github.com/VeigaPunk/xbgst-site)** | Public xbgst hub · [site](https://veigapunk.github.io/xbgst-site/) · [github.com/VeigaPunk/xbgst-site](https://github.com/VeigaPunk/xbgst-site) |
 | **[grok-marketplace](https://github.com/VeigaPunk/grok-marketplace)** | Grok skills / marketplace surface that wires workers onto this substrate |
 | **[ds4cc-marketplace](https://github.com/VeigaPunk/ds4cc-marketplace)** `sekhmet` plugin | Marketplace package name for this binary surface |
-| **[codex-titanium](https://github.com/VeigaPunk/codex-titanium)** | Titanium dispatcher (`codex-titanium` / `codex`); OAuth ChatGPT path |
+| **[codex-titanium](https://github.com/VeigaPunk/codex-titanium)** | Titanium dispatcher (`codex-titanium` / `CODEX_BIN`); OAuth ChatGPT path; never symlink as `codex` |
 | **[tmux-orch](https://github.com/VeigaPunk/tmux-orch)** | Ensures long-lived `sekhmet` tmux session for L3 pools (do not kill session `0`) |
 | **[xbrd-sol-ultra](https://github.com/VeigaPunk/xbrd-sol-ultra)** | Sol Ultra root judge: one `sekhmet swarm -j 64` wave per round (luna + fast); coordination stays above L3 |
 

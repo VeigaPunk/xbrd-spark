@@ -74,6 +74,27 @@ $XBRD_SPARK_ROOT (or $XDG_RUNTIME_DIR/xbrd-spark or /tmp/xbrd-spark)
 - Root override: `--root` or env `XBRD_SPARK_ROOT`.
 - Initial `meta.json` and finalize paths write via `*.tmp` + rename.
 
+## Bounded L2 pulse
+
+L2 callers should use one read-only spark at a time, independent of the
+substrate's wider capacity:
+
+```bash
+scripts/l2-pulse.sh                 # live when OAuth preflight passes
+scripts/l2-pulse.sh --dry-run       # offline dispatch-shape check
+```
+
+The wrapper forces `XBRD_SPARK_JOBS=1`, clears inherited
+`XBRD_SPARK_USE_FALLBACK`, pins `--ro --timeout 90`, preserves its namespace,
+and emits Route ID plus spark ID on stderr. It automatically uses one labeled
+dry run when the dispatcher or OAuth preflight is blocked. It never calls
+`swarm`. See the operator log and envelope in
+[`sekhmet-l3/evidence/L3-PULSE.md`](https://github.com/VeigaPunk/sekhmet-l3/blob/main/evidence/L3-PULSE.md)
+and [`HANDOFF.md`](https://github.com/VeigaPunk/sekhmet-l3/blob/main/evidence/HANDOFF.md).
+
+A 64-wide campaign is coordinator-owned. Never start `sekhmet swarm -j 64`
+from an L2 pulse without an explicit coordinator request.
+
 ## CLI
 
 ```bash

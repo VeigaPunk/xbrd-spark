@@ -24,7 +24,7 @@ musketeer-chrome  (= Chrome for Testing / Canary burner)
         │
         ▼
 Pre-authenticated tabs only for domains you automate:
-  chatgpt.com | grok.com | kimi.com | notebooklm.google.com | …
+  chatgpt.com | grok.com | kimi.ai | notebooklm.google.com | …
         │
         ▼
 chitchat / grok-web / other thin CLIs  (fire-and-forget into that browser)
@@ -123,14 +123,14 @@ One-time (human) in the **musketeer-chrome** window:
 |--------|----------------|
 | `https://chatgpt.com/` | **the-puppeteer** / `chitchat` |
 | `https://grok.com/` | **the-musketeer** / `grok-web` |
-| `https://www.kimi.com/` | **the-kimiraikoner** |
+| `https://www.kimi.ai/` | **the-kimiraikoner** |
 | `https://notebooklm.google.com/` / Gemini notebook | **the-almanacker** |
 
 Verify:
 
 ```bash
 agent-browser --cdp http://127.0.0.1:9222 tab list
-# expect chatgpt.com / grok.com / kimi.com / notebook* without "Log in" walls
+# expect chatgpt.com / grok.com / kimi.ai / notebook* without "Log in" walls
 ```
 
 If snapshot shows **Log in**, stop — do not “fix” with a new profile.
@@ -219,7 +219,7 @@ scrape vault secrets from the extension into agent chat.
 |--------|-----|--------|
 | the-puppeteer | `chitchat` | chatgpt.com |
 | the-musketeer | `grok-web` / musketeer | grok.com |
-| the-kimiraikoner | kimi adapter | kimi.com |
+| the-kimiraikoner | kimi adapter | kimi.ai |
 | the-almanacker | notebook adapter | notebooklm.google.com |
 
 All expect: **fnm multishell + musketeer-chrome burner + pre-auth + agent-browser --cdp 9222**.

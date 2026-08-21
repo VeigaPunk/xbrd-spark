@@ -2,7 +2,7 @@
 
 Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no distiller, no coordination logic lives here.
 
-**Runtime target:** Codex Titanium (`CODEX_BIN` → `codex-titanium` → non-stub `codex`; omarchy npx stub skipped) on **ChatGPT OAuth** (not platform API key). **Never** symlink titanium as `codex`. **`xask`** = thin `sekhmet run --direct` shim on `PATH`.
+**Runtime target:** Codex Titanium (`CODEX_BIN` → `codex-titanium` → non-stub `codex`; omarchy npx stub skipped) on **ChatGPT OAuth** (not platform API key). **Never** symlink titanium as `codex`. **`xask-l3`** = thin `sekhmet run --direct` shim on `PATH` (PATH **`xask`** is xbreed protocol ask).
 
 **Models (xbgst L3 workers — same isolation/swarm surface):**
 - Primary: **`gpt-5.6-luna`** (`XBRD_SPARK_MODEL`)
@@ -36,17 +36,17 @@ sekhmet status <id> [--root PATH]
 ```
 
 Key flags:
-- `--dry-run` — full namespace + stub result + NDJSON; does not spawn titanium/xask
+- `--dry-run` — full namespace + stub result + NDJSON; does not spawn titanium/xask-l3
 - `swarm -j N` — concurrent pool **1..=64** (hard cap); env `XBRD_SPARK_JOBS`; NDJSON per completion
 - `--deterministic` — stable id from task+scope hash (`sp-` + first 16 hex of sha256); collision risk under concurrent same task
 - `--no-keep` — delete namespace after run (default is keep artifacts; gc later)
 - `--scope` — must be a directory; rsync into workspace even on dry-run (mutation-harbor excludes)
-- `--direct` — Titanium path (default **on**); `xask` is already a thin `sekhmet --direct` shim
+- `--direct` — Titanium path (default **on**); `xask-l3` is a thin `sekhmet --direct` shim (PATH `xask` is xbreed protocol)
 - `--ro` — forces titanium `--sandbox read-only`; recorded in meta
 - `--timeout` — wall-clock kill when >0; after kill stdout/stderr joins bounded ~2s; in meta.timeout_secs
 - `--root` / `XBRD_SPARK_ROOT` — isolation root (else `$XDG_RUNTIME_DIR/xbrd-spark` or `/tmp/xbrd-spark`)
 - `CODEX_BIN` — pin Titanium binary path; else `codex-titanium` then non-stub `codex` (omarchy npx stub skipped; never symlink titanium→`codex`)
-- `--no-direct` — legacy loadout only (prefer `xask` shim or `--direct`)
+- `--no-direct` — legacy loadout only (prefer `xask-l3` shim or `--direct`; never PATH `xask`)
 
 Exclusive ns; setup rollback (id reusable); gc age-only for running. Seeded auth 0o600/0o700 on unix.
 

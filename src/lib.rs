@@ -151,7 +151,7 @@ enum Commands {
         #[arg(long)]
         scope: Option<PathBuf>,
 
-        /// Read-only: force codex with `--sandbox read-only` (skips xask so sandbox is enforced).
+        /// Read-only: force codex with `--sandbox read-only` (skips xask-l3 so sandbox is enforced).
         #[arg(long, default_value_t = false)]
         ro: bool,
 
@@ -159,7 +159,7 @@ enum Commands {
         #[arg(long, default_value_t = 120)]
         timeout: u64,
 
-        /// Prefer direct Titanium as `codex` over `xask --spark` (pure L3 default).
+        /// Prefer direct Titanium as `codex` over `xask-l3` (pure L3 default).
         #[arg(long = "direct", action = clap::ArgAction::SetTrue, default_value_t = true)]
         #[arg(long = "no-direct", action = clap::ArgAction::SetFalse)]
         direct: bool,
@@ -176,7 +176,7 @@ enum Commands {
         #[arg(long, default_value_t = false)]
         deterministic: bool,
 
-        /// Dry-run: write full namespace + stub result without spawning xask/codex.
+        /// Dry-run: write full namespace + stub result without spawning xask-l3/codex.
         #[arg(long, default_value_t = false)]
         dry_run: bool,
     },
@@ -234,7 +234,7 @@ enum Commands {
         #[arg(long, default_value_t = 120)]
         timeout: u64,
 
-        /// Prefer direct Titanium as `codex` over `xask --spark` (pure L3 default).
+        /// Prefer direct Titanium as `codex` over `xask-l3` (pure L3 default).
         #[arg(long = "direct", action = clap::ArgAction::SetTrue, default_value_t = true)]
         #[arg(long = "no-direct", action = clap::ArgAction::SetFalse)]
         direct: bool,
@@ -246,7 +246,7 @@ enum Commands {
         #[arg(long = "no-keep", action = clap::ArgAction::SetTrue)]
         no_keep: bool,
 
-        /// Dry-run each task (no xask/codex).
+        /// Dry-run each task (no xask-l3/codex).
         #[arg(long, default_value_t = false)]
         dry_run: bool,
 
@@ -399,7 +399,10 @@ pub fn classify_provider_error(stdout: &str, stderr: &str) -> Option<&'static st
     if blob.contains("403 forbidden") && blob.contains("websocket") {
         return Some("auth_ws");
     }
-    if blob.contains("neither xask nor codex") || blob.contains("codex not found") {
+    if blob.contains("neither xask-l3 nor codex")
+        || blob.contains("neither xask nor codex")
+        || blob.contains("codex not found")
+    {
         return Some("missing_dispatcher");
     }
     None
@@ -883,18 +886,19 @@ pub fn spark_service_tier() -> String {
 /// Build dispatcher cmdline for `model`.
 ///
 /// When `force_codex` is true (fallback retry), always use Titanium codex so `-m`
-/// is applied; xask has no model flag.
+/// is applied; xask-l3 has no model flag.
 ///
 /// Always forces (Titanium path):
 /// - `model_reasoning_effort=low`
 /// - `service_tier=<XBRD_SPARK_SERVICE_TIER|fast>` — Fast mode (priority processing)
 fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Result<(String, Vec<String>)> {
     // Pure L3 default: Titanium exposed as `codex` (single source of flags).
-    // xask only when `--no-direct` (legacy migration / loadout continuity).
+    // `--no-direct` may use `xask-l3` (sekhmet shim) only — never PATH `xask`
+    // (xbreed protocol ask). Missing xask-l3 falls through to titanium.
     // --ro always forces codex so `--sandbox read-only` is actually applied.
     // Fallback retries also force codex so the alternate model is actually selected.
     if !force_codex && !direct && !ro {
-        if let Ok(p) = which::which("xask") {
+        if let Ok(p) = which::which("xask-l3") {
             return Ok((
                 p.to_string_lossy().into_owned(),
                 vec!["--spark".into(), "--gs".into(), "codex".into()],
@@ -909,11 +913,11 @@ fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Re
     let tier = spark_service_tier();
     let p = resolve_codex_bin().with_context(|| {
         if ro {
-            "codex/codex-titanium not found on PATH (--ro forces titanium sandbox; xask skipped)"
+            "codex/codex-titanium not found on PATH (--ro forces titanium sandbox; xask-l3 skipped)"
         } else if direct || force_codex {
             "codex/codex-titanium not found on PATH (pure L3 / model fallback)"
         } else {
-            "neither xask nor codex/codex-titanium found on PATH"
+            "neither xask-l3 nor codex/codex-titanium found on PATH"
         }
     })?;
     Ok((
@@ -2530,19 +2534,116 @@ mod tests {
 
     #[test]
     fn find_dispatcher_ro_forces_codex_sandbox() {
-        // --ro must never return xask argv (no sandbox); requires titanium resolve.
+        // --ro must never return xask / xask-l3 argv (no sandbox); requires titanium resolve.
         if resolve_codex_bin().is_err() {
             return;
         }
         let (bin, args) = find_dispatcher(false, true, DEFAULT_SPARK_MODEL, false).unwrap();
         assert!(
-            !bin.ends_with("xask") && !bin.contains("/xask"),
-            "ro must not use xask: {bin}"
+            !bin.ends_with("/xask")
+                && !bin.ends_with("/xask-l3")
+                && std::path::Path::new(&bin)
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    != Some("xask")
+                && std::path::Path::new(&bin)
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    != Some("xask-l3"),
+            "ro must not use xask/xask-l3: {bin}"
         );
         assert!(args.iter().any(|a| a == "exec"));
         assert!(args
             .windows(2)
             .any(|w| w[0] == "--sandbox" && w[1] == "read-only"));
+    }
+
+    /// `--no-direct` must resolve `xask-l3` (sekhmet shim), never PATH `xask` (xbreed protocol).
+    #[cfg(unix)]
+    #[test]
+    fn find_dispatcher_no_direct_prefers_xask_l3_not_path_xask() {
+        use std::os::unix::fs::PermissionsExt;
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let bin = tmp.path().join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let xask = bin.join("xask");
+        let xask_l3 = bin.join("xask-l3");
+        let titanium = bin.join("codex-titanium");
+        fs::write(&xask, b"#!/bin/sh\necho TRAP-xbreed-ask\n").unwrap();
+        fs::write(&xask_l3, b"#!/bin/sh\necho xask-l3\n").unwrap();
+        fs::write(&titanium, b"#!/bin/sh\necho titanium\n").unwrap();
+        fs::set_permissions(&xask, fs::Permissions::from_mode(0o755)).unwrap();
+        fs::set_permissions(&xask_l3, fs::Permissions::from_mode(0o755)).unwrap();
+        fs::set_permissions(&titanium, fs::Permissions::from_mode(0o755)).unwrap();
+
+        let prev_path = env::var_os("PATH");
+        let prev_bin = env::var_os("CODEX_BIN");
+        env::remove_var("CODEX_BIN");
+        env::set_var("PATH", &bin);
+
+        let (got, args) = find_dispatcher(false, false, DEFAULT_SPARK_MODEL, false).unwrap();
+        assert_eq!(
+            PathBuf::from(&got),
+            xask_l3,
+            "no-direct must pick xask-l3, not PATH xask; got {got}"
+        );
+        assert_ne!(PathBuf::from(&got), xask, "must never resolve protocol xask");
+        assert!(
+            args.iter().any(|a| a == "--spark") && args.iter().any(|a| a == "--gs"),
+            "legacy shim argv expected: {args:?}"
+        );
+
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+        match prev_bin {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
+    }
+
+    /// Without `xask-l3`, `--no-direct` falls through to titanium even if PATH `xask` exists.
+    #[cfg(unix)]
+    #[test]
+    fn find_dispatcher_no_direct_falls_through_without_xask_l3() {
+        use std::os::unix::fs::PermissionsExt;
+        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let tmp = TempDir::new().unwrap();
+        let bin = tmp.path().join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let xask = bin.join("xask");
+        let titanium = bin.join("codex-titanium");
+        fs::write(&xask, b"#!/bin/sh\necho TRAP-xbreed-ask\n").unwrap();
+        fs::write(&titanium, b"#!/bin/sh\necho titanium\n").unwrap();
+        fs::set_permissions(&xask, fs::Permissions::from_mode(0o755)).unwrap();
+        fs::set_permissions(&titanium, fs::Permissions::from_mode(0o755)).unwrap();
+
+        let prev_path = env::var_os("PATH");
+        let prev_bin = env::var_os("CODEX_BIN");
+        env::remove_var("CODEX_BIN");
+        env::set_var("PATH", &bin);
+
+        let (got, args) = find_dispatcher(false, false, DEFAULT_SPARK_MODEL, false).unwrap();
+        assert_eq!(
+            PathBuf::from(&got),
+            titanium,
+            "missing xask-l3 must fall through to titanium, not PATH xask; got {got}"
+        );
+        assert!(args.iter().any(|a| a == "exec"));
+        assert!(args
+            .windows(2)
+            .any(|w| w[0] == "--sandbox" && w[1] == "danger-full-access"));
+
+        match prev_path {
+            Some(v) => env::set_var("PATH", v),
+            None => env::remove_var("PATH"),
+        }
+        match prev_bin {
+            Some(v) => env::set_var("CODEX_BIN", v),
+            None => env::remove_var("CODEX_BIN"),
+        }
     }
 
     #[test]
@@ -3054,6 +3155,10 @@ mod tests {
 
     #[test]
     fn classify_provider_error_missing_dispatcher() {
+        assert_eq!(
+            classify_provider_error("", "neither xask-l3 nor codex/codex-titanium found on PATH"),
+            Some("missing_dispatcher")
+        );
         assert_eq!(
             classify_provider_error("", "neither xask nor codex found on PATH"),
             Some("missing_dispatcher")

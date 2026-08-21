@@ -7,7 +7,7 @@ Binaries: **`sekhmet`** and **`xbrd-spark`** (same surface, Rust only — no Pyt
 
 Ships against **Codex Titanium** (`codex-titanium` on `PATH`, or `CODEX_BIN`) — [codex-titanium](https://github.com/VeigaPunk/codex-titanium).  
 **Do not** symlink titanium as `codex` (omarchy npx `@openai/codex` stub stays separate and is skipped).  
-**`xask`** on `PATH` is a thin `sekhmet run --direct` shim (flag-compat), not a second dispatcher.
+**`xask-l3`** on `PATH` is a thin `sekhmet run --direct` shim (flag-compat), not a second dispatcher. PATH **`xask`** is the xbreed protocol ask — sekhmet `--no-direct` must not resolve it.
 
 **Auth path:** ChatGPT **OAuth** via seeded `~/.codex` (not platform API key).
 
@@ -102,13 +102,13 @@ from an L2 pulse without an explicit coordinator request.
 xbrd-spark run --task "write a rust function that ..."
 echo "probe hypothesis X" | xbrd-spark run --id sp-labrat-42
 
-# Dry-run (no xask/codex; full namespace + stub result + NDJSON)
+# Dry-run (no xask-l3/codex; full namespace + stub result + NDJSON)
 xbrd-spark run --dry-run --task "probe" --root /tmp/xbrd-spark-smoke
 
 # With FS context for mutation / labrat that need files
 xbrd-spark run --scope . --task "mutate the boundary check in src/lib.rs and run tests"
 
-# Prefer direct Codex Titanium (skip xask loadout) for absolute min latency
+# Prefer direct Codex Titanium (skip xask-l3 loadout) for absolute min latency
 xbrd-spark run --direct --task "..."
 # or the always-on alias:
 sekhmet run --direct --task "..."
@@ -140,7 +140,7 @@ Exit non-zero on spark failure, but the structured record is still emitted so do
 ### Flags (enforcement)
 
 - **`--timeout SECS`**: wall-clock kill when `SECS > 0` (poll `try_wait` + process-group `SIGKILL` on Linux); result status is `timeout` (not `fail`). After kill, stdout/stderr reader joins are **bounded** (~2s) so orphan pipe holders cannot hang the spark forever (logs may truncate). `0` waits unlimited. Recorded in `meta.timeout_secs`.
-- **`--ro`**: **forces Titanium** with `--sandbox read-only`. Pure L3 default is **`--direct`** (`codex-titanium` / `CODEX_BIN`); `xask` is already a thin `sekhmet --direct` shim — use `--no-direct` only for rare legacy loadouts. Sandbox without `--ro` is `danger-full-access`. Recorded in `meta.ro` / `meta.direct`.
+- **`--ro`**: **forces Titanium** with `--sandbox read-only`. Pure L3 default is **`--direct`** (`codex-titanium` / `CODEX_BIN`); `xask-l3` is a thin `sekhmet --direct` shim — use `--no-direct` only for rare legacy loadouts (resolves `xask-l3`, never PATH `xask`). Sandbox without `--ro` is `danger-full-access`. Recorded in `meta.ro` / `meta.direct`.
 - **`--scope`**: must be a directory; rsync snapshot into `workspace/` even on `--dry-run` (when rsync is available). Non-directory paths fail setup and roll back the namespace.
 - **Provenance**: `meta` also records `direct`, `dry_run`, and `timeout_secs` for every run.
 - **`usage_tokens`**: best-effort parse from dispatcher stdout/stderr (`tokens used`, `total_tokens`, …) written into `meta.json`, `out/result.json`, and NDJSON when present.
@@ -165,7 +165,7 @@ Preferred L3 calls:
 ```bash
 sekhmet run --direct --task "<probe>"
 # thin PATH shim (same surface):
-xask --direct "<probe>"
+xask-l3 --direct "<probe>"
 # scope for mutation-tester
 sekhmet run --scope "$REPO" --direct --task "..."
 # CI / gates without live model
@@ -183,7 +183,7 @@ cargo build --release
 # binary: target/release/xbrd-spark
 ```
 
-Real runs need `codex-titanium` (or `CODEX_BIN`) on `PATH`; `xask` is optional thin shim. `--dry-run` needs neither.
+Real runs need `codex-titanium` (or `CODEX_BIN`) on `PATH`; `xask-l3` is optional thin shim. `--dry-run` needs neither.
 
 Smoke:
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# xask — thin sekhmet shim (flag-compat). Always sekhmet run --direct.
-# Usage: xask [-d] [--model-id ID] [-e low] [--spark|--spk] [--gs] [--direct]
+# This file is the L3 shim installed as xask-l3 (PATH xask is protocol xbreed).
+# xask-l3 — thin sekhmet shim (flag-compat). Bare `sekhmet run` (Titanium default).
+# `--direct` is accepted and ignored; clap has `--no-direct` only.
+# Usage: xask-l3 [-d] [--model-id ID] [-e low] [--spark|--spk] [--gs] [--direct]
 #             [--ro] [--timeout N] [--no-keep] [--root PATH] [--dry-run]
 #             [codex] "<query>"
 set -euo pipefail
@@ -95,7 +97,9 @@ export XBRD_SPARK_MODEL="$MODEL_ID"
 export XBRD_SPARK_SERVICE_TIER=fast
 export XBRD_SPARK_FALLBACK_MODEL=none
 
-argv=("$SEKHMET" run --direct)
+# Bare `sekhmet run` already defaults Titanium. Clap exposes `--no-direct`
+# only; passing `--direct` is `unexpected argument`.
+argv=("$SEKHMET" run)
 [[ "$RO" == true ]] && argv+=(--ro)
 [[ -n "$TIMEOUT" ]] && argv+=(--timeout "$TIMEOUT")
 [[ "$NO_KEEP" == true ]] && argv+=(--no-keep)
@@ -114,7 +118,7 @@ if [[ "$DEBUG" == true ]]; then
   echo "model_reasoning_effort=low"
   echo "service_tier=fast"
   echo "ARGV: ${argv[*]}"
-  echo "constructed: $SEKHMET run --direct -c model_reasoning_effort=low -c service_tier=fast -m ${MODEL_ID} --task ..."
+  echo "constructed: $SEKHMET run -c model_reasoning_effort=low -c service_tier=fast -m ${MODEL_ID} --task ..."
   exit 0
 fi
 

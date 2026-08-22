@@ -18,7 +18,7 @@ titanium_alive() {
 
 run(){ log "START $*"; ./bench-512qa-v3.sh "$@" >> "$LOG" 2>&1; log "END $3 rc=$?"; }
 
-# 1. golden lane retry — probe gate, 3 attempts with cool-down
+# 1. golden lane retries — probe gate, 3 attempts with cool-down
 for i in 1 2 3; do
   if titanium_alive; then
     rm -rf telemetry-512qa-multi/runs/codex-spark-golden
@@ -28,8 +28,15 @@ for i in 1 2 3; do
   log "titanium quota still gated (attempt $i); cooling down 300s"; sleep 300
 done
 
-# 2. sol-fast redo on v3 (old data predates armor)
-if titanium_alive; then rm -rf telemetry-512qa-multi/runs/sol-fast-titanium; run sekhmet gpt-5.6-sol sol-fast-titanium 64; fi
+# 2. sol-fast + luna-fast redos on v3 (all prior titanium data = quota-fail stubs)
+if titanium_alive; then
+  rm -rf telemetry-512qa-multi/runs/sol-fast-titanium
+  run sekhmet gpt-5.6-sol sol-fast-titanium 64
+fi
+if titanium_alive; then
+  rm -rf telemetry-512qa-multi/runs/luna-fast-titanium
+  run sekhmet gpt-5.6-luna luna-fast-titanium 64
+fi
 
 # 3. v2-era grok casualties — clean v3 redos
 rm -rf telemetry-512qa-multi/runs/grok-4.6-medium; GROK_EFFORT=medium run grok grok-4.6 grok-4.6-medium 16

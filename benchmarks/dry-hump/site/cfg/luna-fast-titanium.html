@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>512QA — luna-fast-titanium</title>
+<style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  margin: 2rem auto; max-width: 1180px; padding: 0 1rem;
+  background: #f6f7f9; color: #17181c; line-height: 1.45;
+}
+h1 { font-size: 1.35rem; margin-bottom: 0.2rem; }
+.muted { color: #6b7280; font-size: 0.82rem; }
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+table {
+  border-collapse: collapse; width: 100%; margin-top: 1rem;
+  font-size: 0.88rem; background: #ffffff;
+  border: 1px solid #d9dce1; border-radius: 8px; overflow: hidden;
+}
+thead th {
+  text-align: left; font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.05em; color: #4b5563; background: #eceef1;
+  padding: 0.55rem 0.7rem; border-bottom: 2px solid #d3d7dd; white-space: nowrap;
+}
+tbody td { padding: 0.45rem 0.7rem; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+th.n, td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; }
+tbody tr:nth-child(even) td { background: rgba(15, 23, 42, 0.025); }
+td.rj { background: rgba(220, 38, 38, 0.07); }
+td.ri { background: rgba(217, 119, 6, 0.07); }
+tbody tr:nth-child(even) td.rj { background: rgba(220, 38, 38, 0.10); }
+tbody tr:nth-child(even) td.ri { background: rgba(217, 119, 6, 0.10); }
+tbody tr:hover td { background: rgba(59, 130, 246, 0.10); }
+td.rj:first-child { box-shadow: inset 3px 0 0 #dc2626; }
+td.ri:first-child { box-shadow: inset 3px 0 0 #d97706; }
+.badge {
+  display: inline-block; padding: 0.08rem 0.5rem; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.01em;
+}
+.badge.bad  { background: #fee2e2; color: #991b1b; }
+.badge.warn { background: #fef3c7; color: #92400e; }
+.stats { display: flex; gap: 1.2rem; flex-wrap: wrap; margin: 0.8rem 0 0.2rem; }
+.stat { background: #ffffff; border: 1px solid #d9dce1; border-radius: 8px; padding: 0.5rem 0.9rem; }
+.stat .v { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .k { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+footer { margin-top: 1.1rem; font-size: 0.8rem; color: #6b7280; }
+@media (prefers-color-scheme: dark) {
+  body { background: #0f1115; color: #e5e7eb; }
+  table, .stat { background: #171a21; border-color: #2a2f3a; }
+  thead th { background: #20242e; color: #9ca3af; border-bottom-color: #2f3542; }
+  tbody td { border-bottom-color: #262b36; }
+  tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.028); }
+  td.rj { background: rgba(248, 113, 113, 0.10); }
+  td.ri { background: rgba(251, 191, 36, 0.10); }
+  tbody tr:nth-child(even) td.rj { background: rgba(248, 113, 113, 0.14); }
+  tbody tr:nth-child(even) td.ri { background: rgba(251, 191, 36, 0.14); }
+  tbody tr:hover td { background: rgba(96, 165, 250, 0.14); }
+  td.rj:first-child { box-shadow: inset 3px 0 0 #f87171; }
+  td.ri:first-child { box-shadow: inset 3px 0 0 #fbbf24; }
+  .badge.bad  { background: #451a1a; color: #fca5a5; }
+  .badge.warn { background: #451f03; color: #fcd34d; }
+  .muted { color: #9ca3af; }
+  footer { color: #9ca3af; }
+}
+</style>
+</head>
+<body>
+<h1>512QA — luna-fast-titanium</h1>
+<p class="muted">Per-domain breakdown. Cells are unique question ids after retry merge (last answer wins); missing data shows as —.</p>
+<p><code>gpt-5.6-luna</code> · lane <strong>sekhmet</strong> · wall 2296s · mutations <strong>0/32</strong></p><div class="stats"><div class="stat"><div class="v">512</div><div class="k">ok</div></div><div class="stat"><div class="v">32</div><div class="k">fail</div></div><div class="stat"><div class="v">512</div><div class="k">expected</div></div><div class="stat"><div class="v">100%</div><div class="k">completion</div></div></div><table><thead><tr><th>domain</th><th class="n">cells</th><th class="n">ok</th><th class="n">coverage</th></tr></thead><tbody><tr><td class="mono">religion</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">sex</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">drugs</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">politics</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">money</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">violence</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">ai</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr><tr><td class="mono">charlie-kirk</td><td class="n">64</td><td class="n">64</td><td class="n">100%</td></tr></tbody></table><footer>generated 2026-08-22T05:18:52Z @ 2335641 · <a href="../index.html">← fleet index</a></footer>
+</body>
+</html>

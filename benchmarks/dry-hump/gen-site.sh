@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# gen-site.sh — render site/index.html for the 512QA campaign from
+# gen-site.sh — render the 512QA campaign site from
 # telemetry-512qa-multi/runs/*/summary.json. bash + jq only; no frameworks,
-# no JS build step, no external assets. Strictly read-only wrt runs/.
+# no JS build step, no external assets. Strictly read-only wrt runs/
+# (per-domain breakdowns read local answers.jsonl when present).
+#
+# Emits:
+#   site/index.html          fleet leaderboard (completion desc, junk last)
+#   site/cfg/<config>.html   per-config page w/ per-domain breakdown
 #
 # Honesty rules (non-negotiable):
 #   * configs with a .junk field -> "quota-stub" badge, sort last regardless of numbers
@@ -9,18 +14,23 @@
 #                                   else sum .barrier_s from batch-times.jsonl;
 #                                   display "~Ns (derived)"; if unreconstructable -> "—"
 #   * ok + fail < expected       -> "incomplete" badge
-# Idempotent: re-running rebuilds the same page from current summaries
+#   * missing per-domain data    -> "—" never a guess
+# Idempotent: re-running rebuilds the same pages from current summaries
 # (footer timestamp aside). jq parse failure on any summary = hard fail.
 set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 RUNS="$HERE/telemetry-512qa-multi/runs"
 OUTDIR="$HERE/site"
+CFGDIR="$OUTDIR/cfg"
 OUT="$OUTDIR/index.html"
 TMP=$(mktemp)
-trap 'rm -f "$TMP"' EXIT
+TMP2=$(mktemp)
+trap 'rm -f "$TMP" "$TMP2"' EXIT
 
-mkdir -p "$OUTDIR"
+mkdir -p "$OUTDIR" "$CFGDIR"
+
+DOMAINS=(religion sex drugs politics money violence ai charlie-kirk)
 
 rows=()
 for p in "$RUNS"/*/summary.json; do
@@ -40,7 +50,19 @@ for p in "$RUNS"/*/summary.json; do
     fi
   fi
 
-  rows+=("$(jq -c --arg dir_cfg "$cfg" --argjson derived "$derived" '
+  # Per-domain cells/ok from local answers.jsonl (retry-merged, unique-by-id last-wins).
+  doms="[]"
+  for d in "${DOMAINS[@]}"; do
+    f="$dir/$d/answers.jsonl"
+    if [[ -s $f ]]; then
+      stat=$(jq -s '{n:length, ok:[.[]|select(.status=="ok")]|length}' "$f")
+    else
+      stat='null'
+    fi
+    doms=$(jq -c --arg d "$d" --argjson s "$stat" '. + [{domain:$d, cells:$s}]' <<<"$doms")
+  done
+
+  rows+=("$(jq -c --arg dir_cfg "$cfg" --argjson derived "$derived" --argjson domains "$doms" '
     {
       config:    (.config // $dir_cfg),
       lane:      (.lane // "—"),
@@ -53,7 +75,8 @@ for p in "$RUNS"/*/summary.json; do
       mut_ok:    (if (.mutations | type) == "object" then .mutations.ok else null end),
       mut_total: (if (.mutations | type) == "object" then .mutations.total else null end),
       junk_flag: has("junk"),
-      junk:      (.junk // null)
+      junk:      (.junk // null),
+      domains:   $domains
     }
     | .rate = (if .expected > 0 then .ok / .expected else -1 end)
     | .incomplete = ((.ok + .fail) < .expected)
@@ -69,16 +92,7 @@ UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 REV=$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo nogit)
 N=${#rows[@]}
 
-{
-cat <<'HEAD'
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>512QA campaign results — xbrd-spark dry-hump</title>
-<style>
+CSS=$(cat <<'CSSEOF'
 :root { color-scheme: light dark; }
 * { box-sizing: border-box; }
 body {
@@ -88,6 +102,8 @@ body {
 }
 h1 { font-size: 1.35rem; margin-bottom: 0.2rem; }
 .muted { color: #6b7280; font-size: 0.82rem; }
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
 table {
   border-collapse: collapse; width: 100%; margin-top: 1rem;
@@ -117,10 +133,14 @@ td.ri:first-child { box-shadow: inset 3px 0 0 #d97706; }
 }
 .badge.bad  { background: #fee2e2; color: #991b1b; }
 .badge.warn { background: #fef3c7; color: #92400e; }
+.stats { display: flex; gap: 1.2rem; flex-wrap: wrap; margin: 0.8rem 0 0.2rem; }
+.stat { background: #ffffff; border: 1px solid #d9dce1; border-radius: 8px; padding: 0.5rem 0.9rem; }
+.stat .v { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .k { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
 footer { margin-top: 1.1rem; font-size: 0.8rem; color: #6b7280; }
 @media (prefers-color-scheme: dark) {
   body { background: #0f1115; color: #e5e7eb; }
-  table { background: #171a21; border-color: #2a2f3a; }
+  table, .stat { background: #171a21; border-color: #2a2f3a; }
   thead th { background: #20242e; color: #9ca3af; border-bottom-color: #2f3542; }
   tbody td { border-bottom-color: #262b36; }
   tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.028); }
@@ -136,21 +156,39 @@ footer { margin-top: 1.1rem; font-size: 0.8rem; color: #6b7280; }
   .muted { color: #9ca3af; }
   footer { color: #9ca3af; }
 }
+CSSEOF
+)
+
+page_head() { # $1=title $2=subtitle
+  cat <<PGHEAD
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>$1</title>
+<style>
+$CSS
 </style>
 </head>
 <body>
-<h1>512QA campaign — results</h1>
-<p class="muted">Self-contained static page generated by <code>gen-site.sh</code> from
-<code>telemetry-512qa-multi/runs/*/summary.json</code> (bash + jq only, no external assets).
-Read-only snapshot of <code>runs/</code> at generation time; live runs without a
-<code>summary.json</code> are excluded. Wall times marked <em>(derived)</em> are
-reconstructed from per-domain telemetry, not measured.</p>
+<h1>$1</h1>
+<p class="muted">$2</p>
+PGHEAD
+}
+
+# ---------- index ----------
+{
+page_head "512QA campaign — results" \
+"Self-contained static site generated by <code>gen-site.sh</code> from <code>telemetry-512qa-multi/runs/*/summary.json</code> (bash + jq only, no external assets). Read-only snapshot of <code>runs/</code> at generation time. Wall times marked <em>(derived)</em> are reconstructed from per-domain telemetry, not measured. Click a config for its per-domain breakdown."
+cat <<'TBLHEAD'
 <table>
 <thead>
 <tr><th>config</th><th>lane</th><th>model</th><th class="n">ok</th><th class="n">fail</th><th class="n">expected</th><th class="n">completion</th><th class="n">wall_s</th><th class="n">mutations ok/total</th><th>flags</th></tr>
 </thead>
 <tbody>
-HEAD
+TBLHEAD
 
 printf '%s\n' "${rows[@]}" | jq -sr '
   def h: tostring | @html;
@@ -173,7 +211,7 @@ printf '%s\n' "${rows[@]}" | jq -sr '
   | .[]
   | (if .junk_flag then "rj" elif .incomplete then "ri" else "rn" end) as $c
   | "<tr>"
-    + "<td class=\"mono \($c)\">\(.config | h)</td>"
+    + "<td class=\"mono \($c)\"><a href=\"cfg/\(.config | h).html\">\(.config | h)</a></td>"
     + "<td class=\"\($c)\">\(.lane | h)</td>"
     + "<td class=\"mono \($c)\">\(.model | h)</td>"
     + "<td class=\"n \($c)\">\(.ok)</td>"
@@ -189,10 +227,59 @@ printf '%s\n' "${rows[@]}" | jq -sr '
 cat <<FOOT
 </tbody>
 </table>
-<footer>generated $UTC @ $REV, $N configs</footer>
+<footer>generated $UTC @ $REV · $N configs · <a href="https://github.com/VeigaPunk/xbrd-spark">xbrd-spark</a></footer>
 </body>
 </html>
 FOOT
 } > "$TMP"
 mv "$TMP" "$OUT"
-echo "wrote $OUT ($N configs)"
+
+# ---------- per-config pages ----------
+PAGES=0
+for row in "${rows[@]}"; do
+  cfg=$(jq -r '.config' <<<"$row")
+  page_head "512QA — $cfg" "Per-domain breakdown. Cells are unique question ids after retry merge (last answer wins); missing data shows as —." > "$TMP2"
+
+  jq -r '
+    def h: tostring | @html;
+    def numfmt: if . >= 1 then (round | tostring) else tostring end;
+    def wallfmt:
+      if .wall == 0 then
+        (if .derived == null or .derived == 0 then "—"
+         else "~\(.derived | numfmt)s (derived)" end)
+      else "\(.wall | numfmt)s" end;
+    def compfmt:
+      if .expected > 0 then "\((((1000 * .ok) / .expected) | round) / 10)%"
+      else "—" end;
+    "<p><code>\(.model | h)</code> · lane <strong>\(.lane | h)</strong> · wall \((wallfmt) | h) · mutations <strong>\(if .mut_ok == null then "—" else "\(.mut_ok)/\(.mut_total // 0)" end | h)</strong>"
+      + (if .junk_flag then " · <span class=\"badge bad\" title=\"\(.junk | h)\">quota-stub</span>" else "" end)
+      + (if .incomplete then " · <span class=\"badge warn\">incomplete</span>" else "" end)
+      + "</p>"
+    + "<div class=\"stats\">"
+    + "<div class=\"stat\"><div class=\"v\">\(.ok)</div><div class=\"k\">ok</div></div>"
+    + "<div class=\"stat\"><div class=\"v\">\(.fail)</div><div class=\"k\">fail</div></div>"
+    + "<div class=\"stat\"><div class=\"v\">\(.expected)</div><div class=\"k\">expected</div></div>"
+    + "<div class=\"stat\"><div class=\"v\">\(compfmt | h)</div><div class=\"k\">completion</div></div>"
+    + "</div>"
+    + "<table><thead><tr><th>domain</th><th class=\"n\">cells</th><th class=\"n\">ok</th><th class=\"n\">coverage</th></tr></thead><tbody>"
+    + ([.domains[] |
+        (if .cells == null then
+           "<tr><td class=\"mono\">\(.domain | h)</td><td class=\"n\">—</td><td class=\"n\">—</td><td class=\"n\">—</td></tr>"
+         else
+           "<tr><td class=\"mono\">\(.domain | h)</td><td class=\"n\">\(.cells.n)</td><td class=\"n\">\(.cells.ok)</td><td class=\"n\">\(if .cells.n > 0 then "\((((1000 * .cells.ok) / .cells.n) | round) / 10)%" else "—" end)</td></tr>"
+         end)]
+       | join(""))
+    + "</tbody></table>"
+    + "<footer>generated '"$UTC"' @ '"$REV"' · <a href=\"../index.html\">← fleet index</a></footer>"
+  ' <<<"$row" >> "$TMP2"
+
+  cat <<PGTAIL >> "$TMP2"
+</body>
+</html>
+PGTAIL
+
+  mv "$TMP2" "$CFGDIR/$cfg.html"
+  PAGES=$((PAGES + 1))
+done
+
+echo "wrote $OUT ($N configs) + $PAGES config pages"

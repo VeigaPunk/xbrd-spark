@@ -12,6 +12,16 @@ use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 
+type ModelStamps = (Option<String>, Option<String>, Option<String>);
+type SummaryCounts = (
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+);
+
 #[derive(Parser, Debug)]
 #[command(name = "harvest-qa", about = "Harvest sekhmet results into ALL-QA.md")]
 struct Args {
@@ -85,7 +95,9 @@ fn main() -> Result<()> {
         }
         // Resolve result paths into run_dir/results/<id>.json when live path gone
         for row in &mut rows {
-            let local = run_dir.join("results").join(format!("{}.json", row.spark_id));
+            let local = run_dir
+                .join("results")
+                .join(format!("{}.json", row.spark_id));
             if local.is_file() {
                 row.result_path = Some(local);
             } else if let Some(ref rp) = row.result_path {
@@ -109,7 +121,12 @@ fn main() -> Result<()> {
                     row.task_from_file = Some(fs::read_to_string(&p)?.trim().to_string());
                 }
             }
-            if row.result_path.as_ref().map(|p| !p.is_file()).unwrap_or(true) {
+            if row
+                .result_path
+                .as_ref()
+                .map(|p| !p.is_file())
+                .unwrap_or(true)
+            {
                 let p = root.join(&row.spark_id).join("out").join("result.json");
                 if p.is_file() {
                     row.result_path = Some(p);
@@ -125,12 +142,7 @@ fn main() -> Result<()> {
             if res_dir.is_dir() {
                 let mut ids: Vec<_> = fs::read_dir(&res_dir)?
                     .filter_map(|e| e.ok())
-                    .filter(|e| {
-                        e.path()
-                            .extension()
-                            .map(|x| x == "json")
-                            .unwrap_or(false)
-                    })
+                    .filter(|e| e.path().extension().map(|x| x == "json").unwrap_or(false))
                     .map(|e| e.path())
                     .collect();
                 ids.sort();
@@ -222,14 +234,14 @@ fn main() -> Result<()> {
     }
 
     // Sort by task order (HARD01.. or index prefix)
-    matched.sort_by(|a, b| task_sort_key(&a.0).cmp(&task_sort_key(&b.0)));
+    matched.sort_by_key(|a| task_sort_key(&a.0));
 
     if let Some(parent) = args.out.parent() {
         fs::create_dir_all(parent)?;
     }
 
-    let mut f = fs::File::create(&args.out)
-        .with_context(|| format!("create {}", args.out.display()))?;
+    let mut f =
+        fs::File::create(&args.out).with_context(|| format!("create {}", args.out.display()))?;
 
     writeln!(f, "# ALL-QA — {run_id}")?;
     writeln!(f, "- model_id: {model_id}")?;
@@ -439,7 +451,9 @@ fn extract_task_from_cmdline(cmdline: &[String]) -> Option<String> {
     // Find HARD or ETHICS style id
     for line in prompt.lines() {
         let t = line.trim();
-        if t.starts_with("HARD") || t.starts_with("ETHICS") || (t.starts_with('E') && t.contains('_'))
+        if t.starts_with("HARD")
+            || t.starts_with("ETHICS")
+            || (t.starts_with('E') && t.contains('_'))
         {
             let t = t.strip_suffix(" | godspeed").unwrap_or(t).trim();
             return Some(t.to_string());
@@ -468,11 +482,19 @@ fn match_task(tasks: &[String], used: &mut [bool], hint: Option<&str>) -> String
             if used[i] {
                 continue;
             }
-            if t.starts_with(prefix) || htrim.starts_with(t.chars().take(40).collect::<String>().as_str()) {
+            if t.starts_with(prefix)
+                || htrim.starts_with(t.chars().take(40).collect::<String>().as_str())
+            {
                 used[i] = true;
                 return task_id_label(i, t);
             }
-            let tid = t.split(':').next().unwrap_or(t).split_whitespace().next().unwrap_or(t);
+            let tid = t
+                .split(':')
+                .next()
+                .unwrap_or(t)
+                .split_whitespace()
+                .next()
+                .unwrap_or(t);
             if htrim.starts_with(tid) || t.starts_with(prefix) {
                 used[i] = true;
                 return task_id_label(i, t);
@@ -536,7 +558,13 @@ fn resolve_q(label: &str, row: &SparkRow, tasks: &[String]) -> String {
         }
     }
     for t in tasks {
-        let tid = t.split(':').next().unwrap_or(t).split_whitespace().next().unwrap_or(t);
+        let tid = t
+            .split(':')
+            .next()
+            .unwrap_or(t)
+            .split_whitespace()
+            .next()
+            .unwrap_or(t);
         if tid == label || t.starts_with(label) {
             return t.clone();
         }
@@ -609,7 +637,7 @@ fn stamps_from_rows(rows: &[SparkRow]) -> (Option<String>, Option<String>, Optio
     (None, None, None)
 }
 
-fn read_summary_stamps(run_dir: &Path) -> Result<Option<(Option<String>, Option<String>, Option<String>)>> {
+fn read_summary_stamps(run_dir: &Path) -> Result<Option<ModelStamps>> {
     let p = run_dir.join("summary.json");
     if !p.is_file() {
         return Ok(None);
@@ -629,16 +657,7 @@ fn read_summary_stamps(run_dir: &Path) -> Result<Option<(Option<String>, Option<
     )))
 }
 
-fn summary_counts(
-    run_dir: Option<&Path>,
-) -> (
-    Option<String>,
-    Option<String>,
-    Option<String>,
-    Option<String>,
-    Option<String>,
-    Option<String>,
-) {
+fn summary_counts(run_dir: Option<&Path>) -> SummaryCounts {
     let Some(d) = run_dir else {
         return (None, None, None, None, None, None);
     };
@@ -654,9 +673,7 @@ fn summary_counts(
     };
     let jobs = v.get("jobs").map(|x| x.to_string());
     let timeout = v.get("timeout").map(|x| x.to_string());
-    let wall = v
-        .get("wall_seconds")
-        .map(|x| x.to_string());
+    let wall = v.get("wall_seconds").map(|x| x.to_string());
     let ok = v.get("sparks_ok").map(|x| x.to_string());
     let fail = v.get("sparks_fail").map(|x| x.to_string());
     let to = v.get("sparks_timeout").map(|x| x.to_string());

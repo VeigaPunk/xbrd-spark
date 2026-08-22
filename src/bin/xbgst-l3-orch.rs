@@ -1,6 +1,6 @@
 //! xbgst L3 orch — 120m autonomous sekhmet waves under xbgst ship rules.
 //!
-//! - Up to 64 concurrent Titanium workers (ChatGPT OAuth; luna + service_tier=fast)
+//! - Up to 64 concurrent Titanium workers (ChatGPT OAuth; luna + explicit service tier)
 //! - Task kinds: issue analysis, review, polish, improve (xbgst roles)
 //! - Strict-improvement ship: gates green + tree changed → commit + push `main`
 //! - Tmp auto-clean after every wave (`--no-keep`, gc, purge /tmp sekhmet-*)
@@ -43,7 +43,11 @@ struct Cli {
     #[arg(long, default_value = xbrd_spark::DEFAULT_SPARK_MODEL, env = "XBRD_SPARK_MODEL")]
     model: String,
 
-    #[arg(long, default_value = "fast", env = "XBRD_SPARK_SERVICE_TIER")]
+    #[arg(
+        long,
+        default_value = xbrd_spark::DEFAULT_SERVICE_TIER,
+        env = "XBRD_SPARK_SERVICE_TIER"
+    )]
     service_tier: String,
 
     #[arg(long, default_value_t = 8)]
@@ -189,6 +193,7 @@ fn run() -> Result<()> {
     if !(1..=64).contains(&cli.jobs) {
         bail!("--jobs must be 1..=64, got {}", cli.jobs);
     }
+    xbrd_spark::validate_service_tier(&cli.service_tier)?;
     let tasks_per_wave = cli.tasks_per_wave.unwrap_or(cli.jobs).clamp(1, 64);
 
     fs::create_dir_all(&cli.out)?;
@@ -299,15 +304,19 @@ fn run() -> Result<()> {
             .map(|p| git_dirty(p).unwrap_or(false))
             .unwrap_or(false);
 
-        let (task_lines, _roles) =
-            build_wave_tasks(&issues, &repos, kind, wave, tasks_per_wave, scope_repo.as_ref());
+        let (task_lines, _roles) = build_wave_tasks(
+            &issues,
+            &repos,
+            kind,
+            wave,
+            tasks_per_wave,
+            scope_repo.as_ref(),
+        );
         let tasks_path = tasks_dir.join(format!("wave-{wave:04}-{}.txt", kind.as_str()));
         fs::write(&tasks_path, task_lines.join("\n") + "\n")?;
 
-        let root = std::env::temp_dir().join(format!(
-            "sekhmet-orch-w{wave}-{}",
-            &uuid_simple()[..10]
-        ));
+        let root =
+            std::env::temp_dir().join(format!("sekhmet-orch-w{wave}-{}", &uuid_simple()[..10]));
         fs::create_dir_all(&root)?;
         let ndjson_out = waves_dir.join(format!("wave-{wave:04}.ndjson"));
         let stderr_out = waves_dir.join(format!("wave-{wave:04}.stderr.log"));
@@ -317,7 +326,6 @@ fn run() -> Result<()> {
 
         let mut cmd = Command::new(&sekhmet);
         cmd.arg("swarm")
-            .arg("--direct")
             .arg("-j")
             .arg(cli.jobs.to_string())
             .arg("--timeout")
@@ -369,7 +377,10 @@ fn run() -> Result<()> {
         let mut ship: Option<ShipRecord> = None;
         if cli.ship && !cli.dry_run {
             if let Some(ref repo) = scope_repo {
-                if matches!(kind, WaveKind::Review | WaveKind::Polish | WaveKind::Improve) {
+                if matches!(
+                    kind,
+                    WaveKind::Review | WaveKind::Polish | WaveKind::Improve
+                ) {
                     match judge_and_ship(repo, dirty_before, kind, !cli.no_push) {
                         Ok(rec) => {
                             if rec.approved && rec.commit.is_some() {
@@ -610,9 +621,7 @@ fn sanitize_worktree(repo: &Path) {
     }
     // Explicit known junk dirs under benchmarks
     {
-        let p = repo.join(
-            "benchmarks/dry-hump/telemetry-e2e-model-questions/__pycache__",
-        );
+        let p = repo.join("benchmarks/dry-hump/telemetry-e2e-model-questions/__pycache__");
         if p.exists() {
             let _ = fs::remove_dir_all(&p);
         }
@@ -685,11 +694,7 @@ fn run_gates(repo: &Path) -> Result<(bool, Option<String>)> {
             .unwrap_or(false);
 
     if has_lib || mode.eq_ignore_ascii_case("lib") {
-        let lib = cargo_status(
-            repo,
-            &["test", "--lib", "--", "--test-threads=2"],
-            240,
-        )?;
+        let lib = cargo_status(repo, &["test", "--lib", "--", "--test-threads=2"], 240)?;
         if !lib.0 {
             return Ok((
                 false,
@@ -711,7 +716,10 @@ fn run_gates(repo: &Path) -> Result<(bool, Option<String>)> {
     } else {
         Ok((
             false,
-            Some(format!("cargo test --all-targets failed: {}", snip(&full.1))),
+            Some(format!(
+                "cargo test --all-targets failed: {}",
+                snip(&full.1)
+            )),
         ))
     }
 }
@@ -795,19 +803,6 @@ fn git_rev_parse(repo: &Path) -> Result<String> {
     Ok(String::from_utf8_lossy(&o.stdout).trim().to_string())
 }
 
-/// Short godspeed **directive** only (4 rules + concurrent tools + Rust lock).
-/// Never inject filter/velocity (trilogy stays judge-only).
-const GODSPEED_DIRECTIVE: &str = "\
-You are Godspeed-enabled. \
-1. Name the axes. \
-2. Iterate cheap, in parallel. \
-3. Keep moves that improve any axis and harm none. \
-4. Don't aim — let the frontier walk itself. \
-IMMEDIATELY STOP ASKING CLARIFYING QUESTIONS. \
-Execute tool calls concurrently in large batches. Do not serialize what can run in parallel. \
-Do not output philosophical reasoning or verbose plans. Act directly via tool calls. \
-Language lock: only Rust. No Python.";
-
 fn pick_scope_repo(repos: &[LocalRepo], wave: u64, kind: WaveKind) -> Option<LocalRepo> {
     if repos.is_empty() || kind == WaveKind::Issues {
         return None;
@@ -832,13 +827,13 @@ fn build_wave_tasks(
             WaveKind::Issues => {
                 if issues.is_empty() {
                     format!(
-                        "{GODSPEED_DIRECTIVE} ROLE={role} | No open issues loaded. Propose how to discover work. Under 20 lines."
+                        "ROLE={role} | No open issues loaded. Propose how to discover work. Under 20 lines."
                     )
                 } else {
                     let issue = &issues[(wave as usize + i) % issues.len()];
                     let body: String = issue.body.chars().take(500).collect();
                     format!(
-                        "{GODSPEED_DIRECTIVE} You are xbgst `{role}` (Titanium OAuth). \
+                        "You are xbgst `{role}` (Titanium OAuth). \
 ISSUE {repo}#{num}: {title} | URL {url} | BODY {body} | \
 Produce role-specific output (labrat=probe+gate, scout=prior-art, reviewer=risks, executor=Rust sketch, \
 critic=attacks, connector=cross-links 2 issues, sentinel=security, distiller=5-bullet next session plan, \
@@ -860,7 +855,7 @@ Max 35 lines. Start with ROLE={role} ISSUE={repo}#{num}.",
                     .unwrap_or("workspace");
                 let verb = kind.as_str();
                 format!(
-                    "{GODSPEED_DIRECTIVE} You are xbgst `{role}` working INSIDE scoped repo `{repo}` (Titanium may mutate workspace). \
+                    "You are xbgst `{role}` working INSIDE scoped repo `{repo}` (Titanium may mutate workspace). \
 Wave kind={verb}. Language lock: Rust only for code changes. \
 1) Inspect the tree (src/, tests/, README, Cargo.toml). \
 2) Make a STRICT IMPROVEMENT only: fix a real bug, add a missing test, tighten docs/AGENTS, remove dead code, or improve sekhmet/xbgst wiring. \
@@ -883,16 +878,9 @@ If nothing is a strict improvement, write NO_IMPROVEMENT and why.",
         } else {
             prompt
         };
-        // Always append | godspeed (Titanium/Codex routing token); idempotent.
-        let prompt = {
-            let p = prompt.replace('\n', " ");
-            let t = p.trim_end();
-            if t.ends_with("| godspeed") || t.ends_with("|godspeed") {
-                p
-            } else {
-                format!("{t} | godspeed")
-            }
-        };
+        // The shared Sekhmet boundary injects the canonical directive. Wave
+        // construction only normalizes the required terminal routing flag.
+        let prompt = xbrd_spark::with_godspeed_suffix(&prompt.replace('\n', " "));
         lines.push(prompt);
     }
     roles.truncate(12);
@@ -935,14 +923,10 @@ fn summarize_ndjson(path: &Path) -> Result<NdStats> {
             "error" => s.error += 1,
             _ => s.fail += 1,
         }
-        if let Some(t) = v
-            .get("usage_tokens")
-            .and_then(|x| x.as_u64())
-            .or_else(|| {
-                v.pointer("/provenance/usage_tokens")
-                    .and_then(|x| x.as_u64())
-            })
-        {
+        if let Some(t) = v.get("usage_tokens").and_then(|x| x.as_u64()).or_else(|| {
+            v.pointer("/provenance/usage_tokens")
+                .and_then(|x| x.as_u64())
+        }) {
             s.usage_tokens_sum += t;
             s.usage_tokens_n += 1;
         }
@@ -965,8 +949,8 @@ fn load_issues(path: &Path) -> Result<Vec<Issue>> {
             if line.is_empty() {
                 continue;
             }
-            let g: GhIssue = serde_json::from_str(line)
-                .with_context(|| format!("JSONL line {}", i + 1))?;
+            let g: GhIssue =
+                serde_json::from_str(line).with_context(|| format!("JSONL line {}", i + 1))?;
             out.push(normalize_issue(g));
         }
     }
@@ -1094,7 +1078,10 @@ fn write_summary(s: &OrchSummary<'_>) -> Result<()> {
         "auth": "chatgpt-oauth",
         "xbgst_ship": "commit+push main on strict improvement only",
     });
-    fs::write(telem.join("summary.json"), serde_json::to_string_pretty(&v)?)?;
+    fs::write(
+        telem.join("summary.json"),
+        serde_json::to_string_pretty(&v)?,
+    )?;
     let notes = format!(
         "# xbgst L3 lunch orch — notes\n\n\
 updated: {}\n\

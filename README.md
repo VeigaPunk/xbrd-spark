@@ -18,11 +18,11 @@ Ships against **Codex Titanium** (`codex-titanium` on `PATH`, or `CODEX_BIN`) �
 | Fallback chain (crate default) | **none** (empty) | `XBRD_SPARK_FALLBACK_MODEL` |
 | xbgst always-on | luna + fallback none | `~/.xbgst/env.l3-sekhmet.sh` |
 | Reasoning | `low` | `-c model_reasoning_effort=low` |
-| Service tier | **`fast`** (Fast mode ≡ priority) | `-c service_tier=fast` / `XBRD_SPARK_SERVICE_TIER` |
+| Service tier | **`default`** (neutral); explicit `fast` opt-in | `-c service_tier=default|fast` / `XBRD_SPARK_SERVICE_TIER` |
 | Force fallback | skip primary (needs chain) | `XBRD_SPARK_USE_FALLBACK=1` |
 | Swarm jobs | **64** default, hard cap **64** | `sekhmet swarm -j N` / `XBRD_SPARK_JOBS` |
 
-On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain **only if** `XBRD_SPARK_FALLBACK_MODEL` is set, with effort **low** + **service_tier=fast**, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.  
+On primary fail with `usage_limit`, `model_unsupported`, or `model_chatgpt_unsupported`, sekhmet walks the fallback chain **only if** `XBRD_SPARK_FALLBACK_MODEL` is set, with effort **low** and the caller-selected service tier, then latches sticky for the process. Recorded in meta as `model` + optional `model_fallback_from`.
 OAuth rejects the slug `gpt-5.6-luna-fast` — use model `gpt-5.6-luna` + `service_tier=fast` (not a `-fast` model id). Env name is **`XBRD_SPARK_FALLBACK_MODEL`** (not `XBRD_SPARK_FALLBACK`).
 
 Dispatcher resolve order: `CODEX_BIN` → `codex-titanium` → non-stub `codex` (omarchy npx `@openai/codex` stub is skipped).
@@ -34,6 +34,8 @@ Routes executions through **Titanium OAuth** (**luna** primary; crate default fa
 - **No git worktrees** — namespaced ephemeral dirs only
 - **Double-work tolerance** — concurrent identical tasks are fine; higher layer (distiller / the-judge) dedups by content hash + provenance
 - **Any-CLI invocable** — labrat, mutation-tester, executor, or plain bash can call it
+- **Canonical Godspeed on every dispatch** — the byte-exact vendored `godspeed-core/directive.md` is prepended at the shared run/swarm boundary, and the delegated prompt ends in exactly one literal `| godspeed`; there is no reduced directive or opt-out
+- **Truthful tier selection** — neutral `default` is explicitly sent to Titanium (overriding any host-level fast setting); `fast` is opt-in, and any other tier fails before dispatch
 - **Coordination stays above** — this layer is pure execution at light speed
 
 This is the missing third layer under xbrd / xbgst / xask: the substrate that pure workers (labrat swarms, mutation probes, titanium-style one-shots) share without clashing.
@@ -53,7 +55,8 @@ This is the missing third layer under xbrd / xbgst / xask: the substrate that pu
 $XBRD_SPARK_ROOT (or $XDG_RUNTIME_DIR/xbrd-spark or /tmp/xbrd-spark)
 └── sp-<uuid>/
     ├── meta.json          # id, hashes, timestamps, cmdline, provenance
-    ├── in/task.md
+    ├── in/task.md         # canonical directive + task + one terminal `| godspeed`
+    ├── in/godspeed.md     # byte-exact canonical directive provenance copy
     ├── workspace/         # optional rsync --scope snapshot (mutation-harbor style)
     ├── out/
     │   ├── result.json

@@ -14,14 +14,7 @@ fn swarm_dry_run_four_tasks_exit_zero() {
     fs::write(&tasks, "alpha\nbeta\ngamma\ndelta\n").unwrap();
 
     let out = Command::new(bin())
-        .args([
-            "swarm",
-            "--dry-run",
-            "--no-keep",
-            "-j",
-            "4",
-            "--tasks-file",
-        ])
+        .args(["swarm", "--dry-run", "--no-keep", "-j", "4", "--tasks-file"])
         .arg(&tasks)
         .arg("--root")
         .arg(root.path())
@@ -34,10 +27,7 @@ fn swarm_dry_run_four_tasks_exit_zero() {
         String::from_utf8_lossy(&out.stderr)
     );
     let stdout = String::from_utf8_lossy(&out.stdout);
-    let lines = stdout
-        .lines()
-        .filter(|l| l.trim().starts_with('{'))
-        .count();
+    let lines = stdout.lines().filter(|l| l.trim().starts_with('{')).count();
     assert_eq!(lines, 4, "expected 4 NDJSON records, got:\n{stdout}");
 }
 

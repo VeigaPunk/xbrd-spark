@@ -9,7 +9,7 @@ Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no
 - Fallback chain (crate default): **none** — set `XBRD_SPARK_FALLBACK_MODEL` to enable auto-retry
 - Always on Titanium path:
   - `-c model_reasoning_effort=low`
-  - `-c service_tier=fast` (Fast mode; Codex maps to priority processing — see [Codex config](https://developers.openai.com/codex/config-reference); override `XBRD_SPARK_SERVICE_TIER`)
+  - `-c service_tier=default` (neutral default; opt in to Fast mode with `XBRD_SPARK_SERVICE_TIER=fast`)
 - Swarm: **`-j 64`** default / hard cap (`XBRD_SPARK_JOBS`)
 - Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1` (no-op unless a chain is set)
 - Disable auto-fallback: unset / `XBRD_SPARK_FALLBACK_MODEL=none` (crate default is already empty)
@@ -46,7 +46,14 @@ Key flags:
 - `--timeout` — wall-clock kill when >0; after kill stdout/stderr joins bounded ~2s; in meta.timeout_secs
 - `--root` / `XBRD_SPARK_ROOT` — isolation root (else `$XDG_RUNTIME_DIR/xbrd-spark` or `/tmp/xbrd-spark`)
 - `CODEX_BIN` — pin Titanium binary path; else `codex-titanium` then non-stub `codex` (omarchy npx stub skipped; never symlink titanium→`codex`)
+- `XBRD_SPARK_SERVICE_TIER` — validated `default|fast`; defaults to explicit `default`, and unsupported values fail before dispatch
 - `--no-direct` — legacy loadout only (prefer `xask-l3` shim or `--direct`; never PATH `xask`)
+
+Every `run` and every `swarm` member receives the byte-exact vendored
+`godspeed-core/directive.md` at the shared dispatch boundary. Never replace it
+with a minimal/summary skill. The actual delegated prompt always ends in exactly
+one literal `| godspeed`; repeated or case-variant terminal markers normalize to
+that single closer. This behavior has no opt-out.
 
 Exclusive ns; setup rollback (id reusable); gc age-only for running. Seeded auth 0o600/0o700 on unix.
 
@@ -91,7 +98,7 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 
 ## Provider quota
 
-If Titanium returns **usage_limit** / `model_unsupported` / `model_chatgpt_unsupported` on the primary model, sekhmet **automatically retries only when** `XBRD_SPARK_FALLBACK_MODEL` is set (effort low + `service_tier=fast`), then latches that model for the rest of the process. Crate default chain is empty — luna primary does not auto-retry onto itself.
+If Titanium returns **usage_limit** / `model_unsupported` / `model_chatgpt_unsupported` on the primary model, sekhmet **automatically retries only when** `XBRD_SPARK_FALLBACK_MODEL` is set (effort low + the selected service tier), then latches that model for the rest of the process. Crate default chain is empty — luna primary does not auto-retry onto itself.
 
 For 403 websocket / 429 rate_limit / auth failures: no model fallback — stop or lower `-j`, prefer dry-run gates.
 

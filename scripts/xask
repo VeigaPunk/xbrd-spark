@@ -2,7 +2,8 @@
 # This file is the L3 shim installed as xask-l3 (PATH xask is protocol xbreed).
 # xask-l3 — thin sekhmet shim (flag-compat). Bare `sekhmet run` (Titanium default).
 # `--direct` is accepted and ignored; clap has `--no-direct` only.
-# Usage: xask-l3 [-d] [--model-id ID] [-e low] [--spark|--spk] [--gs] [--direct]
+# Usage: xask-l3 [-d] [--model-id ID] [-e low] [--service-tier default|fast]
+#             [--spark|--spk] [--gs] [--direct]
 #             [--ro] [--timeout N] [--no-keep] [--root PATH] [--dry-run]
 #             [codex] "<query>"
 set -euo pipefail
@@ -17,6 +18,7 @@ SEKHMET="${SEKHMET:-$(command -v sekhmet 2>/dev/null || echo sekhmet)}"
 DEBUG=false
 MODEL_ID=""
 EFFORT=""
+SERVICE_TIER="default"
 RO=false
 TIMEOUT=""
 NO_KEEP=false
@@ -43,6 +45,11 @@ while [[ $# -gt 0 && "${1:-}" == -* ]]; do
     --effort | -e)
       require_flag_value "$@"
       EFFORT="$2"
+      shift 2
+      ;;
+    --service-tier)
+      require_flag_value "$@"
+      SERVICE_TIER="$2"
       shift 2
       ;;
     --spark | --spk) shift ;;
@@ -76,6 +83,11 @@ if [[ -n "$EFFORT" ]]; then
   esac
 fi
 
+case "$SERVICE_TIER" in
+  default|fast) ;;
+  *) die "unsupported service tier '$SERVICE_TIER' (use default or fast)" ;;
+esac
+
 MODEL="codex"
 if [[ $# -gt 0 ]]; then
   case "$1" in
@@ -87,14 +99,14 @@ if [[ $# -gt 0 ]]; then
 fi
 
 if [[ $# -eq 0 ]]; then
-  die "usage: xask [-d] [--model-id ID] [-e low] [--spark|--spk] [--gs] [--direct] [--ro] [--timeout N] [--no-keep] [--root PATH] [--dry-run] [codex] \"<query>\""
+  die "usage: xask [-d] [--model-id ID] [-e low] [--service-tier default|fast] [--spark|--spk] [--gs] [--direct] [--ro] [--timeout N] [--no-keep] [--root PATH] [--dry-run] [codex] \"<query>\""
 fi
 
 QUERY="$*"
 MODEL_ID="${MODEL_ID:-gpt-5.6-luna}"
 
 export XBRD_SPARK_MODEL="$MODEL_ID"
-export XBRD_SPARK_SERVICE_TIER=fast
+export XBRD_SPARK_SERVICE_TIER="$SERVICE_TIER"
 export XBRD_SPARK_FALLBACK_MODEL=none
 
 # Bare `sekhmet run` already defaults Titanium. Clap exposes `--no-direct`
@@ -116,9 +128,9 @@ if [[ "$DEBUG" == true ]]; then
   echo "XBRD_SPARK_MODEL=$XBRD_SPARK_MODEL"
   echo "XBRD_SPARK_SERVICE_TIER=$XBRD_SPARK_SERVICE_TIER"
   echo "model_reasoning_effort=low"
-  echo "service_tier=fast"
+  echo "service_tier=$SERVICE_TIER"
   echo "ARGV: ${argv[*]}"
-  echo "constructed: $SEKHMET run -c model_reasoning_effort=low -c service_tier=fast -m ${MODEL_ID} --task ..."
+  echo "constructed: $SEKHMET run -c model_reasoning_effort=low -c service_tier=$SERVICE_TIER -m ${MODEL_ID} --task ..."
   exit 0
 fi
 

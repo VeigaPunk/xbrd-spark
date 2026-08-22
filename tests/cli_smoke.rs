@@ -62,13 +62,7 @@ fn dry_run_collect_status_gc_exit_zero() {
     assert!(fs::metadata(root.join(id).join("meta.json")).is_ok());
 
     let gc = Command::new(bin())
-        .args([
-            "gc",
-            "--max-age",
-            "0",
-            "--root",
-            root.to_str().unwrap(),
-        ])
+        .args(["gc", "--max-age", "0", "--root", root.to_str().unwrap()])
         .output()
         .expect("gc");
     assert!(
@@ -115,10 +109,130 @@ fn sekhmet_alias_swarm_dry_run() {
             records += 1;
         }
     }
-    assert_eq!(records, 3, "expected 3 NDJSON spark records, stdout:\n{stdout}");
+    assert_eq!(
+        records, 3,
+        "expected 3 NDJSON spark records, stdout:\n{stdout}"
+    );
     let n = fs::read_dir(&root)
         .unwrap()
         .filter(|e| e.as_ref().map(|e| e.path().is_dir()).unwrap_or(false))
         .count();
     assert_eq!(n, 3);
+}
+
+#[cfg(unix)]
+#[test]
+fn sekhmet_actual_dispatch_uses_canonical_directive_and_one_closer() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let tmp = TempDir::new().unwrap();
+    let root = tmp.path().join("root");
+    let fake_codex = tmp.path().join("fake-codex");
+    fs::write(
+        &fake_codex,
+        b"#!/bin/sh\nlast=\nfor arg in \"$@\"; do last=$arg; done\nbase=${0%/*}\nprintf '%s' \"$last\" > \"$base/captured-prompt\"\n",
+    )
+    .unwrap();
+    fs::set_permissions(&fake_codex, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let out = Command::new(sekhmet_bin())
+        .env("CODEX_BIN", &fake_codex)
+        .env_remove("XBRD_SPARK_MODEL")
+        .env_remove("XBRD_SPARK_FALLBACK_MODEL")
+        .env_remove("XBRD_SPARK_USE_FALLBACK")
+        .env_remove("XBRD_SPARK_SERVICE_TIER")
+        .args([
+            "run",
+            "--id",
+            "sp-canonical-argv",
+            "--task",
+            "inspect this | GODSPEED | godspeed",
+            "--root",
+            root.to_str().unwrap(),
+        ])
+        .output()
+        .expect("spawn sekhmet with fake codex");
+    assert!(
+        out.status.success(),
+        "dispatch failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
+
+    let prompt = fs::read_to_string(tmp.path().join("captured-prompt")).unwrap();
+    assert!(
+        prompt
+            .as_bytes()
+            .starts_with(xbrd_spark::GODSPEED_DIRECTIVE.as_bytes()),
+        "actual argv omitted canonical directive"
+    );
+    assert!(prompt.ends_with(xbrd_spark::GODSPEED_PROMPT_SUFFIX));
+    assert_eq!(
+        prompt.matches(xbrd_spark::GODSPEED_PROMPT_SUFFIX).count(),
+        1,
+        "actual argv must end in one canonical closer: {prompt:?}"
+    );
+
+    let standalone = fs::read(root.join("sp-canonical-argv/in/godspeed.md")).unwrap();
+    assert_eq!(standalone, xbrd_spark::GODSPEED_DIRECTIVE.as_bytes());
+
+    let meta: serde_json::Value =
+        serde_json::from_slice(&fs::read(root.join("sp-canonical-argv/meta.json")).unwrap())
+            .unwrap();
+    let cmdline = meta["cmdline"].as_array().unwrap();
+    assert!(
+        cmdline
+            .iter()
+            .any(|arg| arg.as_str() == Some("service_tier=default")),
+        "neutral tier must be explicit in actual dispatch argv: {cmdline:?}"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn sekhmet_rejects_unsupported_tier_before_spawn() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let tmp = TempDir::new().unwrap();
+    let root = tmp.path().join("root");
+    let fake_codex = tmp.path().join("fake-codex");
+    fs::write(
+        &fake_codex,
+        b"#!/bin/sh\nbase=${0%/*}\ntouch \"$base/unexpected-spawn\"\n",
+    )
+    .unwrap();
+    fs::set_permissions(&fake_codex, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let out = Command::new(sekhmet_bin())
+        .env("CODEX_BIN", &fake_codex)
+        .env("XBRD_SPARK_SERVICE_TIER", "flex")
+        .env_remove("XBRD_SPARK_FALLBACK_MODEL")
+        .env_remove("XBRD_SPARK_USE_FALLBACK")
+        .args([
+            "run",
+            "--id",
+            "sp-invalid-tier",
+            "--task",
+            "must not spawn",
+            "--root",
+            root.to_str().unwrap(),
+        ])
+        .output()
+        .expect("spawn sekhmet invalid-tier probe");
+
+    assert!(!out.status.success(), "unsupported tier must fail");
+    let result: serde_json::Value =
+        serde_json::from_slice(&fs::read(root.join("sp-invalid-tier/out/result.json")).unwrap())
+            .unwrap();
+    assert!(
+        result["stderr"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("unsupported service tier 'flex'"),
+        "unexpected result: {result:?}"
+    );
+    assert!(
+        !tmp.path().join("unexpected-spawn").exists(),
+        "dispatcher ran despite invalid tier"
+    );
 }

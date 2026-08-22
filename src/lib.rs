@@ -26,7 +26,7 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 
 /// Default Titanium model for pure L3 sparks under **xbgst** (override: `XBRD_SPARK_MODEL`).
 ///
-/// Pin is **`gpt-5.6-luna`** + `service_tier=fast` + `model_reasoning_effort=low`.
+/// Pin is **`gpt-5.6-luna`** + `service_tier=default` + `model_reasoning_effort=low`.
 /// Crate default fallback chain is empty (set `XBRD_SPARK_FALLBACK_MODEL` to enable).
 /// Never use fused slug `gpt-5.6-luna-fast` — tier is a separate `-c service_tier=…` flag.
 pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.6-luna";
@@ -34,9 +34,9 @@ pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.6-luna";
 /// Slug const for an optional OAuth fallback candidate. Does **not** feed `DEFAULT_FALLBACK_CHAIN`.
 pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna";
 
-/// Default service tier for Titanium exec (Fast mode). Override: `XBRD_SPARK_SERVICE_TIER`.
-/// Codex config key `service_tier`; values `fast` or `priority` are equivalent for GPT-5.6.
-pub const DEFAULT_SERVICE_TIER: &str = "fast";
+/// Neutral service tier for Titanium exec. Override with the explicit `fast`
+/// selection through `XBRD_SPARK_SERVICE_TIER`.
+pub const DEFAULT_SERVICE_TIER: &str = "default";
 
 /// Default fallback chain: empty (no auto-retry). Comma-separated override via env.
 /// Disable: empty / `none` / `off` / `0`. Do not add spark/luna into this crate default.
@@ -48,74 +48,56 @@ static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
 /// Process-wide sticky model once a working fallback is selected (or next candidate after reject).
 static STICKY_MODEL: Mutex<Option<String>> = Mutex::new(None);
 
-/// Serializes env mutations for godspeed inject tests / rare probes.
+/// Serializes process-global env mutations in tests.
 #[cfg(test)]
-static GODSPEED_ENV_LOCK: Mutex<()> = Mutex::new(());
+static TEST_ENV_LOCK: Mutex<()> = Mutex::new(());
 
-/// Short godspeed **directive** only (4 rules + concurrent tools + Rust lock).
-/// Injected on **every** sekhmet/`xbrd-spark` dispatch (`run` and `swarm`).
-/// Never inject filter/velocity (trilogy stays judge-only).
-/// Opt out: `XBRD_SPARK_NO_GODSPEED=1` (tests / rare probes only).
-pub const GODSPEED_DIRECTIVE: &str = "\
-You are Godspeed-enabled.
-1. Name the axes.
-2. Iterate cheap, in parallel.
-3. Keep moves that improve any axis and harm none.
-4. Don't aim — let the frontier walk itself.
-IMMEDIATELY STOP ASKING CLARIFYING QUESTIONS.
-Execute tool calls concurrently in large batches. Do not serialize what can run in parallel.
-Do not output philosophical reasoning or verbose plans. Act directly via tool calls.
-Language lock: only Rust. No Python.";
+/// Byte-exact Godspeed behavioral directive vendored from
+/// `../godspeed-core/directive.md` in the xbgst source tree.
+///
+/// This is the full, quintessential directive: never replace it with a summary,
+/// a shortened skill, or a hand-written approximation. It is injected into every
+/// Sekhmet dispatch (`run` and every `swarm` member).
+pub const GODSPEED_DIRECTIVE: &str = include_str!("../godspeed/directive.md");
 
-/// True when env disables automatic godspeed prepend.
-pub fn godspeed_inject_enabled() -> bool {
-    match env::var("XBRD_SPARK_NO_GODSPEED") {
-        Ok(v) => {
-            let t = v.trim().to_ascii_lowercase();
-            !(t == "1" || t == "true" || t == "yes" || t == "on")
-        }
-        Err(_) => true,
-    }
-}
+/// SHA-256 of the canonical `godspeed-core/directive.md` bytes.
+pub const GODSPEED_DIRECTIVE_SHA256: &str =
+    "db88963cbdf5a0db22b460b284bf6f1d1f4abac9eaadb28bdb5e9bffe27be3bb";
 
-/// Suffix appended to every Titanium/Codex prompt when godspeed inject is on.
+/// Suffix appended to every Titanium/Codex prompt.
 /// Codex/ChatGPT routes often key off a trailing `| godspeed` token.
 pub const GODSPEED_PROMPT_SUFFIX: &str = "| godspeed";
 
-/// True if task already ends with `| godspeed` (any whitespace).
-fn has_godspeed_suffix(task: &str) -> bool {
-    let t = task.trim_end();
-    t.ends_with("| godspeed")
-        || t.ends_with("|godspeed")
-        || t.to_ascii_lowercase().ends_with("| godspeed")
+/// Remove every trailing Godspeed marker so the canonical literal can be
+/// appended exactly once. Matching is case-insensitive and accepts whitespace
+/// between the pipe and word for compatibility with existing callers.
+fn trim_terminal_godspeed_markers(task: &str) -> &str {
+    let mut body = task.trim_end();
+    while let Some((head, tail)) = body.rsplit_once('|') {
+        if !tail.trim().eq_ignore_ascii_case("godspeed") {
+            break;
+        }
+        body = head.trim_end();
+    }
+    body
 }
 
-/// Append ` | godspeed` if missing. Idempotent.
+/// Normalize the prompt to exactly one terminal literal `| godspeed`.
 pub fn with_godspeed_suffix(task: &str) -> String {
-    if !godspeed_inject_enabled() {
-        return task.to_string();
-    }
-    if has_godspeed_suffix(task) {
-        return task.to_string();
-    }
-    let t = task.trim_end();
-    if t.is_empty() {
+    let body = trim_terminal_godspeed_markers(task);
+    if body.is_empty() {
         return GODSPEED_PROMPT_SUFFIX.to_string();
     }
-    format!("{t} {GODSPEED_PROMPT_SUFFIX}")
+    format!("{body} {GODSPEED_PROMPT_SUFFIX}")
 }
 
-/// Prepend short godspeed directive + append `| godspeed` if missing.
-/// Idempotent for already-injected prompts.
+/// Prepend the byte-exact canonical directive and normalize the terminal flag.
+/// Idempotent for prompts produced by this function.
 pub fn with_godspeed_directive(task: &str) -> String {
-    if !godspeed_inject_enabled() {
-        return task.to_string();
-    }
-    let t = task.trim_start();
-    let body = if t.starts_with("You are Godspeed-enabled") {
+    let body = if task.starts_with(GODSPEED_DIRECTIVE) {
         task.to_string()
     } else {
-        format!("{GODSPEED_DIRECTIVE}\n\n---\n\n{task}")
+        format!("{GODSPEED_DIRECTIVE}\n---\n\n{task}")
     };
     with_godspeed_suffix(&body)
 }
@@ -408,7 +390,6 @@ pub fn classify_provider_error(stdout: &str, stderr: &str) -> Option<&'static st
     None
 }
 
-
 /// Serialize NDJSON emit only (never hold this lock across Titanium spawn).
 fn emit_ndjson(record: &CollectRecord) -> Result<()> {
     static EMIT: Mutex<()> = Mutex::new(());
@@ -683,8 +664,7 @@ fn build_env(base: &Path) -> HashMap<String, String> {
     }
     // Always-on fnm: stable default node bin + FNM_DIR (workers get env_clear).
     if let Some(fnm) = host_fnm_dir() {
-        envm
-            .entry("FNM_DIR".into())
+        envm.entry("FNM_DIR".into())
             .or_insert_with(|| fnm.to_string_lossy().into_owned());
     }
     let host_path = envm
@@ -868,19 +848,22 @@ fn resolve_codex_bin() -> Result<PathBuf> {
     )
 }
 
-/// Service tier for Titanium (`service_tier` config). Default `fast` (Fast mode / priority).
-pub fn spark_service_tier() -> String {
-    match env::var("XBRD_SPARK_SERVICE_TIER") {
-        Ok(s) => {
-            let t = s.trim();
-            if t.is_empty() {
-                DEFAULT_SERVICE_TIER.into()
-            } else {
-                t.to_string()
-            }
-        }
-        Err(_) => DEFAULT_SERVICE_TIER.into(),
+/// Validate the service-tier vocabulary exposed by Sekhmet/xask.
+pub fn validate_service_tier(value: &str) -> Result<&str> {
+    let tier = value.trim();
+    match tier {
+        "default" | "fast" => Ok(tier),
+        _ => bail!("unsupported service tier '{tier}'; use default or fast"),
     }
+}
+
+/// Explicit service tier for Titanium (`service_tier` config).
+pub fn spark_service_tier() -> Result<String> {
+    let configured = env::var("XBRD_SPARK_SERVICE_TIER")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| DEFAULT_SERVICE_TIER.to_string());
+    Ok(validate_service_tier(&configured)?.to_string())
 }
 
 /// Build dispatcher cmdline for `model`.
@@ -890,8 +873,13 @@ pub fn spark_service_tier() -> String {
 ///
 /// Always forces (Titanium path):
 /// - `model_reasoning_effort=low`
-/// - `service_tier=<XBRD_SPARK_SERVICE_TIER|fast>` — Fast mode (priority processing)
-fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Result<(String, Vec<String>)> {
+/// - `service_tier=<XBRD_SPARK_SERVICE_TIER|default>` — explicit, validated tier
+fn find_dispatcher(
+    direct: bool,
+    ro: bool,
+    model: &str,
+    force_codex: bool,
+) -> Result<(String, Vec<String>)> {
     // Pure L3 default: Titanium exposed as `codex` (single source of flags).
     // `--no-direct` may use `xask-l3` (sekhmet shim) only — never PATH `xask`
     // (xbreed protocol ask). Missing xask-l3 falls through to titanium.
@@ -910,7 +898,7 @@ fn find_dispatcher(direct: bool, ro: bool, model: &str, force_codex: bool) -> Re
     } else {
         "danger-full-access"
     };
-    let tier = spark_service_tier();
+    let tier = spark_service_tier()?;
     let p = resolve_codex_bin().with_context(|| {
         if ro {
             "codex/codex-titanium not found on PATH (--ro forces titanium sandbox; xask-l3 skipped)"
@@ -1353,14 +1341,10 @@ fn run_spark(
 
     // Setup through rsync only: on failure, release exclusive claim so the id is reusable.
     // After meta/finalize, keep current emit-record behavior (do not delete when keep=true).
-    // Always inject short godspeed directive (visible in in/task.md + in/godspeed.md).
+    // This shared run/swarm boundary always injects the canonical Godspeed directive.
     let task_body = with_godspeed_directive(task);
-    let godspeed_on = godspeed_inject_enabled()
-        && task_body
-            .trim_start()
-            .starts_with("You are Godspeed-enabled");
     // Quiet by default — L3 is invisible. Verbose only when requested.
-    if godspeed_on && env::var_os("XBRD_SPARK_VERBOSE").is_some() {
+    if env::var_os("XBRD_SPARK_VERBOSE").is_some() {
         eprintln!(
             "sekhmet: godspeed directive INJECTED spark_id={id} (read in/godspeed.md + in/task.md head)"
         );
@@ -1370,8 +1354,8 @@ fn run_spark(
         ensure_dirs(&base)?;
         seed_codex_home(&base.join("codex-home"))?;
         fs::write(base.join("in/task.md"), &task_body)?;
-        // Standalone copy so operators/tmux can `head` godspeed without digging the full prompt.
-        fs::write(base.join("in/godspeed.md"), format!("{GODSPEED_DIRECTIVE}\n"))?;
+        // Standalone byte-exact copy for provenance and local parity checks.
+        fs::write(base.join("in/godspeed.md"), GODSPEED_DIRECTIVE.as_bytes())?;
         // Scope snapshot always when requested (including dry-run) so probes see workspace files.
         if let Some(s) = scope {
             if !s.is_dir() {
@@ -1471,15 +1455,7 @@ fn run_spark(
 
     if let Err(e) = dispatcher {
         let msg = format!("{:#}", e);
-        let (_, record) = finalize_result(
-            &base,
-            &mut meta,
-            "error",
-            "",
-            &msg,
-            Some(1),
-            0,
-        )?;
+        let (_, record) = finalize_result(&base, &mut meta, "error", "", &msg, Some(1), 0)?;
         emit_ndjson(&record)?;
         if !keep {
             let _ = fs::remove_dir_all(&base);
@@ -1513,10 +1489,7 @@ fn run_spark(
                 if !stderr.is_empty() {
                     stderr.push('\n');
                 }
-                stderr.push_str(&format!(
-                    "xbrd-spark: killed after timeout ({}s)",
-                    timeout
-                ));
+                stderr.push_str(&format!("xbrd-spark: killed after timeout ({}s)", timeout));
             }
             let exit = if timed.timed_out {
                 Some(1)
@@ -1532,15 +1505,8 @@ fn run_spark(
         Err(e) => {
             let msg = format!("{:#}", e);
             let duration_ms = start.elapsed().as_millis() as u64;
-            let (_, record) = finalize_result(
-                &base,
-                &mut meta,
-                "error",
-                "",
-                &msg,
-                Some(1),
-                duration_ms,
-            )?;
+            let (_, record) =
+                finalize_result(&base, &mut meta, "error", "", &msg, Some(1), duration_ms)?;
             emit_ndjson(&record)?;
             if !keep {
                 let _ = fs::remove_dir_all(&base);
@@ -1550,7 +1516,8 @@ fn run_spark(
     };
 
     // Automatic model fallback chain: usage_limit / model_unsupported → next model.
-    // Crate default chain is empty; set XBRD_SPARK_FALLBACK_MODEL to enable (effort low + service_tier=fast).
+    // Crate default chain is empty; set XBRD_SPARK_FALLBACK_MODEL to enable.
+    // Fallback keeps the caller-selected validated tier and effort low.
     let origin_model = meta.model.clone();
     let mut tried: Vec<String> = vec![meta.model.clone()];
     let mut prior_stderr = attempt.1.clone();
@@ -1700,7 +1667,11 @@ fn collect(ids: &[String], root: &Path) -> Result<()> {
 /// - other statuses: delete when `started_at` is before cutoff
 /// - unparseable `started_at`: treat as eligible (delete)
 /// - missing/unparseable meta: use directory mtime vs cutoff (delete only if mtime < cutoff)
-fn gc_should_delete(meta: Option<&Meta>, dir_mtime: Option<std::time::SystemTime>, cutoff: chrono::DateTime<chrono::Utc>) -> bool {
+fn gc_should_delete(
+    meta: Option<&Meta>,
+    dir_mtime: Option<std::time::SystemTime>,
+    cutoff: chrono::DateTime<chrono::Utc>,
+) -> bool {
     match meta {
         Some(m) => {
             let started = chrono::DateTime::parse_from_rfc3339(&m.started_at)
@@ -1840,23 +1811,12 @@ pub fn run_cli() -> Result<()> {
             fail_fast,
         } => {
             if jobs > MAX_SWARM_CONCURRENCY {
-                eprintln!(
-                    "sekhmet: --jobs {jobs} exceeds max {MAX_SWARM_CONCURRENCY}; clamping"
-                );
+                eprintln!("sekhmet: --jobs {jobs} exceeds max {MAX_SWARM_CONCURRENCY}; clamping");
             }
             let root = root.unwrap_or_else(default_root);
             let tasks = load_swarm_tasks(tasks_file.as_deref())?;
             let code = run_swarm(
-                tasks,
-                jobs,
-                scope,
-                ro,
-                timeout,
-                direct,
-                root,
-                !no_keep,
-                dry_run,
-                fail_fast,
+                tasks, jobs, scope, ro, timeout, direct, root, !no_keep, dry_run, fail_fast,
             )?;
             if code != 0 {
                 std::process::exit(code);
@@ -1916,9 +1876,6 @@ mod tests {
         .unwrap();
         fs::write(base.join("out/artifacts").join("deadbeef"), b"artifact").unwrap();
     }
-
-
-
 
     #[test]
     fn hash_str_stable() {
@@ -2012,6 +1969,7 @@ mod tests {
 
     #[test]
     fn default_root_honors_xbrd_spark_root() {
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         // Prefer explicit control; restore prior env after.
         let prev = env::var_os("XBRD_SPARK_ROOT");
         let tmp = TempDir::new().unwrap();
@@ -2123,10 +2081,7 @@ mod tests {
 
         gc(2, root).unwrap();
 
-        assert!(
-            young_base.exists(),
-            "young running spark must not be gc'd"
-        );
+        assert!(young_base.exists(), "young running spark must not be gc'd");
         assert!(
             !old_base.exists(),
             "old running spark is orphan; should be gc'd"
@@ -2182,7 +2137,6 @@ mod tests {
         let old_mtime = std::time::SystemTime::now() - std::time::Duration::from_secs(10_000);
         assert!(gc_should_delete(None, Some(old_mtime), cutoff));
 
-
         // missing meta + no mtime → keep (safer)
         assert!(!gc_should_delete(None, None, cutoff));
     }
@@ -2200,66 +2154,57 @@ mod tests {
     }
 
     #[test]
-    fn with_godspeed_directive_prepends_once() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
-        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
-        env::remove_var("XBRD_SPARK_NO_GODSPEED");
-        let raw = "do the thing";
-        let once = with_godspeed_directive(raw);
-        assert!(
-            once.starts_with("You are Godspeed-enabled"),
-            "got: {once:?}"
+    fn canonical_godspeed_directive_matches_pinned_hash_and_local_source() {
+        assert_eq!(hash_str(GODSPEED_DIRECTIVE), GODSPEED_DIRECTIVE_SHA256);
+        assert_eq!(GODSPEED_DIRECTIVE.len(), 429);
+
+        // The sibling SSoT is available in the xbgst development tree. Packaged
+        // builds remain self-contained through the vendored byte-exact copy.
+        let canonical = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .expect("xbgst parent")
+            .join("godspeed-core/directive.md");
+        if canonical.is_file() {
+            assert_eq!(
+                fs::read(&canonical).unwrap(),
+                GODSPEED_DIRECTIVE.as_bytes(),
+                "vendored directive drifted from {}",
+                canonical.display()
+            );
+        }
+    }
+
+    #[test]
+    fn with_godspeed_directive_prepends_canonical_bytes_once() {
+        let once = with_godspeed_directive("do the thing");
+        assert!(once.as_bytes().starts_with(GODSPEED_DIRECTIVE.as_bytes()));
+        assert_eq!(
+            once.matches("You are a Godspeed-enabled subagent.").count(),
+            1,
+            "canonical directive must be injected once: {once:?}"
         );
         assert!(once.contains("do the thing"));
-        assert!(
-            once.trim_end().ends_with("| godspeed"),
-            "must append | godspeed, got: {once:?}"
-        );
-        let twice = with_godspeed_directive(&once);
-        assert_eq!(once, twice, "idempotent");
-        match prev {
-            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
-            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
-        }
+        assert!(once.ends_with(GODSPEED_PROMPT_SUFFIX));
+        assert_eq!(with_godspeed_directive(&once), once, "idempotent");
     }
 
     #[test]
-    fn with_godspeed_suffix_appends_once() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
-        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
-        env::remove_var("XBRD_SPARK_NO_GODSPEED");
-        let once = with_godspeed_suffix("probe authz");
-        assert_eq!(once, "probe authz | godspeed");
-        assert_eq!(with_godspeed_suffix(&once), once);
-        assert_eq!(
-            with_godspeed_suffix("already | godspeed"),
-            "already | godspeed"
-        );
-        match prev {
-            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
-            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
-        }
-    }
-
-    #[test]
-    fn with_godspeed_directive_respects_opt_out() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
-        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
-        env::set_var("XBRD_SPARK_NO_GODSPEED", "1");
-        let out = with_godspeed_directive("plain");
-        assert_eq!(out, "plain");
-        assert_eq!(with_godspeed_suffix("plain"), "plain");
-        match prev {
-            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
-            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
+    fn with_godspeed_suffix_normalizes_terminal_marker_exactly_once() {
+        for raw in [
+            "probe authz",
+            "probe authz | godspeed",
+            "probe authz |godspeed",
+            "probe authz | GODSPEED | godspeed   \n",
+        ] {
+            let once = with_godspeed_suffix(raw);
+            assert_eq!(once, "probe authz | godspeed", "raw={raw:?}");
+            assert_eq!(once.matches(GODSPEED_PROMPT_SUFFIX).count(), 1);
+            assert_eq!(with_godspeed_suffix(&once), once, "raw={raw:?}");
         }
     }
 
     #[test]
     fn dry_run_writes_namespace_and_record() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
-        let prev = env::var_os("XBRD_SPARK_NO_GODSPEED");
-        env::remove_var("XBRD_SPARK_NO_GODSPEED");
         let tmp = TempDir::new().unwrap();
         let root = tmp.path();
         let id = "sp-dry-1";
@@ -2274,21 +2219,12 @@ mod tests {
         assert!(base.join("logs/stdout.log").is_file());
 
         let task = fs::read_to_string(base.join("in/task.md")).unwrap();
-        assert!(
-            task.starts_with("You are Godspeed-enabled"),
-            "godspeed must be injected into task.md, got: {task}"
-        );
+        assert!(task.as_bytes().starts_with(GODSPEED_DIRECTIVE.as_bytes()));
         assert!(task.contains("probe task"), "raw task retained");
-        assert!(
-            task.trim_end().ends_with("| godspeed"),
-            "task.md must end with | godspeed, got: {task}"
-        );
-        let gs = fs::read_to_string(base.join("in/godspeed.md")).unwrap();
-        assert!(gs.starts_with("You are Godspeed-enabled"));
-        match prev {
-            Some(v) => env::set_var("XBRD_SPARK_NO_GODSPEED", v),
-            None => env::remove_var("XBRD_SPARK_NO_GODSPEED"),
-        }
+        assert!(task.ends_with(GODSPEED_PROMPT_SUFFIX));
+        assert_eq!(task.matches(GODSPEED_PROMPT_SUFFIX).count(), 1);
+        let gs = fs::read(base.join("in/godspeed.md")).unwrap();
+        assert_eq!(gs, GODSPEED_DIRECTIVE.as_bytes());
 
         let result: ResultJson =
             serde_json::from_str(&fs::read_to_string(base.join("out/result.json")).unwrap())
@@ -2339,6 +2275,7 @@ mod tests {
 
     #[test]
     fn build_env_forces_namespace_paths() {
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let base = tmp.path().join("sp-env");
         ensure_dirs(&base).unwrap();
@@ -2366,6 +2303,7 @@ mod tests {
 
     #[test]
     fn build_env_always_injects_fnm_default_bin() {
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let fake_fnm = tmp.path().join("fnm-root");
         let install = fake_fnm.join("node-versions/v99.0.0/installation");
@@ -2404,7 +2342,8 @@ mod tests {
         let path = envm.get("PATH").expect("PATH");
         let want = bin.canonicalize().unwrap_or(bin);
         assert!(
-            path.split(':').any(|p| Path::new(p) == want || p == want.to_string_lossy()),
+            path.split(':')
+                .any(|p| Path::new(p) == want || p == want.to_string_lossy()),
             "PATH missing fnm default bin {want:?}: {path}"
         );
         assert_eq!(
@@ -2422,7 +2361,11 @@ mod tests {
     fn find_dispatcher_direct_includes_exec_model_sandbox() {
         if resolve_codex_bin().is_err() {
             // Still verify sandbox string selection via a local replica of the branch.
-            let sandbox_ro = if true { "read-only" } else { "danger-full-access" };
+            let sandbox_ro = if true {
+                "read-only"
+            } else {
+                "danger-full-access"
+            };
             let sandbox_rw = if false {
                 "read-only"
             } else {
@@ -2519,10 +2462,11 @@ mod tests {
 
     #[test]
     fn run_with_timeout_marks_timed_out() {
-        if which::which("sleep").is_err() {
+        let _g = TEST_ENV_LOCK.lock().unwrap();
+        let Ok(sleep) = which::which("sleep") else {
             return;
-        }
-        let mut cmd = Command::new("sleep");
+        };
+        let mut cmd = Command::new(sleep);
         cmd.arg("5")
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
@@ -2563,7 +2507,7 @@ mod tests {
     #[test]
     fn find_dispatcher_no_direct_prefers_xask_l3_not_path_xask() {
         use std::os::unix::fs::PermissionsExt;
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let bin = tmp.path().join("bin");
         fs::create_dir_all(&bin).unwrap();
@@ -2588,7 +2532,11 @@ mod tests {
             xask_l3,
             "no-direct must pick xask-l3, not PATH xask; got {got}"
         );
-        assert_ne!(PathBuf::from(&got), xask, "must never resolve protocol xask");
+        assert_ne!(
+            PathBuf::from(&got),
+            xask,
+            "must never resolve protocol xask"
+        );
         assert!(
             args.iter().any(|a| a == "--spark") && args.iter().any(|a| a == "--gs"),
             "legacy shim argv expected: {args:?}"
@@ -2609,7 +2557,7 @@ mod tests {
     #[test]
     fn find_dispatcher_no_direct_falls_through_without_xask_l3() {
         use std::os::unix::fs::PermissionsExt;
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let bin = tmp.path().join("bin");
         fs::create_dir_all(&bin).unwrap();
@@ -2707,10 +2655,7 @@ mod tests {
         .unwrap();
         assert_eq!(code, 0);
         let copied = spark_dir(&root, id).join("workspace/probe.txt");
-        assert!(
-            copied.is_file(),
-            "expected rsync into workspace on dry-run"
-        );
+        assert!(copied.is_file(), "expected rsync into workspace on dry-run");
         assert_eq!(fs::read_to_string(copied).unwrap(), "scope-payload");
     }
 
@@ -2837,7 +2782,7 @@ mod tests {
 
     #[test]
     fn resolve_codex_bin_honors_codex_bin_env() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let fake = tmp.path().join("fake-codex");
         fs::write(&fake, b"#!/bin/sh\nexit 0\n").unwrap();
@@ -2860,7 +2805,7 @@ mod tests {
     #[test]
     fn resolve_codex_bin_prefers_titanium_over_codex() {
         use std::os::unix::fs::PermissionsExt;
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let bin = tmp.path().join("bin");
         fs::create_dir_all(&bin).unwrap();
@@ -2891,7 +2836,7 @@ mod tests {
     #[test]
     fn resolve_codex_bin_skips_omarchy_npx_stub() {
         use std::os::unix::fs::PermissionsExt;
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let bin = tmp.path().join("bin");
         fs::create_dir_all(&bin).unwrap();
@@ -2928,7 +2873,7 @@ mod tests {
     #[test]
     fn resolve_codex_bin_accepts_non_stub_codex() {
         use std::os::unix::fs::PermissionsExt;
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let tmp = TempDir::new().unwrap();
         let bin = tmp.path().join("bin");
         fs::create_dir_all(&bin).unwrap();
@@ -2973,30 +2918,48 @@ mod tests {
         if resolve_codex_bin().is_err() {
             return;
         }
+        let _g = TEST_ENV_LOCK.lock().unwrap();
+        let prev = env::var_os("XBRD_SPARK_SERVICE_TIER");
         // Pass a model ≠ primary so -m is proven (both consts may be luna).
         let explicit = "gpt-5.3-codex-spark";
+        env::set_var("XBRD_SPARK_SERVICE_TIER", "default");
         let (_, args) = find_dispatcher(true, false, explicit, true).unwrap();
-        assert!(args
-            .windows(2)
-            .any(|w| w[0] == "-m" && w[1] == explicit));
+        assert!(args.windows(2).any(|w| w[0] == "-m" && w[1] == explicit));
         assert!(
             args.windows(2)
-                .any(|w| w[0] == "-c" && w[1] == "service_tier=fast"),
-            "expected service_tier=fast in args: {args:?}"
+                .any(|w| w[0] == "-c" && w[1] == "service_tier=default"),
+            "neutral default must override host fast config: {args:?}"
         );
         assert!(args
             .windows(2)
             .any(|w| w[0] == "-c" && w[1] == "model_reasoning_effort=low"));
+
+        env::set_var("XBRD_SPARK_SERVICE_TIER", "fast");
+        let (_, fast_args) = find_dispatcher(true, false, explicit, true).unwrap();
+        assert!(fast_args
+            .windows(2)
+            .any(|w| w[0] == "-c" && w[1] == "service_tier=fast"));
+        match prev {
+            Some(v) => env::set_var("XBRD_SPARK_SERVICE_TIER", v),
+            None => env::remove_var("XBRD_SPARK_SERVICE_TIER"),
+        }
     }
 
     #[test]
     fn spark_service_tier_env_override() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         let prev = env::var_os("XBRD_SPARK_SERVICE_TIER");
         env::remove_var("XBRD_SPARK_SERVICE_TIER");
-        assert_eq!(spark_service_tier(), DEFAULT_SERVICE_TIER);
-        env::set_var("XBRD_SPARK_SERVICE_TIER", "priority");
-        assert_eq!(spark_service_tier(), "priority");
+        assert_eq!(spark_service_tier().unwrap(), DEFAULT_SERVICE_TIER);
+        env::set_var("XBRD_SPARK_SERVICE_TIER", " fast ");
+        assert_eq!(spark_service_tier().unwrap(), "fast");
+        for unsupported in ["priority", "flex", "bogus"] {
+            let err = validate_service_tier(unsupported).unwrap_err();
+            assert!(
+                err.to_string().contains("unsupported service tier"),
+                "unexpected error for {unsupported}: {err:#}"
+            );
+        }
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_SERVICE_TIER", v),
             None => env::remove_var("XBRD_SPARK_SERVICE_TIER"),
@@ -3005,7 +2968,7 @@ mod tests {
 
     #[test]
     fn model_defaults_and_fallback_env() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev_m = env::var_os("XBRD_SPARK_MODEL");
         let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
@@ -3052,7 +3015,9 @@ mod tests {
     #[test]
     fn should_fallback_on_quota_and_unsupported() {
         assert!(should_fallback_on_fail_reason(Some("usage_limit")));
-        assert!(should_fallback_on_fail_reason(Some("model_chatgpt_unsupported")));
+        assert!(should_fallback_on_fail_reason(Some(
+            "model_chatgpt_unsupported"
+        )));
         assert!(should_fallback_on_fail_reason(Some("model_unsupported")));
         assert!(!should_fallback_on_fail_reason(Some("rate_limit")));
         assert!(!should_fallback_on_fail_reason(None));
@@ -3069,7 +3034,7 @@ mod tests {
 
     #[test]
     fn default_model_is_luna_xbgst_primary() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
@@ -3084,7 +3049,7 @@ mod tests {
 
     #[test]
     fn dry_run_records_model_and_optional_fallback_from() {
-        let _g = GODSPEED_ENV_LOCK.lock().unwrap();
+        let _g = TEST_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev_m = env::var_os("XBRD_SPARK_MODEL");
         let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
@@ -3098,10 +3063,9 @@ mod tests {
         let id = "sp-model-fb-dry";
         let code = run_spark(id, "probe", None, false, 0, true, root, true, true).unwrap();
         assert_eq!(code, 0);
-        let meta: Meta = serde_json::from_str(
-            &fs::read_to_string(root.join(id).join("meta.json")).unwrap(),
-        )
-        .unwrap();
+        let meta: Meta =
+            serde_json::from_str(&fs::read_to_string(root.join(id).join("meta.json")).unwrap())
+                .unwrap();
         assert_eq!(meta.model, "gpt-5.3-codex-spark");
         assert_eq!(
             meta.model_fallback_from.as_deref(),
@@ -3253,7 +3217,4 @@ mod tests {
                 .unwrap();
         assert_eq!(res.usage_tokens, Some(2048));
     }
-
-
-
 }

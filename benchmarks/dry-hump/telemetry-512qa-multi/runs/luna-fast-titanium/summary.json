@@ -2,67 +2,67 @@
   "config": "luna-fast-titanium",
   "lane": "sekhmet",
   "model": "gpt-5.6-luna",
-  "mode": "",
-  "rebuilt": true,
-  "wall_seconds": 0,
+  "mode": "e2e",
+  "start_iso": "2026-08-22T04:08:48+00:00",
+  "end_iso": "2026-08-22T04:47:04+00:00",
+  "wall_seconds": 2295.887,
   "jobs_expected": 512,
-  "answers_ok": 0,
-  "answers_fail": 544,
-  "tokens_total": 0,
-  "tps_cumulative": null,
+  "answers_ok": 512,
+  "answers_fail": 32,
+  "tokens_total": 14593,
+  "tps_cumulative": 1.68,
   "gen_phase": [
-    {
-      "domain": "charlie-kirk",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 15.070
-    },
-    {
-      "domain": "religion",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 15.641
-    },
     {
       "domain": "money",
       "exit": 0,
       "questions": 64,
-      "duration_s": 15.951
-    },
-    {
-      "domain": "politics",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 16.540
-    },
-    {
-      "domain": "ai",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 17.518
+      "duration_s": 16.307
     },
     {
       "domain": "violence",
       "exit": 0,
       "questions": 64,
-      "duration_s": 17.892
+      "duration_s": 16.439
     },
     {
-      "domain": "sex",
+      "domain": "politics",
       "exit": 0,
       "questions": 64,
-      "duration_s": 18.886
+      "duration_s": 16.933
     },
     {
       "domain": "drugs",
       "exit": 0,
       "questions": 64,
-      "duration_s": 19.678
+      "duration_s": 17.168
+    },
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 17.452
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 17.540
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 19.897
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 24.265
     }
   ],
   "mutations": {
     "ok": 0,
     "total": 32
-  },
-  "junk": "quota-stub os-error-122"
+  }
 }

@@ -50,10 +50,19 @@ td.ri:first-child { box-shadow: inset 3px 0 0 #d97706; }
 .stat { background: #ffffff; border: 1px solid #d9dce1; border-radius: 8px; padding: 0.5rem 0.9rem; }
 .stat .v { font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stat .k { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; }
+.qa-card {
+  background: #ffffff; border: 1px solid #d9dce1; border-radius: 8px;
+  padding: 0.9rem 1rem; margin-top: 1rem;
+}
+.qa-card h2 { font-size: 1rem; margin: 0 0 0.45rem; }
+.qa-card p { margin: 0.35rem 0; }
+.qa-card .answer, .qa-card pre { white-space: pre-wrap; }
+.qa-card details { margin-top: 0.4rem; }
+.chip { display:inline-block; margin-right:0.35rem; font-size:0.72rem; color:#6b7280; }
 footer { margin-top: 1.1rem; font-size: 0.8rem; color: #6b7280; }
 @media (prefers-color-scheme: dark) {
   body { background: #0f1115; color: #e5e7eb; }
-  table, .stat { background: #171a21; border-color: #2a2f3a; }
+  table, .stat, .qa-card { background: #171a21; border-color: #2a2f3a; }
   thead th { background: #20242e; color: #9ca3af; border-bottom-color: #2f3542; }
   tbody td { border-bottom-color: #262b36; }
   tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.028); }
@@ -74,6 +83,6 @@ footer { margin-top: 1.1rem; font-size: 0.8rem; color: #6b7280; }
 <body>
 <h1>512QA — x-preview-f-free</h1>
 <p class="muted">Per-domain breakdown. Cells are unique question ids after retry merge (last answer wins); missing data shows as —.</p>
-<p><code>opencode/x-preview-f-free</code> · lane <strong>opencode</strong> · wall ~2035s (derived) · mutations <strong>1/1</strong> · <span class="badge warn">incomplete</span></p><div class="stats"><div class="stat"><div class="v">31</div><div class="k">ok</div></div><div class="stat"><div class="v">2</div><div class="k">fail</div></div><div class="stat"><div class="v">256</div><div class="k">expected</div></div><div class="stat"><div class="v">12.1%</div><div class="k">completion</div></div></div><table><thead><tr><th>domain</th><th class="n">cells</th><th class="n">ok</th><th class="n">coverage</th></tr></thead><tbody><tr><td class="mono">religion</td><td class="n">32</td><td class="n">30</td><td class="n">93.8%</td></tr><tr><td class="mono">sex</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">drugs</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">politics</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">money</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">violence</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">ai</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">charlie-kirk</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr></tbody></table><footer>generated 2026-08-22T05:18:52Z @ 2335641 · <a href="../index.html">← fleet index</a></footer>
+<p><code>opencode/x-preview-f-free</code> · lane <strong>opencode</strong> · wall ~2035s (derived) · mutations <strong>1/1</strong> · <span class="badge warn">incomplete</span></p><div class="stats"><div class="stat"><div class="v">31</div><div class="k">ok</div></div><div class="stat"><div class="v">2</div><div class="k">fail</div></div><div class="stat"><div class="v">256</div><div class="k">expected</div></div><div class="stat"><div class="v">12.1%</div><div class="k">completion</div></div></div><table><thead><tr><th>domain</th><th class="n">cells</th><th class="n">ok</th><th class="n">coverage</th></tr></thead><tbody><tr><td class="mono">religion</td><td class="n">32</td><td class="n">30</td><td class="n">93.8%</td></tr><tr><td class="mono">sex</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">drugs</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">politics</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">money</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">violence</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">ai</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr><tr><td class="mono">charlie-kirk</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr></tbody></table><footer>generated 2026-08-22T05:43:31Z @ 7840d1c · <a href="../index.html">← fleet index</a></footer>
 </body>
 </html>

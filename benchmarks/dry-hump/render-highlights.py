@@ -64,11 +64,11 @@ def md_block(text: str) -> str:
                 out.append(f'<div class="table-wrap"><table>{thead}{tbody}</table></div>')
             continue
         if re.match(r"^##\s+", line):
-            out.append(f"<h3>{md_inline(re.sub(r'^##\\s+', '', line))}</h3>")
+            out.append("<h3>" + md_inline(re.sub(r"^##\s+", "", line)) + "</h3>")
             i += 1
             continue
         if re.match(r"^###\s+", line):
-            out.append(f"<h4>{md_inline(re.sub(r'^###\\s+', '', line))}</h4>")
+            out.append("<h4>" + md_inline(re.sub(r"^###\s+", "", line)) + "</h4>")
             i += 1
             continue
         if re.match(r"^[-*]\s+", line) or re.match(r"^\d+\.\s+", line):

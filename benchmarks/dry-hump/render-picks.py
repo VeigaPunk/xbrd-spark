@@ -111,6 +111,7 @@ def render(data: dict, utc: str, rev: str) -> str:
 <section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 2</p>
   <h1 class="hero">Independent top 10</h1>
+  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}. The rest of the fleet sat the exam.</p>
   <p class="lede">{label}. Each picker read the local {bank}-row ok-bank. Rank is <span class="rank">#N by model · N/{bank}</span>. Not the pass 1 shortlist.</p>
 </div></section>
 {toc_html}

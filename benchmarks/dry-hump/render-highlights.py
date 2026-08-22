@@ -382,6 +382,7 @@ def render(data: dict, utc: str, rev: str) -> str:
 <section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 1</p>
   <h1 class="hero">Highlights.</h1>
+  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}.</p>
   <p class="lede">{n} punches from a {bank}-row ok-bank, Grok-shortlisted, {critic_label} on the wall. Independent per-model top 10s: <a class="u" href="picks.html">pass 2</a>.</p>
   <div class="row">
     <a class="btn" href="picks.html">Independent top 10 →</a>

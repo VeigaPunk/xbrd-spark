@@ -1,0 +1,67 @@
+{
+  "config": "nemotron-3.5-lightning-free",
+  "lane": "opencode",
+  "model": "opencode/nemotron-3.5-lightning-free",
+  "mode": "",
+  "rebuilt": true,
+  "wall_seconds": 0,
+  "jobs_expected": 434,
+  "answers_ok": 27,
+  "answers_fail": 3,
+  "tokens_total": 0,
+  "tps_cumulative": null,
+  "gen_phase": [
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 0,
+      "duration_s": 41.921
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 62.521
+    },
+    {
+      "domain": "money",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 76.314
+    },
+    {
+      "domain": "violence",
+      "exit": 0,
+      "questions": 60,
+      "duration_s": 85.454
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 54,
+      "duration_s": 86.193
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 93.037
+    },
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 155.071
+    },
+    {
+      "domain": "politics",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 175.872
+    }
+  ],
+  "mutations": {
+    "ok": 1,
+    "total": 1
+  }
+}

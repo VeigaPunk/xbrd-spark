@@ -1,0 +1,68 @@
+{
+  "config": "luna-fast-titanium",
+  "lane": "sekhmet",
+  "model": "gpt-5.6-luna",
+  "mode": "",
+  "rebuilt": true,
+  "wall_seconds": 0,
+  "jobs_expected": 512,
+  "answers_ok": 0,
+  "answers_fail": 544,
+  "tokens_total": 0,
+  "tps_cumulative": null,
+  "gen_phase": [
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 15.070
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 15.641
+    },
+    {
+      "domain": "money",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 15.951
+    },
+    {
+      "domain": "politics",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 16.540
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 17.518
+    },
+    {
+      "domain": "violence",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 17.892
+    },
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 18.886
+    },
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 19.678
+    }
+  ],
+  "mutations": {
+    "ok": 0,
+    "total": 32
+  },
+  "junk": "quota-stub os-error-122"
+}

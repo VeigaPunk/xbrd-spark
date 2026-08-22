@@ -39,3 +39,152 @@ DONE grok-4.6-low ok=536/512 fail=16 wall=1312.326s tps=0.00 mut_ok=24/40
 ./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
 ./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
 ./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/sex/answers.jsonl: No such file or directory
+[01:31:10] END   grok grok-4.6 grok-4.6-medium 16 rc=0
+[01:31:10] START grok grok-4.6 grok-4.6-high 16
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+jq: parse error: Invalid numeric literal at line 36, column 4105
+[retry] 33 cells flagged for re-dispatch

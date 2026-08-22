@@ -1,0 +1,67 @@
+{
+  "config": "hy3-free",
+  "lane": "opencode",
+  "model": "opencode/hy3-free",
+  "mode": "",
+  "rebuilt": true,
+  "wall_seconds": 0,
+  "jobs_expected": 508,
+  "answers_ok": 350,
+  "answers_fail": 158,
+  "tokens_total": 0,
+  "tps_cumulative": null,
+  "gen_phase": [
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 61,
+      "duration_s": 21.579
+    },
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 24.490
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 25.274
+    },
+    {
+      "domain": "money",
+      "exit": 0,
+      "questions": 63,
+      "duration_s": 28.547
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 29.729
+    },
+    {
+      "domain": "politics",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 35.429
+    },
+    {
+      "domain": "violence",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 36.608
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 39.704
+    }
+  ],
+  "mutations": {
+    "ok": 0,
+    "total": 0
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "config": "grok-4.6-default",
+  "lane": "grok",
+  "model": "grok-4.6",
+  "mode": "",
+  "rebuilt": true,
+  "wall_seconds": 0,
+  "jobs_expected": 512,
+  "answers_ok": 399,
+  "answers_fail": 1,
+  "tokens_total": 0,
+  "tps_cumulative": null,
+  "gen_phase": [
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 38.671
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 44.370
+    },
+    {
+      "domain": "money",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 52.206
+    },
+    {
+      "domain": "violence",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 53.193
+    },
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 53.738
+    },
+    {
+      "domain": "politics",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 108.804
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 152.116
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 231.729
+    }
+  ],
+  "mutations": {
+    "ok": 0,
+    "total": 0
+  }
+}

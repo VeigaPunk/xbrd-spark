@@ -1,1 +1,3 @@
 [01:21:01] RERUN-START opencode opencode-go/ox-alpha-free ox-alpha-free 32
+[retry] 43 cells flagged for re-dispatch
+DONE ox-alpha-free ok=267/273 fail=7 wall=2366.742s tps=null mut_ok=1/1

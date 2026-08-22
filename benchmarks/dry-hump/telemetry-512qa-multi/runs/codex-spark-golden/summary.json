@@ -1,0 +1,69 @@
+{
+  "config": "codex-spark-golden",
+  "lane": "sekhmet",
+  "model": "gpt-5.3-codex-spark",
+  "mode": "e2e",
+  "start_iso": "2026-08-22T01:23:53+00:00",
+  "end_iso": "2026-08-22T01:24:07+00:00",
+  "wall_seconds": 13.458,
+  "jobs_expected": 512,
+  "answers_ok": 0,
+  "answers_fail": 544,
+  "tokens_total": 0,
+  "tps_cumulative": null,
+  "gen_phase": [
+    {
+      "domain": "politics",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 5.246
+    },
+    {
+      "domain": "ai",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 5.687
+    },
+    {
+      "domain": "money",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 5.797
+    },
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 6.571
+    },
+    {
+      "domain": "violence",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 7.065
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 7.157
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 7.813
+    },
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 8.006
+    }
+  ],
+  "mutations": {
+    "ok": 0,
+    "total": 32
+  },
+  "junk": "quota-stub os-error-122"
+}

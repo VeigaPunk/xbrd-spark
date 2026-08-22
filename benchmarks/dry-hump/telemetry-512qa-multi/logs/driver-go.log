@@ -1,0 +1,4 @@
+[02:00:38] START glm-5.3
+[retry] 49 cells flagged for re-dispatch
+DONE glm-5.3 ok=507/512 fail=6 wall=3537.867s tps=null mut_ok=1/1
+[02:59:36] END glm rc=0

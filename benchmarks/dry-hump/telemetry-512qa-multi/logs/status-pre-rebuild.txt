@@ -1,0 +1,22 @@
+CONFIG                           STATE     DETAIL
+codex-spark-golden               DONE      {"w":13.458,"ok":0,"exp":512,"fail":544,"tps":null,"mut":{"ok":0,"total":32}}
+glm-5.3                          DONE      {"w":3537.867,"ok":507,"exp":512,"fail":6,"tps":null,"mut":{"ok":1,"total":1}}
+grok-4.6-default                 DEAD      gen:8/8 ans:400/512
+grok-4.6-high                    DONE      {"w":0,"ok":509,"exp":512,"fail":3,"tps":null,"mut":{"ok":0,"total":0}}
+grok-4.6-low                     DEAD      gen:8/8 ans:552/512
+hy3-free                         DEAD      gen:8/8 ans:508/508
+luna-fast-titanium               DEAD      gen:8/8 ans:544/512
+mimo-v2.5-free                   DEAD      gen:8/8 ans:447/447
+muse-spark-1.2-contributor-free  DEAD      gen:8/8 ans:35/512
+nemotron-3.5-lightning-free      DEAD      gen:8/8 ans:30/434
+nemotron-3-ultra-free            DEAD      gen:8/8 ans:33/509
+ox-alpha-free                    DONE      {"w":2366.742,"ok":267,"exp":273,"fail":7,"tps":null,"mut":{"ok":1,"total":1}}
+qwen3.8-max-low                  DEAD      gen:8/8 ans:431/512
+sol-fast-titanium                DEAD      gen:8/8 ans:544/512
+x-preview-f-free                 DEAD      gen:8/8 ans:33/256
+--- queue tail ---
+  jq: parse error: Invalid numeric literal at line 36, column 4105
+  [retry] 33 cells flagged for re-dispatch
+--- load ---
+   00:18:32 up 14 min,  1 user,  load average: 0.28, 0.31, 0.20
+  mem_used:2G avail:27G

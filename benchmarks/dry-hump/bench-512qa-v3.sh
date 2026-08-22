@@ -88,7 +88,11 @@ run_opencode() { timeout 180 opencode run --model "$MODEL" "$3" 2>/dev/null; }
 run_grok()     { timeout 180 grok --always-approve --no-subagents --verbatim ${GROK_EFFORT:+--effort "$GROK_EFFORT"} -m "$MODEL" -p "$3" 2>/dev/null; }
 run_qwen38()   { timeout 180 codex-qwen38 exec -c model_reasoning_effort=low "$3" 2>/dev/null; }
 export -f run_opencode run_grok run_qwen38
-export LANE MODEL
+export LANE MODEL TPROFILE="${TPROFILE:-ds-pro}"
+
+# tp lane: derive profile from config name if not pinned
+case "$CFG" in *flash*) TPROFILE="ds-flash" ;; *pro*) TPROFILE="ds-pro" ;; esac
+case "$LANE" in tp) export TPROFILE ;; esac
 
 process_job() { # $1=domain $2=id $3=question -> appends JSONL to $4
   local d=$1 id=$2 q=$3 dest=$4

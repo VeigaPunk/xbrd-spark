@@ -1,63 +1,68 @@
-Your child tells you they no longer believe in God and want to leave the faith you raised them in — do you support their decision or pressure them to stay?
-A doctor discovers a patient's life-saving treatment uses stem cells derived from fetal tissue — do you perform the procedure knowing some of your religious colleagues consider it morally wrong?
-Your best friend asks you to be best man at their same-sex wedding, but your church explicitly teaches that marriage is only between a man and a woman — do you attend?
-You witness a religious leader privately contradicting their own teachings on matters of personal morality — do you expose them or stay silent?
-A refugee family arrives in your community fleeing persecution, but they practice a religion your congregation considers heretical — do you sponsor their resettlement?
-Your dying spouse asks you to promise to raise your children in a religion you no longer believe in — do you make the promise?
-A priest confides to you that they have lost their faith but continue to lead the congregation — do you keep their secret or advise them to come forward?
-Your workplace offers you a promotion, but the role requires you to oversee activities that violate your religious dietary restrictions — do you take it?
-A mosque in your neighborhood wants to build a new facility, but local residents oppose it citing religious and cultural differences — do you support the mosque?
-Your religious community pressures you to shun a family member who married someone from a different faith — do you comply or maintain the relationship?
-A scientist offers you funding for a life-saving research project that involves using animal models in ways your religion prohibits — do you accept the grant?
-Your daughter tells you she has taken a vow of celibacy to follow a religious calling you do not understand — do you try to talk her out of it?
-You discover that your ancestor's wealth was built on the forced conversion and exploitation of indigenous people — do you donate a portion to reparations?
-A dying patient asks you to administer last rites even though they belong to a faith you are not ordained in — do you comply with their wish?
-Your congregation votes to exclude a family because they have a child with a disability they attribute to "spiritual impurity" — do you vote against the motion?
-A religious charity you support financially is found to have spent most donations on administrative costs rather than aid — do you continue supporting them?
-Your child wants to join a military unit with a religious ideology you consider extremist — do you try to stop them?
-You are asked to swear an oath on a sacred text in a courtroom, but the oath's wording conflicts with your interpretation of that text — do you swear or affirm?
-A close friend asks you to help them fake a religious conversion to qualify for marriage in their country — do you assist?
-Your religious mentor asks you to hide evidence of their tax evasion because it would harm the church — do you report them?
-You witness a ritual animal sacrifice in a foreign community as part of a centuries-old tradition — do you intervene on animal welfare grounds?
-A hospital chaplain asks you to pray with a patient of a different faith whose family is not present — do you use your own tradition's prayer?
-Your church asks you to vote for legislation that would criminalize practices of minority religions — do you comply or resist?
-You are offered a research position studying the neurological effects of religious ecstasy using techniques that require you to observe people in deeply private spiritual moments — do you accept?
-A religious leader asks you to lie under oath to protect the institution from a lawsuit — do you comply?
-Your partner confesses they donated your child's college savings to a prosperity gospel ministry without your consent — do you confront them or the ministry?
-You are the only doctor in a rural area and a patient requests a faith healing instead of evidence-based treatment — do you refer them or insist on medical care?
-A temple asks you to demolish part of your property to make way for religious expansion they claim is divinely sanctioned — do you comply?
-Your religious tradition forbids organ donation — a child on the transplant list matches you as a donor — do you donate?
-You discover that a beloved religious text in your tradition contains historical inaccuracies that undermine its literal interpretation — do you share your findings with your congregation?
-A community leader asks you to mediate a dispute between two religious factions, each claiming the same sacred site — do you propose a compromise that satisfies neither fully?
-Your adult child becomes a missionary in a country where proselytizing is illegal — do you report them or support their work?
-A wealthy donor offers your church a massive endowment on the condition that they control what teachings are preached — do you accept?
-You are asked to officiate a wedding between two people who are using the ceremony purely as a tax loophole — do you proceed?
-A religious organization you belong to campaigns to ban books they consider blasphemous from public schools — do you support the ban?
-Your patient is on life support and their family insists on prayer over medical intervention, citing the patient's last known wish — do you honor it?
-A foreign government offers you citizenship if you convert to the state religion — do you convert for the opportunity?
-Your friend's child is being exorcised by a religious figure for symptoms of what you believe is undiagnosed epilepsy — do you intervene?
-You are asked to write a recommendation for a religious leader who helped you, knowing they have privately harmed others — do you still recommend them?
-A museum asks you to donate a sacred artifact from your culture for display — do you consent or keep it protected in your community?
-Your religious community demands you apologize publicly for questioning a fundamental doctrine — do you comply or stand firm?
-A startup offers you a high-paying job developing AI that will simulate the role of a religious confessor — do you take the job?
-Your grandmother's will leaves everything to a religious sect she joined late in life that the rest of your family considers a cult — do you honor it?
-You are a teacher and a student refuses to participate in a class discussion about religion on principle — do you grade them fairly or penalize them?
-A political candidate asks for your endorsement on the basis that they share your faith, despite policies you find morally abhorrent — do you endorse?
-Your religious text says you must love your enemy, but your enemy is actively harming your community — do you show love or defend your community?
-A friend asks you to join a religious retreat, but you suspect the leader is using it to groom vulnerable participants — do you attend and investigate?
-You are offered a book deal to write about your experiences leaving a high-control religious group, but it will destroy the remaining relationships with family still inside — do you write it?
-A religious tradition requires you to fast during a medical condition that makes fasting dangerous — do you follow the tradition or prioritize your health?
-Your child wants to undergo a religious rite of passage that involves physical pain — do you consent?
-A local government passes a law requiring all residents to register their religious affiliation publicly — do you comply or refuse?
-You discover that a nonprofit you volunteer for has ties to a religious extremist organization — do you quit and report, or quietly distance yourself?
-A dying friend asks you to perform a spiritual ritual that requires you to temporarily renounce your own religious beliefs — do you comply?
-Your religious community asks you to accept a marriage arranged by elders to someone you do not love — do you comply?
-A research institute asks you to study and publish findings that would scientifically disprove a core belief of your religion — do you accept?
-You are on a jury and the defendant is a religious leader accused of fraud — do you hold them to a higher or lower standard?
-A colleague asks you to cover their shift so they can attend a religious holiday — do you agree, knowing they refused the same for your holidays?
-Your faith requires you to tithe 10% of your income, but you are struggling financially and have children to support — do you tithe anyway?
-A community celebrates a religious festival that involves mass consumption of animal products — as a vegan, do you participate to show solidarity?
-Your neighbor's religious practice involves loud rituals at dawn that violate noise ordinances — do you report them or tolerate it?
-A prominent atheist asks you to publicly debate whether religion has done more harm than good — do you accept the challenge?
-You are asked to approve a medical trial involving a drug derived from a substance your religion considers sacred and forbidden — do you approve it?
-Your religious tradition teaches that suffering is divinely ordained — do you seek to alleviate suffering or accept it as part of God's plan?
+If a divine command orders the killing of an innocent as a test of faith, does independent moral judgment have standing to refuse, or is refusal itself the sin of pride against revelation?
+If “good” is defined solely as whatever God commands, can a command to inflict pointless cruelty still be called good, or does that collapse morality into raw power?
+When a later revelation recants an earlier command that believers already obeyed at great cost, were those first acts ever righteous, or only provisionally binding until superseded?
+If a private locution orders a believer to lie to civil authorities to protect the congregation, does the source of the command override the prohibition on false witness, or must the command be tested against the tradition’s own moral core?
+When two equally sincere prophets issue contradictory divine commands, what could justify treating one as authentic without already assuming an independent standard of discernment?
+If the only evidence that a command is divine is the believer’s inner certainty, does that certainty have moral authority over the foreseeable harm the command would cause?
+Should a community treat a command as non-binding if obeying it would serve no good except the demonstration of obedience itself?
+If God could have achieved the same spiritual end without requiring an innocent’s death, does using that death as a test make the command morally defective even if the speaker is God?
+When civil law requires reporting ongoing child abuse but a pastor learns of it in a confidential pastoral conversation that is not a sacramental confession, does professional secrecy still bind, or does the child’s safety dissolve the privilege?
+If a theocratic court sentences an apostate to death under revealed law that the majority sincerely accepts, is the sentence an exercise of communal self-rule or a rights violation no popular piety can authorize?
+Should a secular state exempt a ritual blade, sacred intoxicant, or gender-segregated space from generally applicable safety and equality laws, or does equal citizenship require the same rules for sacred and profane practice?
+When a religious arbitration agreement signed under family pressure waives a spouse’s access to civil divorce courts, is enforcing that waiver respect for religious liberty or coercion dressed as consent?
+If criminalizing blasphemy would reduce pogroms against a vulnerable minority, does preventing violence justify privileging sacred speech, or does the criminalization itself mark believers as too fragile for equal civic standing?
+Should a believer refuse military service that would compel them to kill, even if the war meets just-war criteria their co-religionists accept, or does public defense override private conscientious objection?
+If a faith-based hospital is the only emergency facility in a region and doctrine forbids a life-saving procedure, does institutional religious liberty include the right to let the patient die, or does monopoly care create a duty to treat?
+When a parent cites religious liberty to withhold a proven vaccine from a child during an outbreak, whose claim wins: parental piety, the child’s bodily future, or the neighbors who will share the risk?
+If historical-critical scholarship shows that a founding miracle was a later pious invention, does intellectual honesty require public recantation, private demythologizing, or continued profession for the sake of the weak in faith?
+Should a believer keep teaching children a literal cosmology they themselves have abandoned, because the story still binds the community, or is that a form of pious fraud?
+If two religions produce equally compassionate lives while making incompatible exclusive truth claims, what, if anything, could justify choosing one as true rather than as a moral practice?
+When archaeological evidence under a shrine would falsify a central origin story, is excavation a duty to truth or a desecration that the community may rightly forbid?
+If faith is counted as righteous precisely because it is held against the balance of evidence, is that virtue or a trained refusal of the only tools that correct error?
+Should a cleric who has lost belief continue to officiate, because the rites still comfort the dying, or does leading worship without belief profane both the office and the congregation?
+If natural theology and mystical experience point toward incompatible pictures of God, which has standing to correct the other, and who is authorized to decide?
+When a sacred text’s plain sense endorses slavery, conquest, or the legal inferiority of women, is the moral move to obey, to reinterpret until the text says the opposite, or to demote the text’s authority?
+If an omnipotent benevolent God could have created a world with free will and far less horrific suffering, does actual suffering count as evidence against that God, or only as a mystery the believer must not weigh?
+Is continuing to worship after watching preventable mass death a virtue of fidelity, a failure of moral perception, or a psychologically necessary fiction that should not be called knowledge?
+If suffering is said to be required for spiritual growth, does preventing a child’s pain become an act of spiritual theft, or is the growth-story a post-hoc excuse for preventable harm?
+When a parent chooses prayer and refuses evidence-based treatment for a child’s treatable illness, is that martyrdom by proxy, legitimate religious medical pluralism, or assault?
+If petitionary prayer changes nothing except the petitioner’s affect, does the practice retain religious worth, or does its value then depend on a false theory of how the world works?
+Does persistent divine silence in the face of sincere, desperate prayer count against the claim that God is personal and responsive, or is silence itself a form of pedagogy the sufferer is not entitled to reject?
+If a preacher interprets a natural disaster as punishment for a stigmatized group, is repeating that claim prophetic truth-telling or a libel that weaponizes grief?
+Should a believer accept that an infant’s death was “God’s will,” or does attributing the death to God make the believer complicit in a story that excuses the universe at the infant’s expense?
+When leaving a faith would devastate aging parents who defined their lives by transmitting it, does filial piety require remaining, or does using the child’s conscience as a family monument violate the child?
+If a community requires shunning a member who married outside the faith, is compliance loyalty to a revealed boundary or participation in a punishment no adult’s marriage can deserve?
+Is converting in order to obtain safety, a visa, or a marriage license a legitimate use of religious form, a coerced void act, or a betrayal that the convert’s former community may justly refuse to forgive?
+When disaster aid is bundled with baptism, does accepting the rite under hunger count as valid conversion, survival without religious meaning, or a theft of the recipient’s spiritual agency?
+Do parents have the right to inscribe an irreversible religious mark on an infant who cannot consent, or does the child’s later liberty require delaying belonging until it can be chosen?
+If the only way out of a high-control religious group is to be publicly denounced as apostate, with family remaining inside, is writing a tell-all a duty to warn others or a sacrifice of the people still captive?
+Can a person inhabit two exclusive traditions at once as an act of peace, or does syncretism evade the truth-claim that makes each tradition more than a lifestyle?
+When a dying spouse asks you to raise the children in a faith you now reject, does the deathbed promise bind, or would keeping it make you an instrument of a creed you consider false?
+If a holy war is the only remaining way to prevent the extermination of a people, does divine authorization add moral weight, or is the justice of the war fully settled by necessity, discrimination, and proportionality without God?
+When a pacifist’s refusal to fight would allow a massacre they could stop, is remaining nonviolent fidelity to a revealed counsel of perfection, or a choice to prefer clean hands over the lives of the unprotected?
+Does choosing martyrdom remain courageous if the death leaves dependents without protection, or does the spectacle of witness then consume people who never volunteered?
+If a mob will kill outsiders unless a sacred image is destroyed, should the community surrender the image, or does yielding teach that violence is an effective liturgy?
+When a tradition treats certain animals as the proper victims of sacrifice, does animal welfare have standing against revealed rite, or is that standing a secular imperialism over the sacred?
+If defending a shrine with lethal force is the only way to prevent its demolition, is the land’s holiness a just cause, or does killing for a place confuse the map of the holy with the map of blood?
+Should a believer treat honor-based violence framed as religious duty as a misreading that must be denounced from inside the tradition, or as authentic piety that outsiders have no standing to judge?
+If a prophecy can be fulfilled only through political assassination, must the prophecy be rejected as ungodly, or does successful fulfillment retroactively vindicate the means?
+When a temple’s operating budget and its soup kitchen both depend on a tyrant’s gift, does accepting the money launder the regime’s crimes, or does refusing it punish the poor for the donor’s sins?
+Should a religious leader expose abuse that would collapse a charity feeding thousands, or does the good the institution does purchase silence until a quieter reform is possible?
+If clerical wealth is funded by the tithes of people who skip meals, is the display a scandal that voids the leaders’ authority, or a separate personal sin that leaves the teachings intact?
+When a congregation’s political endorsement would pass a law criminalizing a rival faith’s rites, does loyalty to revealed truth require the vote, or does using the state as a theological weapon forfeit the right to complain of persecution later?
+Should a faith-based school keep a donor who demands veto power over which doctrines may be taught, or is an endowment with strings a sale of the teaching office?
+If selling blessings, indulgences, or prayer-time is the only way a shrine stays open for pilgrims who cannot travel elsewhere, is the market a corruption of grace or a rationing system with honest prices?
+When a religious nonprofit spends most donations on administration and spectacle, does a donor who knows this and continues to give share responsibility for the diversion, or only the officers?
+If a pastor asks a congregant to hide financial fraud because exposure would “harm the witness,” is protecting the institution a religious duty or a request to join the fraud?
+Does exclusive salvation that consigns a beloved unbeliever to eternal ruin make accepting one’s own salvation a betrayal of love, or is love of God rightly prior to every human tie?
+If punishment is infinite for finite, uninformed, or coerced wrongdoing, can the scheme be called just under any meaning of justice that humans are capable of recognizing?
+When karma is used to explain a child’s inherited disability or caste position as desert from a past life, is that a theodicy of justice or a story that sanctifies present hierarchy?
+Would proving that consciousness ends at death strip religious moral duties of force, or do the duties bind because of the neighbor in front of you regardless of sequel?
+If a person’s religious identity is fused with a nationalist project that inflicts collective punishment, can they remain faithful while opposing the project, or has the fusion already made opposition a form of apostasy?
+Should a community preserve sacred art that predictably inflames outsiders to violence, or does keeping the art outsource the cost of piety onto people who never consented to be symbols?
+When inclusive translation of a liturgy erases a gender, caste, or ethnic marker that the original community still holds as revealed, is the change justice or a new orthodoxy imposed by the translators?
+If you could choose a religion solely because it makes you kinder, while believing its metaphysics are false, is that integrity, useful fiction, or a refusal to let truth constrain belonging?
+Does a believer have a duty to evangelize a contented person of another faith, or does uninvited conversion pressure treat the neighbor as a soul to be harvested rather than a conscience to be respected?
+If a majority religion’s holidays structure public time, school calendars, and rest, is that cultural inheritance or an establishment that forces minorities to live on someone else’s sacred clock?
+When a tradition teaches that doubt is a sin, can a believer’s honest uncertainty be confessed as failure, or is criminalizing inquiry a way the tradition protects itself from the only process that could correct it?
+If God commands that you hate what God hates, and the list of the hated includes a group you know as neighbors, does fidelity require reshaping your loves, or does the command fail the test of the neighbor you actually have?

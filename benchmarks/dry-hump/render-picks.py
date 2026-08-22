@@ -31,7 +31,7 @@ def render(data: dict, utc: str, rev: str) -> str:
     toc: list[str] = []
     n = 0
     for pi, picker in enumerate(pickers, 1):
-        model = str(picker.get("model") or picker.get("config") or f"picker-{pi}")
+        model = str(picker.get("picker") or picker.get("model") or picker.get("config") or f"picker-{pi}")
         cfg = str(picker.get("config") or "")
         picks = picker.get("picks") or []
         hid = html.escape(re.sub(r"[^a-z0-9-]+", "-", model.lower()).strip("-") or f"p{pi}")

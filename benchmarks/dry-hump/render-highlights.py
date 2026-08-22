@@ -40,7 +40,16 @@ SHORT_LABEL = {
     "qwen3.8-max": "qwen",
 }
 
-CSS_VER = "boards"
+CSS_VER = "clout"
+
+
+def clout_poke(bank: int, extra: str = "") -> str:
+    name = '<em class="clout">Clout Fable</em>'
+    tail = f" {extra}" if extra else ""
+    return (
+        f'<p class="poke"><strong>Empty chair.</strong> {name} refused to partake in the QA. '
+        f"#0 by {name} · 0/{bank}.{tail}</p>"
+    )
 
 
 def slug(name: str) -> str:
@@ -465,7 +474,7 @@ def render(data: dict, utc: str, rev: str, pickers: list[dict] | None = None) ->
     body = f"""<section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 1</p>
   <h1 class="hero">Highlights.</h1>
-  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}.</p>
+  {clout_poke(bank)}
   <p class="lede">{n} punches from a {bank}-row ok-bank, Grok-shortlisted, {critic_label} on the wall. Each picker also has its own board below.</p>
   {strip}
   <div class="row">
@@ -529,7 +538,7 @@ def render_model_board(picker: dict, pickers: list[dict], utc: str, rev: str, ba
     body = f"""<section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 2 · {html.escape(model)}</p>
   <h1 class="hero">{html.escape(model)}</h1>
-  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}. The rest of the fleet sat the exam.</p>
+  {clout_poke(bank, "The rest of the fleet sat the exam.")}
   <p class="lede">Independent top 10. This picker read the local {bank}-row ok-bank. Rank is <span class="rank">#N by {html.escape(model)} · N/{bank}</span>.</p>
   {strip}
   <div class="row">

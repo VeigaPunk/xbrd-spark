@@ -38,6 +38,7 @@
   --warn: #c4a574;
   --danger: #c47a72;
   --gold: #c4a574;
+  --clout: #d97757; /* Anthropic orange */
   --font: "JetBrainsMonoNL NFM", "JetBrainsMonoNL Nerd Font Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --shadow: 0 18px 50px color-mix(in oklab, #000 40%, transparent);
   --max: 72rem;
@@ -89,7 +90,7 @@ h1.hero { margin-top: 0.75rem; font-size: clamp(2.15rem, 1.4rem + 2.4vw, 3.4rem)
   line-height: 1.5;
 }
 .poke strong { color: var(--fg); font-weight: 500; }
-.poke em { color: var(--warn); font-style: normal; }
+.poke em, .clout { color: var(--clout); font-style: normal; }
 .models {
   display: flex; flex-wrap: wrap; gap: 0.35rem;
   margin-top: 1.35rem;

@@ -15,6 +15,7 @@ assert _spec.loader is not None
 _spec.loader.exec_module(_mod)
 DOMAIN_LABEL = _mod.DOMAIN_LABEL
 chrome = _mod.chrome
+clout_poke = _mod.clout_poke
 model_nav = _mod.model_nav
 picker_name = _mod.picker_name
 render_model_board = _mod.render_model_board
@@ -70,7 +71,7 @@ def render_hub(data: dict, utc: str, rev: str) -> str:
     body = f"""<section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 2</p>
   <h1 class="hero">Independent top 10</h1>
-  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}. The rest of the fleet sat the exam.</p>
+  {clout_poke(bank, "The rest of the fleet sat the exam.")}
   <p class="lede">{html.escape(label)}. Each picker read the local {bank}-row ok-bank and has its own highlights page. Rank is <span class="rank">#N by model · N/{bank}</span>.</p>
   {strip}
 </div></section>

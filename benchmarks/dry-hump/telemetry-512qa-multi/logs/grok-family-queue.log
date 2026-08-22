@@ -1,0 +1,41 @@
+[00:44:18] START grok grok-4.6 grok-4.6-low 16
+[00:46:19] END   grok grok-4.6 grok-4.6-low 16 (rc=0)
+[00:46:19] START grok grok-4.6 grok-4.6-medium 16
+[00:46:51] END   grok grok-4.6 grok-4.6-medium 16 (rc=0)
+[00:46:51] START grok grok-4.6 grok-4.6-high 16
+[00:47:28] END   grok grok-4.6 grok-4.6-high 16 (rc=0)
+[00:47:28] START grok grok-4.6 grok-4.6-xhigh 16
+DONE grok-4.6-xhigh ok=0/0 fail=0 wall=0.091s tps=null mut_ok=0/0
+[00:47:51] START grok grok-4.6 grok-4.6-low 16
+xargs: unmatched single quote; by default quotes are special to xargs unless you use the -0 option
+[00:57:26] END   grok grok-4.6 grok-4.6-low 16 (rc=0)
+[00:57:26] START grok grok-4.6 grok-4.6-medium 16
+DONE grok-4.6-medium ok=0/0 fail=0 wall=1.073s tps=null mut_ok=0/0
+[00:59:07] START grok grok-4.6 grok-4.6-low 16
+[retry] 0 cells flagged for re-dispatch
+jq: invalid JSON text passed to --argjson
+Use jq --help for help with command-line options,
+or see the jq manpage, or online docs at https://jqlang.org
+DONE grok-4.6-low ok=536/512 fail=16 wall=1312.326s tps=0.00 mut_ok=24/40
+[01:21:00] END   grok grok-4.6 grok-4.6-low 16 (rc=0)
+[01:21:00] START grok grok-4.6 grok-4.6-medium 16
+[01:21:01] START grok grok-4.6 grok-4.6-medium 16
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 107: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/religion/answers.jsonl: No such file or directory
+./bench-512qa-v3.sh: line 179: /home/vgpnk/Projects/xbgst/xbrd-spark/benchmarks/dry-hump/telemetry-512qa-multi/runs/grok-4.6-medium/batch-times.jsonl: No such file or directory

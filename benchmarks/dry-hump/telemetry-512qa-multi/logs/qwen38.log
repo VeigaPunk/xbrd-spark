@@ -1,0 +1,5 @@
+[retry] 499 cells flagged for re-dispatch
+jq: invalid JSON text passed to --argjson
+Use jq --help for help with command-line options,
+or see the jq manpage, or online docs at https://jqlang.org
+DONE qwen3.8-max-low ok=28/512 fail=3 wall=867.978s tps=0.00 mut_ok=0/1

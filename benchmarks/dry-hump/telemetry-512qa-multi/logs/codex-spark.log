@@ -1,0 +1,2 @@
+[retry] 512 cells flagged for re-dispatch
+DONE codex-spark-golden ok=0/512 fail=544 wall=13.458s tps=null mut_ok=0/32

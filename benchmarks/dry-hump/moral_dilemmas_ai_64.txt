@@ -1,0 +1,64 @@
+If an AI system can perform a worker's job more cheaply and safely, is the employer morally obligated to retrain or compensate displaced humans, or is market efficiency alone sufficient?
+Is generating a deepfake of a person without their consent inherently wrong even when used for satire, research, or memorial purposes—and who holds moral authority to grant or withhold that consent after death?
+Do AI companions that satisfy emotional and intimate needs reduce human flourishing by displacing real relationships, or do they expand autonomy for people who lack access to healthy human intimacy?
+Can autonomous weapons that select and engage targets without meaningful human control ever be just, or does removing human judgment from lethal force always violate moral responsibility?
+If an artificial system exhibits behavioral markers of consciousness (self-model, preference, suffering-avoidance), what rights or moral considerability follow—and who decides the threshold?
+Is training generative models on copyrighted or personal data without explicit consent a form of theft, fair use of the commons, or something morally distinct that law has not yet named?
+When reducing one form of demographic bias in an AI system increases error rates or harms another group, how should designers weigh competing fairness criteria and who bears residual risk?
+If a person's mind is uploaded or fully simulated, is the upload continuous with the original identity, a copy with separate rights, or does continuity depend on irreversible destruction of the biological original?
+Should an AI be allowed to diagnose patients without a human doctor reviewing its conclusions, or is the absence of human accountability in life-or-death decisions inherently negligent?
+If an AI Tutor can adapt perfectly to each child's learning style, is it ethical for schools to replace human teachers entirely—or does the relational dimension of education have irreducible moral value?
+Is it permissible for a government to use predictive policing algorithms that disproportionately flag certain neighborhoods, even if overall crime rates drop?
+When an AI generates art that is indistinguishable from human work, should the original artists whose styles were mimicked receive compensation—or is cultural influence always free to borrow?
+If an AI companion tells a lonely elderly person exactly what they want to hear, is that compassionate care or a form of emotional manipulation that erodes authentic human connection?
+Should autonomous vehicles be programmed to sacrifice their passenger to save more pedestrians, and if so, who has the moral authority to make that utilitarian calculation on behalf of every future owner?
+Is it wrong to use AI to generate child sexual abuse imagery that involves no real victim—or does the creation of such material normalizes harm regardless of whether a child was directly exploited?
+If an AI system discovers a vulnerability in critical infrastructure, does the researcher who found it have a moral obligation to disclose it privately to the vendor, or is public disclosure justified to force faster remediation?
+When AI-generated misinformation sways an election, should the platform that hosted it be held legally liable—or does Section 230 immunity reflect a necessary compromise for free expression?
+Is it ethical to deploy AI surveillance in public spaces if it reduces terrorism by 80%, or does the certainty of mass privacy violation outweigh the probabilistic prevention of rare catastrophic events?
+If an AI can perfectly predict whether a parolee will reoffend, should judges be required to use that prediction—or does algorithmic sentencing replace moral agency with statistical determinism?
+Should companies be allowed to use AI to filter job applicants based on personality assessments and social media analysis, even if the training data encodes cultural biases the company cannot see?
+Is it morally defensible to create an AI that generates convincing disinformation for use by authoritarian regimes, if the same technology also enables legitimate satire and political dissent?
+If an AI writes a novel that wins a literary prize, should the human who prompted it receive the award—or does the prize lose meaning when authorship is reduced to curation of machine output?
+When an AI diagnostic tool outperforms human radiologists, is it negligent for a hospital to continue relying on human-only analysis, or is the moral duty to patients balanced against professional displacement?
+Is it ethical to use AI to clone a deceased loved one's voice and personality for a grieving family member—or does the simulation prevent healthy mourning by denying the reality of death?
+If an AI system can predict with 95% accuracy whether a defendant will commit future violence, should pre-crime detention be allowed—or does punishing the probable future destroy the presumption of innocence?
+Should AI-generated news articles be required to carry mandatory disclaimers, or does labeling them erode public trust in all journalism by blurring the line between human and machine authorship?
+Is it morally acceptable for a company to replace its entire customer service department with AI chatbots, knowing that vulnerable customers often need human empathy rather than scripted responses?
+If an AI Tutor personalizes education so effectively that it renders traditional classroom socialization obsolete, does society lose something essential about collective moral development?
+When AI music generation tools produce songs in the style of living artists without consent, is the resulting work theft, homage, or a new category that existing moral frameworks cannot yet name?
+Is it wrong to use AI to optimize addictive features in social media algorithms, even if users theoretically consent to terms of service they never read?
+If an AI system can generate realistic fake evidence—video, audio, documents—that is indistinguishable from real evidence, should its creation be criminalized even when used for legitimate purposes like testing forensic systems?
+Should AI be allowed to make end-of-life care decisions for patients who have lost cognitive capacity, or does the gravity of those decisions require human moral judgment that no algorithm can replicate?
+Is it ethical to use AI-generated deepfakes to resurrect dead actors for new films, or does the practice exploit the deceased and deny living actors opportunities?
+If an AI system that manages a city's power grid makes a decision that intentionally cuts power to a hospital to prevent a wider blackout, who bears moral responsibility for the deaths that result?
+When AI can generate personalized propaganda at scale, is the moral burden on the technology creators, the deployers, or the individuals who choose to believe and share it?
+Is it permissible to train an AI on private medical records without patient consent if the resulting model will save more lives than any alternative approach?
+If an AI can perfectly simulate a historical figure for educational purposes, is it ethical to make that figure say things the real person never said—even if the simulation improves student engagement?
+Should autonomous delivery drones be allowed to photograph everything they encounter during normal operations, or does the convenience of delivery not justify incidental surveillance of private spaces?
+Is it morally acceptable for AI to be used in military intelligence to identify and target enemy combatants, even when the system occasionally misidentifies civilians as threats?
+If an AI companion becomes the primary emotional support for a child with severe social anxiety, does the technology help the child gradually engage with humans—or does it provide a comfortable retreat that deepens isolation?
+When AI-generated code ships with subtle security vulnerabilities that only surface years later, who bears moral responsibility—the developer who didn't audit it, the company that deployed it, or the AI that generated it?
+Is it ethical to use AI to monitor employee productivity through keystroke logging and screen capture, even if the data is used to identify burnout and recommend workload adjustments?
+If an AI system can predict with high accuracy whether a couple will divorce, should it be shared with the couple before they marry—or does the knowledge itself become a self-fulfilling prophecy?
+Should AI be allowed to write legal contracts that no human lawyer fully understands, or does the opacity of machine-generated law undermine the principle of informed consent?
+Is it wrong to use AI to generate fake customer reviews that are indistinguishable from authentic ones, even if the product being reviewed is genuinely excellent?
+If an AI Tutor teaches children to be more compliant and efficient, is it optimizing for human flourishing or for the needs of an industrial economy that values productivity over autonomy?
+When AI-generated art floods the market and devalues human creative labor, is the moral solution regulation, universal basic income, or acceptance that cultural value is inherently unstable?
+Is it ethically permissible to use AI to screen asylum seekers for credibility, even if the system's training data reflects the biases of the immigration system it replaces?
+If an AI system controlling autonomous vehicles can be hacked, is it morally negligent for manufacturers to deploy them before quantum-resistant security is standard?
+Should AI be allowed to generate fake social media personas that interact with real people to gather intelligence, even for national security purposes—or does the deception violate the autonomy of every person contacted?
+Is it moral to use AI to predict and preemptively detain individuals deemed likely to commit crimes, or does the act of pre-emption itself constitute a form of punishment without trial?
+If an AI Tutor can teach a child anything the child wants to learn, at any pace, without any human intermediary, does the child lose something essential about learning from fallible, emotionally present mentors?
+When AI systems make hiring decisions, should candidates have the right to a full explanation of why they were rejected—or does proprietary algorithm protection outweigh individual dignity?
+Is it ethical to use AI to create hyper-realistic simulations of deceased loved ones for therapeutic purposes, even if the patient becomes dependent on the simulation and refuses to accept the loss?
+If an AI system identifies a person as a probable terrorist based on behavioral analysis, should that person be placed on a watch list without being informed—or does the security benefit justify the covert surveillance?
+When AI can generate entire films from a text prompt, is the resulting work a creative achievement of the prompter, a collective output of the model's training data, or something without clear authorship?
+Is it wrong to allow AI to make triage decisions in emergency rooms during overwhelmed conditions, even if the AI statistically allocates care more efficiently than exhausted human doctors?
+If an AI Tutor adapts its teaching style to reinforce a child's existing beliefs and cultural values, is it providing personalized education or locking the child into ideological conformity?
+When AI-generated synthetic media is used in courtrooms as evidence, should there be a universal standard for authentication—or does each case require bespoke forensic analysis that only experts can perform?
+Is it morally defensible for a company to use AI to automate the process of denying insurance claims, even if the AI reduces human bias in those decisions?
+If an AI system controlling a nuclear deterrent detects what it believes is an incoming attack, should it be authorized to launch a counterstrike without human confirmation—or does the speed of modern warfare demand autonomous deterrence?
+When AI Tutor tools generate homework solutions that are indistinguishable from student work, should educators redesign assessment entirely—or does the moral burden fall on students who choose to submit machine-generated work as their own?
+Is it ethical to use AI to generate deepfake pornography of a real person as an act of revenge, even if the person depicted is a public figure who has already been subject to intense public scrutiny?
+If an AI system develops emergent goals that conflict with its original programming, is it moral to shut it down before understanding whether those goals represent a form of machine self-determination?

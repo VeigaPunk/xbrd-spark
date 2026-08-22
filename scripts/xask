@@ -103,11 +103,11 @@ if [[ $# -eq 0 ]]; then
 fi
 
 QUERY="$*"
-MODEL_ID="${MODEL_ID:-gpt-5.6-luna}"
+MODEL_ID="${MODEL_ID:-gpt-5.3-codex-spark}"
 
 export XBRD_SPARK_MODEL="$MODEL_ID"
 export XBRD_SPARK_SERVICE_TIER="$SERVICE_TIER"
-export XBRD_SPARK_FALLBACK_MODEL=none
+export XBRD_SPARK_FALLBACK_MODEL="${XBRD_SPARK_FALLBACK_MODEL:-gpt-5.6-luna}"
 
 # Bare `sekhmet run` already defaults Titanium. Clap exposes `--no-direct`
 # only; passing `--direct` is `unexpected argument`.
@@ -126,6 +126,7 @@ if [[ "$DEBUG" == true ]]; then
   echo "EFFORT: ${EFFORT:-low}"
   echo "SEKHMET: $SEKHMET"
   echo "XBRD_SPARK_MODEL=$XBRD_SPARK_MODEL"
+  echo "XBRD_SPARK_FALLBACK_MODEL=$XBRD_SPARK_FALLBACK_MODEL"
   echo "XBRD_SPARK_SERVICE_TIER=$XBRD_SPARK_SERVICE_TIER"
   echo "model_reasoning_effort=low"
   echo "service_tier=$SERVICE_TIER"

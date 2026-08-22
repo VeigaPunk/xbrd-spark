@@ -5,14 +5,14 @@ Always-available pure L3 swarm dispatch substrate (xbreed layer 3). No judge, no
 **Runtime target:** Codex Titanium (`CODEX_BIN` → `codex-titanium` → non-stub `codex`; omarchy npx stub skipped) on **ChatGPT OAuth** (not platform API key). **Never** symlink titanium as `codex`. **`xask-l3`** = thin `sekhmet run --direct` shim on `PATH` (PATH **`xask`** is xbreed protocol ask).
 
 **Models (xbgst L3 workers — same isolation/swarm surface):**
-- Primary: **`gpt-5.6-luna`** (`XBRD_SPARK_MODEL`)
-- Fallback chain (crate default): **none** — set `XBRD_SPARK_FALLBACK_MODEL` to enable auto-retry
+- Primary: **`gpt-5.3-codex-spark`** (`XBRD_SPARK_MODEL`)
+- Fallback chain (crate default): **`gpt-5.6-luna`** — override or disable via `XBRD_SPARK_FALLBACK_MODEL`
 - Always on Titanium path:
   - `-c model_reasoning_effort=low`
   - `-c service_tier=default` (neutral default; opt in to Fast mode with `XBRD_SPARK_SERVICE_TIER=fast`)
 - Swarm: **`-j 64`** default / hard cap (`XBRD_SPARK_JOBS`)
-- Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1` (no-op unless a chain is set)
-- Disable auto-fallback: unset / `XBRD_SPARK_FALLBACK_MODEL=none` (crate default is already empty)
+- Force fallback without probing primary: `XBRD_SPARK_USE_FALLBACK=1` (uses the crate chain `gpt-5.6-luna` unless env overrides)
+- Disable auto-fallback: `XBRD_SPARK_FALLBACK_MODEL=none` (empty / `off` / `0` also disable)
 - Meta: `model` + optional `model_fallback_from`
 
 Agents that should call it:
@@ -98,7 +98,7 @@ Keep in-session: **pastebin.com URL + short counts** (ok/fail/timeout/wall). Scr
 
 ## Provider quota
 
-If Titanium returns **usage_limit** / `model_unsupported` / `model_chatgpt_unsupported` on the primary model, sekhmet **automatically retries only when** `XBRD_SPARK_FALLBACK_MODEL` is set (effort low + the selected service tier), then latches that model for the rest of the process. Crate default chain is empty — luna primary does not auto-retry onto itself.
+If Titanium returns **usage_limit** / `model_unsupported` / `model_chatgpt_unsupported` on the primary model, sekhmet **automatically retries the fallback chain** — crate default `gpt-5.6-luna`, override or disable with `XBRD_SPARK_FALLBACK_MODEL` (effort low + the selected service tier), then latches that model for the rest of the process. A chain entry equal to the primary is skipped, so an explicit luna primary does not auto-retry onto itself.
 
 For 403 websocket / 429 rate_limit / auth failures: no model fallback — stop or lower `-j`, prefer dry-run gates.
 

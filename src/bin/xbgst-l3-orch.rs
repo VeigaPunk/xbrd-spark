@@ -1,6 +1,6 @@
 //! xbgst L3 orch — 120m autonomous sekhmet waves under xbgst ship rules.
 //!
-//! - Up to 64 concurrent Titanium workers (ChatGPT OAuth; luna + explicit service tier)
+//! - Up to 64 concurrent Titanium workers (ChatGPT OAuth; codex-spark primary, luna fallback, explicit service tier)
 //! - Task kinds: issue analysis, review, polish, improve (xbgst roles)
 //! - Strict-improvement ship: gates green + tree changed → commit + push `main`
 //! - Tmp auto-clean after every wave (`--no-keep`, gc, purge /tmp sekhmet-*)
@@ -336,6 +336,7 @@ fn run() -> Result<()> {
             .arg("--root")
             .arg(&root)
             .env("XBRD_SPARK_MODEL", &cli.model)
+            // Force FALLBACK=none so each wave is isolated (no process-wide luna latch).
             .env("XBRD_SPARK_FALLBACK_MODEL", "none")
             .env("XBRD_SPARK_SERVICE_TIER", &cli.service_tier)
             .env("XBRD_SPARK_ROOT", &root)

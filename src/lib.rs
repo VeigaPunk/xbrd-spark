@@ -26,21 +26,23 @@ pub const MAX_SWARM_CONCURRENCY: usize = 64;
 
 /// Default Titanium model for pure L3 sparks under **xbgst** (override: `XBRD_SPARK_MODEL`).
 ///
-/// Pin is **`gpt-5.6-luna`** + `service_tier=default` + `model_reasoning_effort=low`.
-/// Crate default fallback chain is empty (set `XBRD_SPARK_FALLBACK_MODEL` to enable).
+/// Pin is **`gpt-5.3-codex-spark`** + `service_tier=default` + `model_reasoning_effort=low`.
+/// Crate default fallback chain is `["gpt-5.6-luna"]` (override or disable via
+/// `XBRD_SPARK_FALLBACK_MODEL`).
 /// Never use fused slug `gpt-5.6-luna-fast` — tier is a separate `-c service_tier=…` flag.
-pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.6-luna";
+pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
 
-/// Slug const for an optional OAuth fallback candidate. Does **not** feed `DEFAULT_FALLBACK_CHAIN`.
+/// Slug const for the OAuth fallback candidate; feeds `DEFAULT_FALLBACK_CHAIN`.
 pub const DEFAULT_FALLBACK_MODEL: &str = "gpt-5.6-luna";
 
 /// Neutral service tier for Titanium exec. Override with the explicit `fast`
 /// selection through `XBRD_SPARK_SERVICE_TIER`.
 pub const DEFAULT_SERVICE_TIER: &str = "default";
 
-/// Default fallback chain: empty (no auto-retry). Comma-separated override via env.
-/// Disable: empty / `none` / `off` / `0`. Do not add spark/luna into this crate default.
-pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &[];
+/// Default fallback chain: `["gpt-5.6-luna"]` — auto-retry onto luna when the
+/// codex-spark primary is quota-blocked or rejected. Comma-separated override via env.
+/// Disable: empty / `none` / `off` / `0`.
+pub const DEFAULT_FALLBACK_CHAIN: &[&str] = &["gpt-5.6-luna"];
 
 /// Process-wide: skip primary after usage_limit (swarm efficiency).
 static FALLBACK_LATCHED: AtomicBool = AtomicBool::new(false);
@@ -699,7 +701,7 @@ pub fn primary_spark_model() -> String {
 /// Fallback chain when primary is quota-blocked / model rejected. Empty disables.
 ///
 /// `XBRD_SPARK_FALLBACK_MODEL` may be a single model or a comma-separated chain.
-/// Default (no env): empty — auto-retry only when the operator sets the env.
+/// Default (no env): crate chain `["gpt-5.6-luna"]` — set the env to override or disable.
 pub fn fallback_spark_models() -> Vec<String> {
     match env::var("XBRD_SPARK_FALLBACK_MODEL") {
         Ok(s) => {
@@ -1516,7 +1518,7 @@ fn run_spark(
     };
 
     // Automatic model fallback chain: usage_limit / model_unsupported → next model.
-    // Crate default chain is empty; set XBRD_SPARK_FALLBACK_MODEL to enable.
+    // Crate default chain is ["gpt-5.6-luna"]; override/disable via XBRD_SPARK_FALLBACK_MODEL.
     // Fallback keeps the caller-selected validated tier and effort low.
     let origin_model = meta.model.clone();
     let mut tried: Vec<String> = vec![meta.model.clone()];
@@ -2920,8 +2922,8 @@ mod tests {
         }
         let _g = TEST_ENV_LOCK.lock().unwrap();
         let prev = env::var_os("XBRD_SPARK_SERVICE_TIER");
-        // Pass a model ≠ primary so -m is proven (both consts may be luna).
-        let explicit = "gpt-5.3-codex-spark";
+        // Pass a model ≠ primary so -m is proven (primary is codex-spark).
+        let explicit = "gpt-5.6-luna";
         env::set_var("XBRD_SPARK_SERVICE_TIER", "default");
         let (_, args) = find_dispatcher(true, false, explicit, true).unwrap();
         assert!(args.windows(2).any(|w| w[0] == "-m" && w[1] == explicit));
@@ -2978,21 +2980,21 @@ mod tests {
         env::remove_var("XBRD_SPARK_USE_FALLBACK");
 
         assert_eq!(primary_spark_model(), DEFAULT_SPARK_MODEL);
-        assert_eq!(fallback_spark_model(), None);
+        assert_eq!(fallback_spark_model().as_deref(), Some("gpt-5.6-luna"));
         let (m, from) = resolve_run_model();
         assert_eq!(m, DEFAULT_SPARK_MODEL);
         assert!(from.is_none());
 
-        // Empty crate chain: USE_FALLBACK=1 still stays on primary with no from.
+        // Crate chain ["gpt-5.6-luna"]: USE_FALLBACK=1 jumps to luna with from=primary.
         env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
         let (m2, from2) = resolve_run_model();
-        assert_eq!(m2, DEFAULT_SPARK_MODEL);
-        assert!(from2.is_none());
+        assert_eq!(m2, "gpt-5.6-luna");
+        assert_eq!(from2.as_deref(), Some(DEFAULT_SPARK_MODEL));
 
-        // Explicit distinct fallback + USE_FALLBACK → that slug + from=primary.
-        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.3-codex-spark");
+        // Explicit fallback (chain entry, distinct from primary) + USE_FALLBACK.
+        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.6-luna");
         let (m3, from3) = resolve_run_model();
-        assert_eq!(m3, "gpt-5.3-codex-spark");
+        assert_eq!(m3, "gpt-5.6-luna");
         assert_eq!(from3.as_deref(), Some(DEFAULT_SPARK_MODEL));
         env::remove_var("XBRD_SPARK_USE_FALLBACK");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
@@ -3033,13 +3035,13 @@ mod tests {
     }
 
     #[test]
-    fn default_model_is_luna_xbgst_primary() {
+    fn default_model_is_codex_spark_xbgst_primary() {
         let _g = TEST_ENV_LOCK.lock().unwrap();
         clear_fallback_latch();
         let prev = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         env::remove_var("XBRD_SPARK_FALLBACK_MODEL");
-        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.6-luna");
-        assert!(fallback_spark_models().is_empty());
+        assert_eq!(DEFAULT_SPARK_MODEL, "gpt-5.3-codex-spark");
+        assert_eq!(fallback_spark_models(), vec!["gpt-5.6-luna".to_string()]);
         assert_eq!(DEFAULT_FALLBACK_MODEL, "gpt-5.6-luna");
         match prev {
             Some(v) => env::set_var("XBRD_SPARK_FALLBACK_MODEL", v),
@@ -3055,8 +3057,8 @@ mod tests {
         let prev_f = env::var_os("XBRD_SPARK_FALLBACK_MODEL");
         let prev_u = env::var_os("XBRD_SPARK_USE_FALLBACK");
         env::remove_var("XBRD_SPARK_MODEL");
-        // Distinct fallback so meta proves fallback_from (both consts are luna).
-        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.3-codex-spark");
+        // Distinct fallback so meta proves fallback_from (primary is codex-spark).
+        env::set_var("XBRD_SPARK_FALLBACK_MODEL", "gpt-5.6-luna");
         env::set_var("XBRD_SPARK_USE_FALLBACK", "1");
         let tmp = TempDir::new().unwrap();
         let root = tmp.path();
@@ -3066,7 +3068,7 @@ mod tests {
         let meta: Meta =
             serde_json::from_str(&fs::read_to_string(root.join(id).join("meta.json")).unwrap())
                 .unwrap();
-        assert_eq!(meta.model, "gpt-5.3-codex-spark");
+        assert_eq!(meta.model, "gpt-5.6-luna");
         assert_eq!(
             meta.model_fallback_from.as_deref(),
             Some(DEFAULT_SPARK_MODEL)

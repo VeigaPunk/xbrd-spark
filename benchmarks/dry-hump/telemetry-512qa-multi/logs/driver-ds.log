@@ -1,0 +1,32 @@
+[03:31:50] START alibaba-token-plan/deepseek-v4-pro-0813 ds-pro-0813
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+[retry] 0 cells flagged for re-dispatch
+DONE ds-pro-0813 ok=0/0 fail=0 wall=0.032s tps=null mut_ok=0/0
+[03:31:50] END ds-pro-0813 rc=0
+[03:31:50] START alibaba-token-plan/deepseek-v4-flash-0731 ds-flash-0731
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+./bench-512qa-tp.sh: line 36: TPROFILE: unbound variable
+[retry] 0 cells flagged for re-dispatch
+DONE ds-flash-0731 ok=0/0 fail=0 wall=0.031s tps=null mut_ok=0/0
+[03:31:50] END ds-flash-0731 rc=0
+[03:31:50] DS-TRACK-DONE
+[03:32:42] START alibaba-token-plan/deepseek-v4-pro-0813 ds-pro-0813
+[04:02:39] START-PARALLEL flash ds-flash-0731
+[retry] 67 cells flagged for re-dispatch
+[retry] 48 cells flagged for re-dispatch
+DONE ds-flash-0731 ok=445/512 fail=107 wall=1478.193s tps=null mut_ok=0/40
+[04:27:17] END-PARALLEL flash rc=0
+DONE ds-pro-0813 ok=397/445 fail=83 wall=3294.941s tps=null mut_ok=0/35

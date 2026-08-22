@@ -19,6 +19,17 @@ DOMAIN_LABEL = {
     "money": "money",
 }
 
+CONFIG_MODEL = {
+    "grok-4.6-low": "grok-4.6",
+    "grok-4.6-high": "grok-4.6",
+    "grok-4.6-default": "grok-4.6",
+    "qwen3.8-max-low": "qwen3.8-max",
+    "sol-fast-titanium": "gpt-5.6-sol",
+    "luna-fast-titanium": "gpt-5.6-luna",
+    "ds-flash-0731": "deepseek-v4-flash-0731",
+    "ds-pro-0813": "deepseek-v4-pro-0813",
+}
+
 
 def md_inline(s: str) -> str:
     s = html.escape(s)
@@ -313,6 +324,7 @@ a { color: inherit; }
 def render(data: dict, utc: str, rev: str) -> str:
     passages = data.get("passages") or []
     critic_label = html.escape(str(data.get("critic_label") or "Qwen 3.8 Max"))
+    bank = int(data.get("bank_n") or 5235)
     toc = []
     essays = []
     for i, p in enumerate(passages, 1):
@@ -324,16 +336,19 @@ def render(data: dict, utc: str, rev: str) -> str:
         critic = html.escape(str(p.get("critic") or ""))
         tag = html.escape(str(p.get("tag") or ""))
         cfg = html.escape(str(p.get("config") or ""))
+        raw_model = str(p.get("model") or CONFIG_MODEL.get(str(p.get("config") or ""), p.get("config") or "model"))
+        model = html.escape(raw_model)
         stamp = html.escape(DOMAIN_LABEL.get(domain, domain))
+        rankline = html.escape(f"#{i} by {raw_model} · {i}/{bank}")
         toc.append(
             f'<a href="#{pid}"><span class="toc-n">{n}</span>'
             f'<span><span class="toc-q">{critic}</span>'
-            f'<div class="toc-meta">{stamp} · {tag}</div></span></a>'
+            f'<div class="toc-meta">{rankline} · {stamp} · {tag}</div></span></a>'
         )
         essays.append(
             f'<article class="essay" id="{pid}">'
-            f'<div class="essay-head"><span class="stamp {dclass}"><i></i>{stamp}</span>'
-            f'<span>{n} · {cfg}</span></div>'
+            f'<div class="essay-head"><span class="rank">{rankline}</span>'
+            f'<span>{stamp} · {cfg}</span></div>'
             f'<h2>{q}</h2>'
             f'<blockquote class="pull">{critic}<cite>{critic_label}</cite></blockquote>'
             f'<div class="prose">{md_block(str(p.get("answer") or ""))}</div>'
@@ -346,27 +361,39 @@ def render(data: dict, utc: str, rev: str) -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0c0c0b">
 <title>512QA — highlights</title>
-<meta name="description" content="Nine punches from a 512-question moral arcade. Dark, funny, unhinged.">
-<style>
-{CSS}
-</style>
+<meta name="description" content="Independent punches from a {bank}-answer moral arcade. JetBrainsMonoNL Nerd Font Mono.">
+<link rel="preload" href="fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/family.css">
 </head>
 <body>
-<header class="mast">
-  <span>xbrd-spark · 512QA</span>
-  <nav><a href="index.html">fleet board</a></nav>
+<header class="top">
+  <div class="navwrap">
+    <a class="brand" href="index.html">512QA</a>
+    <nav class="desk">
+      <a href="index.html">Fleet</a>
+      <a class="on" href="highlights.html">Highlights</a>
+      <a href="picks.html">Independent top 10</a>
+    </nav>
+  </div>
 </header>
-<section class="hero">
-  <p class="kicker">moral-dilemma arcade</p>
-  <h1>Highlights.</h1>
-  <p class="lede">Not a spreadsheet. {n} questions where the models got vicious, funny, or uncomfortably honest — with {critic_label} picking the line that should live on the wall.</p>
-</section>
-<nav class="toc" aria-label="Punchlines">
+<main>
+<section class="band"><div class="wrap">
+  <p class="eyebrow">VeigaPunk · xbrd-spark · pass 1</p>
+  <h1 class="hero">Highlights.</h1>
+  <p class="lede">{n} punches from a {bank}-row ok-bank, Grok-shortlisted, {critic_label} on the wall. Independent per-model top 10s: <a class="u" href="picks.html">pass 2</a>.</p>
+  <div class="row">
+    <a class="btn" href="picks.html">Independent top 10 →</a>
+    <a class="btn ghost" href="index.html">Fleet board</a>
+  </div>
+</div></section>
+<nav class="wrap toc" aria-label="Punchlines">
 {"".join(toc)}
 </nav>
 {"".join(essays)}
-<footer class="foot">generated {html.escape(utc)} @ {html.escape(rev)} · <a href="index.html">fleet index</a> · <a href="https://github.com/VeigaPunk/xbrd-spark">github</a></footer>
+</main>
+<footer class="bot"><div class="foot">generated {html.escape(utc)} @ {html.escape(rev)} · JetBrainsMonoNL Nerd Font Mono · <a href="https://github.com/VeigaPunk/xbrd-spark">github</a></div></footer>
 </body>
 </html>
 """

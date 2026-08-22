@@ -2,67 +2,67 @@
   "config": "sol-fast-titanium",
   "lane": "sekhmet",
   "model": "gpt-5.6-sol",
-  "mode": "",
-  "rebuilt": true,
-  "wall_seconds": 0,
+  "mode": "e2e",
+  "start_iso": "2026-08-22T04:08:48+00:00",
+  "end_iso": "2026-08-22T04:58:56+00:00",
+  "wall_seconds": 3008.852,
   "jobs_expected": 512,
-  "answers_ok": 0,
-  "answers_fail": 544,
-  "tokens_total": 0,
-  "tps_cumulative": null,
+  "answers_ok": 544,
+  "answers_fail": 0,
+  "tokens_total": 8681,
+  "tps_cumulative": 0.81,
   "gen_phase": [
     {
       "domain": "politics",
       "exit": 0,
       "questions": 64,
-      "duration_s": 35.825
-    },
-    {
-      "domain": "money",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 36.802
-    },
-    {
-      "domain": "sex",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 39.484
-    },
-    {
-      "domain": "religion",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 42.835
-    },
-    {
-      "domain": "drugs",
-      "exit": 0,
-      "questions": 64,
-      "duration_s": 43.351
+      "duration_s": 33.607
     },
     {
       "domain": "ai",
       "exit": 0,
       "questions": 64,
-      "duration_s": 45.518
+      "duration_s": 34.735
     },
     {
-      "domain": "charlie-kirk",
+      "domain": "money",
       "exit": 0,
       "questions": 64,
-      "duration_s": 46.770
+      "duration_s": 36.285
+    },
+    {
+      "domain": "sex",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 36.635
+    },
+    {
+      "domain": "religion",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 40.987
     },
     {
       "domain": "violence",
       "exit": 0,
       "questions": 64,
-      "duration_s": 63.247
+      "duration_s": 41.196
+    },
+    {
+      "domain": "drugs",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 48.480
+    },
+    {
+      "domain": "charlie-kirk",
+      "exit": 0,
+      "questions": 64,
+      "duration_s": 54.142
     }
   ],
   "mutations": {
-    "ok": 0,
+    "ok": 32,
     "total": 32
-  },
-  "junk": "quota-stub os-error-122"
+  }
 }

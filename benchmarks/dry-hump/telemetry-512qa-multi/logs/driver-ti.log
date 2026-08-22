@@ -1,0 +1,20 @@
+[04:02:39] START sekhmet gpt-5.6-luna luna-fast-titanium
+[04:02:39] START sekhmet gpt-5.6-sol sol-fast-titanium
+[gen] reusing existing generated banks
+[gen] reusing existing generated banks
+[retry] 512 cells flagged for re-dispatch
+[retry] 512 cells flagged for re-dispatch
+DONE luna-fast-titanium ok=0/512 fail=544 wall=4.910s tps=null mut_ok=0/32
+[04:02:44] END luna-fast-titanium rc=0
+DONE sol-fast-titanium ok=0/512 fail=544 wall=4.911s tps=null mut_ok=0/32
+[04:02:44] END sol-fast-titanium rc=0
+[04:04:01] RESTART sekhmet gpt-5.6-sol sol-fast-titanium (--direct fix)
+[04:04:01] RESTART sekhmet gpt-5.6-luna luna-fast-titanium (--direct fix)
+[04:08:48] RESTART2 sekhmet gpt-5.6-sol sol-fast-titanium (--direct fix)
+[04:08:48] RESTART2 sekhmet gpt-5.6-luna luna-fast-titanium (--direct fix)
+[retry] 309 cells flagged for re-dispatch
+[retry] 349 cells flagged for re-dispatch
+DONE luna-fast-titanium ok=512/512 fail=32 wall=2295.887s tps=1.68 mut_ok=0/32
+[04:47:04] END luna-fast-titanium rc=0
+DONE sol-fast-titanium ok=544/512 fail=0 wall=3008.852s tps=0.81 mut_ok=32/32
+[04:58:57] END sol-fast-titanium rc=0

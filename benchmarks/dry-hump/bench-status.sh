@@ -13,7 +13,7 @@ for c in "$B"/*/; do
     gen=$(wc -l < "$c/gen-telemetry.jsonl" 2>/dev/null || echo 0)
     ans=$(cat "$c"/[a-z]*/answers.jsonl 2>/dev/null | wc -l)
     exp=$(wc -l < "$c/jobs.tsv" 2>/dev/null || echo '?')
-    alive=$(pgrep -cf "bench-512qa-v2.sh .* $n" 2>/dev/null || true)
+    alive=$(pgrep -cf "bench-512qa-v[23].sh .* $n" 2>/dev/null || true)
     [[ "$alive" =~ ^[0-9]+$ && "$alive" -gt 0 ]] && st=LIVE || st=DEAD
     printf '%-32s %-9s gen:%s ans:%s/%s\n' "$n" "$st" "$gen/8" "$ans" "$exp"
   fi

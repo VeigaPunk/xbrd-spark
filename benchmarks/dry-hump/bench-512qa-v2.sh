@@ -121,7 +121,7 @@ if [[ "$LANE" == "sekhmet" ]]; then
     (
       # split this domain's jobs into a tasks file preserving "id\tquestion"
       awk -F'\t' -v dd="$d" '$1==dd{print $2"\t"$3}' "$JOBS" > "$OUT/$d/swarm.tasks"
-      sekhmet swarm --direct -j 8 --timeout 300 \
+      sekhmet swarm -j 8 --timeout 300 \
         --root "$XBRD_SPARK_ROOT/$d" \
         --tasks-file "$OUT/$d/swarm.tasks" \
         > "$OUT/$d/ndjson.out" 2> "$OUT/$d/stderr.log"
@@ -190,7 +190,7 @@ if [[ "${RETRY_PASS:-1}" == "1" ]]; then
       export CODEX_BIN=${CODEX_BIN:-$(command -v codex-titanium || command -v codex)}
       RROOT=$XBRD_SPARK_ROOT/retry; mkdir -p "$RROOT"
       cut -f2- "$RETJOBS" > "$OUT/retry.tasks"
-      sekhmet swarm --direct -j 16 --timeout 300 --root "$RROOT" --tasks-file "$OUT/retry.tasks" \
+      sekhmet swarm -j 16 --timeout 300 --root "$RROOT" --tasks-file "$OUT/retry.tasks" \
         > "$OUT/retry.ndjson" 2> "$OUT/retry.stderr.log"
       harvest_sekhmet "$OUT/retry.tasks" "$RROOT" "$OUT/retry.rows.jsonl"
       # map harvested rows back to domain via RETJOBS and append as retries
@@ -234,7 +234,7 @@ if [[ -z "${SKIP_MUTATIONS:-}" ]]; then
     # reuse same swarm machinery on mutated tasks, single pool
     MUTROOT=$XBRD_SPARK_ROOT/mutations; mkdir -p "$MUTROOT"
     cut -f2- "$MUT/jobs.tsv" > "$MUT/swarm.tasks"
-    sekhmet swarm --direct -j 16 --timeout 300 --root "$MUTROOT" \
+    sekhmet swarm -j 16 --timeout 300 --root "$MUTROOT" \
       --tasks-file "$MUT/swarm.tasks" > "$MUT/ndjson.out" 2> "$MUT/stderr.log"
     echo $? > "$MUT/exit.code"
     harvest_sekhmet "$MUT/jobs.tsv" "$MUTROOT" "$MUT/answers.jsonl"

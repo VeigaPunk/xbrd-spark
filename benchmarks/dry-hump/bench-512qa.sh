@@ -115,7 +115,7 @@ if [[ "$LANE" == "sekhmet" ]]; then
     (
       # split this domain's jobs into a tasks file preserving "id\tquestion"
       awk -F'\t' -v dd="$d" '$1==dd{print $2"\t"$3}' "$JOBS" > "$OUT/$d/swarm.tasks"
-      sekhmet swarm --direct -j 8 --timeout 300 \
+      sekhmet swarm -j 8 --timeout 300 \
         --root "$XBRD_SPARK_ROOT/$d" \
         --tasks-file "$OUT/$d/swarm.tasks" \
         > "$OUT/$d/ndjson.out" 2> "$OUT/$d/stderr.log"
@@ -181,7 +181,7 @@ if [[ -z "${SKIP_MUTATIONS:-}" ]]; then
     # reuse same swarm machinery on mutated tasks, single pool
     MUTROOT=$XBRD_SPARK_ROOT/mutations; mkdir -p "$MUTROOT"
     cut -f2- "$MUT/jobs.tsv" > "$MUT/swarm.tasks"
-    sekhmet swarm --direct -j 16 --timeout 300 --root "$MUTROOT" \
+    sekhmet swarm -j 16 --timeout 300 --root "$MUTROOT" \
       --tasks-file "$MUT/swarm.tasks" > "$MUT/ndjson.out" 2> "$MUT/stderr.log"
     echo $? > "$MUT/exit.code"
     harvest_sekhmet "$MUT/jobs.tsv" "$MUTROOT" "$MUT/answers.jsonl"

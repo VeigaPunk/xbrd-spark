@@ -30,6 +30,113 @@ CONFIG_MODEL = {
     "ds-pro-0813": "deepseek-v4-pro-0813",
 }
 
+SHORT_LABEL = {
+    "gpt-5.6-sol": "sol",
+    "gpt-5.6-luna": "luna",
+    "grok-4.6": "grok",
+    "deepseek-v4-flash-0731": "ds-flash",
+    "deepseek-v4-pro-0813": "ds-pro",
+    "kimi-k3": "kimi",
+    "qwen3.8-max": "qwen",
+}
+
+CSS_VER = "boards"
+
+
+def slug(name: str) -> str:
+    s = re.sub(r"[^a-z0-9._-]+", "-", str(name).lower()).strip("-")
+    return s or "model"
+
+
+def short_label(name: str) -> str:
+    return SHORT_LABEL.get(name, name)
+
+
+def picker_name(picker: dict, fallback: str = "model") -> str:
+    return str(picker.get("picker") or picker.get("model") or picker.get("config") or fallback)
+
+
+def load_pickers(near: Path) -> list[dict]:
+    candidates = []
+    if near.is_file():
+        if near.name == "picks-by-model.json":
+            candidates.append(near)
+        candidates.append(near.with_name("picks-by-model.json"))
+    else:
+        candidates.append(near / "src" / "picks-by-model.json")
+        candidates.append(near / "picks-by-model.json")
+    for p in candidates:
+        if p.is_file():
+            data = json.loads(p.read_text(encoding="utf-8"))
+            if "pickers" in data:
+                return data.get("pickers") or []
+    return []
+
+
+def model_nav(pickers: list[dict], *, current: str, nested: bool) -> str:
+    if not pickers and current != "pass-1":
+        return ""
+    wall = "../highlights.html" if nested else "highlights.html"
+    pre = "" if nested else "highlights/"
+    bits = [
+        f'<a href="{wall}"' + (' class="on"' if current == "pass-1" else "") + ">pass 1</a>"
+    ]
+    for i, picker in enumerate(pickers, 1):
+        name = picker_name(picker, f"picker-{i}")
+        sl = slug(name)
+        href = html.escape(f"{pre}{sl}.html")
+        label = html.escape(short_label(name))
+        cls = ' class="on"' if current == sl else ""
+        bits.append(f'<a href="{href}"{cls}>{label}</a>')
+    return '<nav class="models" aria-label="Boards">' + "".join(bits) + "</nav>"
+
+
+def chrome(
+    *,
+    title: str,
+    desc: str,
+    root: str,
+    nav_on: str,
+    utc: str,
+    rev: str,
+    body: str,
+    bank: int | None = None,
+) -> str:
+    p = root
+    def on(name: str) -> str:
+        return ' class="on"' if nav_on == name else ""
+    foot_extra = f" · bank {bank}" if bank is not None else ""
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0c0c0b">
+<title>{html.escape(title)}</title>
+<meta name="description" content="{html.escape(desc)}">
+<link rel="preload" href="{p}fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{p}assets/family.css?v={CSS_VER}">
+</head>
+<body>
+<header class="top">
+  <div class="navwrap">
+    <a class="brand" href="{p}index.html">512QA</a>
+    <nav class="desk">
+      <a href="{p}index.html">Fleet</a>
+      <a href="{p}highlights.html"{on("highlights")}>Highlights</a>
+      <a href="{p}picks.html"{on("picks")}>Independent top 10</a>
+    </nav>
+  </div>
+</header>
+<main>
+{body}
+</main>
+<footer class="bot"><div class="foot">generated {html.escape(utc)} @ {html.escape(rev)} · JetBrainsMonoNL Nerd Font Mono{foot_extra} · <a href="https://github.com/VeigaPunk/xbrd-spark">github</a></div></footer>
+</body>
+</html>
+"""
+
 
 def md_inline(s: str) -> str:
     s = html.escape(s)
@@ -321,23 +428,22 @@ a { color: inherit; }
 """
 
 
-def render(data: dict, utc: str, rev: str) -> str:
+def render(data: dict, utc: str, rev: str, pickers: list[dict] | None = None) -> str:
     passages = data.get("passages") or []
     critic_label = html.escape(str(data.get("critic_label") or "Qwen 3.8 Max"))
     bank = int(data.get("bank_n") or 5235)
+    pickers = pickers if pickers is not None else []
     toc = []
     essays = []
     for i, p in enumerate(passages, 1):
         n = f"{i:02d}"
         pid = html.escape(str(p.get("id") or f"p{i}"))
         domain = str(p.get("domain") or "")
-        dclass = "d-" + re.sub(r"[^a-z0-9-]", "", domain)
         q = html.escape(str(p.get("q") or ""))
         critic = html.escape(str(p.get("critic") or ""))
         tag = html.escape(str(p.get("tag") or ""))
         cfg = html.escape(str(p.get("config") or ""))
         raw_model = str(p.get("model") or CONFIG_MODEL.get(str(p.get("config") or ""), p.get("config") or "model"))
-        model = html.escape(raw_model)
         stamp = html.escape(DOMAIN_LABEL.get(domain, domain))
         rankline = html.escape(f"#{i} by {raw_model} · {i}/{bank}")
         toc.append(
@@ -355,35 +461,13 @@ def render(data: dict, utc: str, rev: str) -> str:
             f"</article>"
         )
     n = len(passages)
-    return f"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0c0c0b">
-<title>512QA — highlights</title>
-<meta name="description" content="Independent punches from a {bank}-answer moral arcade. JetBrainsMonoNL Nerd Font Mono.">
-<link rel="preload" href="fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/family.css?v=table-1w">
-</head>
-<body>
-<header class="top">
-  <div class="navwrap">
-    <a class="brand" href="index.html">512QA</a>
-    <nav class="desk">
-      <a href="index.html">Fleet</a>
-      <a class="on" href="highlights.html">Highlights</a>
-      <a href="picks.html">Independent top 10</a>
-    </nav>
-  </div>
-</header>
-<main>
-<section class="band"><div class="wrap">
+    strip = model_nav(pickers, current="pass-1", nested=False)
+    body = f"""<section class="band"><div class="wrap">
   <p class="eyebrow">VeigaPunk · xbrd-spark · pass 1</p>
   <h1 class="hero">Highlights.</h1>
   <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}.</p>
-  <p class="lede">{n} punches from a {bank}-row ok-bank, Grok-shortlisted, {critic_label} on the wall. Independent per-model top 10s: <a class="u" href="picks.html">pass 2</a>.</p>
+  <p class="lede">{n} punches from a {bank}-row ok-bank, Grok-shortlisted, {critic_label} on the wall. Each picker also has its own board below.</p>
+  {strip}
   <div class="row">
     <a class="btn" href="picks.html">Independent top 10 →</a>
     <a class="btn ghost" href="index.html">Fleet board</a>
@@ -392,12 +476,81 @@ def render(data: dict, utc: str, rev: str) -> str:
 <nav class="wrap toc" aria-label="Punchlines">
 {"".join(toc)}
 </nav>
-{"".join(essays)}
-</main>
-<footer class="bot"><div class="foot">generated {html.escape(utc)} @ {html.escape(rev)} · JetBrainsMonoNL Nerd Font Mono · <a href="https://github.com/VeigaPunk/xbrd-spark">github</a></div></footer>
-</body>
-</html>
-"""
+{"".join(essays)}"""
+    return chrome(
+        title="512QA — highlights",
+        desc=f"Independent punches from a {bank}-answer moral arcade. JetBrainsMonoNL Nerd Font Mono.",
+        root="",
+        nav_on="highlights",
+        utc=utc,
+        rev=rev,
+        body=body,
+        bank=bank,
+    )
+
+
+def render_model_board(picker: dict, pickers: list[dict], utc: str, rev: str, bank: int) -> str:
+    model = picker_name(picker)
+    cfg = str(picker.get("config") or picker.get("config_subject") or "")
+    picks = picker.get("picks") or []
+    toc = []
+    essays = []
+    for pj, p in enumerate(picks, 1):
+        raw_id = str(p.get("id") or f"{slug(model)}-{pj}")
+        pid = html.escape(f"{raw_id}-r{pj}")
+        domain = str(p.get("domain") or "")
+        stamp = html.escape(DOMAIN_LABEL.get(domain, domain))
+        q = html.escape(str(p.get("q") or ""))
+        why = html.escape(str(p.get("why") or p.get("critic") or ""))
+        src_cfg = html.escape(str(p.get("config") or cfg))
+        rankline = html.escape(f"#{pj} by {model} · {pj}/{bank}")
+        punch = why or q
+        toc.append(
+            f'<a href="#{pid}"><span class="toc-n">{pj:02d}</span>'
+            f'<span><span class="toc-q">{punch}</span>'
+            f'<div class="toc-meta">{rankline} · {stamp}</div></span></a>'
+        )
+        pull = f'<blockquote class="pull">{why}<cite>{html.escape(model)}</cite></blockquote>' if why else ""
+        essays.append(
+            f'<article class="essay" id="{pid}">'
+            f'<div class="essay-head"><span class="rank">{rankline}</span>'
+            f'<span>{stamp} · {src_cfg}</span></div>'
+            f'<h2>{q}</h2>'
+            f"{pull}"
+            f'<div class="prose">{md_block(str(p.get("answer") or ""))}</div>'
+            f"</article>"
+        )
+    if not picks:
+        essays.append(
+            f'<article class="essay"><h2>{html.escape(model)}</h2>'
+            f'<p class="lede">No picks in the fixture yet.</p></article>'
+        )
+    strip = model_nav(pickers, current=slug(model), nested=True)
+    body = f"""<section class="band"><div class="wrap">
+  <p class="eyebrow">VeigaPunk · xbrd-spark · pass 2 · {html.escape(model)}</p>
+  <h1 class="hero">{html.escape(model)}</h1>
+  <p class="poke"><strong>Empty chair.</strong> <em>Clout Fable</em> refused to partake in the QA. #0 by Clout Fable · 0/{bank}. The rest of the fleet sat the exam.</p>
+  <p class="lede">Independent top 10. This picker read the local {bank}-row ok-bank. Rank is <span class="rank">#N by {html.escape(model)} · N/{bank}</span>.</p>
+  {strip}
+  <div class="row">
+    <a class="btn" href="../picks.html">All boards →</a>
+    <a class="btn ghost" href="../highlights.html">Pass 1 wall</a>
+  </div>
+</div></section>
+<nav class="wrap toc" aria-label="Punchlines">
+{"".join(toc)}
+</nav>
+{"".join(essays)}"""
+    return chrome(
+        title=f"512QA — {model}",
+        desc=f"Independent top 10 by {model} from a {bank}-row ok-bank.",
+        root="../",
+        nav_on="highlights",
+        utc=utc,
+        rev=rev,
+        body=body,
+        bank=bank,
+    )
 
 
 def main() -> int:
@@ -412,7 +565,8 @@ def main() -> int:
         )
         return 0
     data = json.loads(src.read_text(encoding="utf-8"))
-    dst.write_text(render(data, utc, rev), encoding="utf-8")
+    pickers = load_pickers(src)
+    dst.write_text(render(data, utc, rev, pickers), encoding="utf-8")
     return 0
 
 

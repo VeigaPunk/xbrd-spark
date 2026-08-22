@@ -6,9 +6,10 @@
 #
 # Emits:
 #   site/index.html          fleet leaderboard (completion desc, junk last)
-#   site/highlights.html     editorial board from site/src/highlights.json (pass 1)
-#   site/picks.html          pass 2 independent top 10 from site/src/picks-by-model.json
-#   site/cfg/<config>.html   per-config page w/ per-domain breakdown
+#   site/highlights.html           pass 1 editorial wall from site/src/highlights.json
+#   site/picks.html                pass 2 hub (per-model punch walls)
+#   site/highlights/<model>.html   one highlights-style board per picker
+#   site/cfg/<config>.html         per-config page w/ per-domain breakdown
 #
 # Honesty rules (non-negotiable):
 #   * configs with a .junk field -> "quota-stub" badge, sort last regardless of numbers
@@ -182,7 +183,7 @@ page_head() { # $1=title $2=subtitle  $3=asset prefix ('.' or '..')
 <meta name="theme-color" content="#0c0c0b">
 <title>$1</title>
 <link rel="preload" href="$prefix/fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="$prefix/assets/family.css?v=table-1w">
+<link rel="stylesheet" href="$prefix/assets/family.css?v=boards">
 <style>
 $CSS
 body { font-family: var(--font, ui-monospace, monospace); background: var(--bg, #0c0c0b); color: var(--fg, #eceae4); }
@@ -306,4 +307,4 @@ PGTAIL
   PAGES=$((PAGES + 1))
 done
 
-echo "wrote $OUT ($N configs) + $PAGES config pages + $OUTDIR/highlights.html + $OUTDIR/picks.html"
+echo "wrote $OUT ($N configs) + $PAGES config pages + $OUTDIR/highlights.html + $OUTDIR/picks.html + $OUTDIR/highlights/*.html"

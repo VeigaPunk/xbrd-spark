@@ -21,3 +21,4 @@ benchmarks/**/runs/
 **/__pycache__/
 NON-SSOT.md
 residual-twin.txt
+benchmarks/**/runs.bak*/

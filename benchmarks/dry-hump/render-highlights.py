@@ -365,7 +365,7 @@ def render(data: dict, utc: str, rev: str) -> str:
 <title>512QA — highlights</title>
 <meta name="description" content="Independent punches from a {bank}-answer moral arcade. JetBrainsMonoNL Nerd Font Mono.">
 <link rel="preload" href="fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/family.css">
+<link rel="stylesheet" href="assets/family.css?v=table-1w">
 </head>
 <body>
 <header class="top">

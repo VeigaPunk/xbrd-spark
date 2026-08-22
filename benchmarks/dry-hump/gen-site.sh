@@ -182,7 +182,7 @@ page_head() { # $1=title $2=subtitle  $3=asset prefix ('.' or '..')
 <meta name="theme-color" content="#0c0c0b">
 <title>$1</title>
 <link rel="preload" href="$prefix/fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="$prefix/assets/family.css">
+<link rel="stylesheet" href="$prefix/assets/family.css?v=table-1w">
 <style>
 $CSS
 body { font-family: var(--font, ui-monospace, monospace); background: var(--bg, #0c0c0b); color: var(--fg, #eceae4); }

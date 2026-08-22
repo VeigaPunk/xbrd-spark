@@ -94,7 +94,7 @@ def render(data: dict, utc: str, rev: str) -> str:
 <title>512QA — independent top 10</title>
 <meta name="description" content="{label}">
 <link rel="preload" href="fonts/JetBrainsMonoNLNerdFontMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/family.css">
+<link rel="stylesheet" href="assets/family.css?v=table-1w">
 </head>
 <body>
 <header class="top">
